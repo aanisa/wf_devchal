@@ -1,0 +1,10 @@
+flask
+gevent
+gunicorn
+sqlalchemy
+flask-sqlalchemy
+psycopg2
+flask-migrate
+requests
+flask-migrate
+functools32
