@@ -1,5 +1,5 @@
 import unittest
-from models import School
+import models
 from app import app, db
 
 class TestCase(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestCase(unittest.TestCase):
         pass
 
     def test_foo(self):
-        c = School(name="Name")
+        c = models.School(name="Name")
         db.session.add(c)
         db.session.commit()
         assert True

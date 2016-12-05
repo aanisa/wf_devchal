@@ -1,5 +1,5 @@
 from app import app, db
-from sqlalchemy.orm import relationship
+import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
 import requests
@@ -15,14 +15,14 @@ class Checklist(Base):
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey('apply_school.id'))
-    school = relationship("School", back_populates="apply_school")
+    school = sqlalchemy.orm.relationship("School", back_populates="checklists")
     interview_scheduled_at = db.Column(db.DateTime)
     observation_scheduled_at = db.Column(db.DateTime)
 
 class School(Base):
     __tablename__ = "apply_school"
     id = db.Column(db.Integer, primary_key=True)
-    checklists = relationship("Checklist", back_populates="apply_checklist")
+    checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
     schedule_interview_url = db.Column(db.String(80))
@@ -30,7 +30,7 @@ class School(Base):
     email = db.Column(db.String(80))
     survey_monkey_choice_id = db.Column(db.String(80))
 
-    def survey_monkey_choice_id(self, survey_id, survey_monkey_which_schools_question_id):
+    def XXX_HERE_TOD_survey_monkey_choice_id(self, survey_id, survey_monkey_which_schools_question_id):
         for page in Survey(survey_id).data["pages"]:
             for question in page["questions"]:
                 if question["id"] == survey_monkey_which_schools_question_id:
