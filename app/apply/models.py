@@ -38,40 +38,39 @@ request_session.headers.update({
 
 class Survey():
     @lru_cache(maxsize=None)
-    def __init__(self, id):
-        self.data = request_session.get("https://api.surveymonkey.net/v3/surveys{0}/details".format(id)).json()
+    def __init__(self):
+        self.data = request_session.get("https://api.surveymonkey.net/v3/surveys{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
-    def survey_monkey_choice_id_for_school(self, school, survey_monkey_which_schools_question_id):
+    def survey_monkey_choice_id_for_school(self, school):
         for page in Survey(survey_id).data["pages"]:
             for question in page["questions"]:
-                if question["id"] == survey_monkey_which_schools_question_id:
+                if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
                     for choice in question["answers"]["choices"]:
                         if choice["text"].lower().find(school.match.lower()) >= 0:
                             return choice["id"]
         raise LookupError
 
 @lru_cache(maxsize=None)
-def responses(id):
-    return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(id), params={"sort_order": "DESC"}).json()
+def responses():
+    return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC"}).json()
 
 class Response():
-    def __init__(self, survey_id, guid):
+    def __init__(self, guid):
         self.guid = guid
-        for d in responses(survey_id)["data"]:
+        for d in responses()["data"]:
             if d["custom_variables"]["response_guid"] == self.guid:
                 self.data = d
-        raise LookupError
 
-    def schools(self, survey_monkey_which_schools_question_id):
+    def schools(self):
         schools = []
         for page in self.data["pages"]:
             for question in page["questions"]:
-                if question["id"] == survey_monkey_which_schools_question_id:
+                if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
                     for answer in question["answers"]:
                         schools.append(School.query.filter(School.survey_monkey_choice_id == answer["choice_id"]).first())
         return schools
 
-    def create_checklists(self, survey_monkey_which_schools_question_id):
-        for school in self.schools(survey_monkey_which_schools_question_id):
+    def create_checklists(self):
+        for school in self.schools():
             school.checklists.append(Checklist(guid=self.guid))
         db.session.commit()
