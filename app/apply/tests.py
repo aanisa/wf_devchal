@@ -17,4 +17,4 @@ class TestCase(unittest.TestCase):
     def test_response(self):
         response = models.Response(self.guid)
         assert isinstance(response.data, dict)
-        assert len(response.schools()) > 0
+        assert len(response.schools) > 0

@@ -61,6 +61,7 @@ class Response():
             if d["custom_variables"]["response_guid"] == self.guid:
                 self.data = d
 
+    @property
     def schools(self):
         schools = []
         for page in self.data["pages"]:
@@ -73,4 +74,63 @@ class Response():
     def create_checklists(self):
         for school in self.schools():
             school.checklists.append(Checklist(guid=self.guid))
+        db.session.commit()
+
+class Appointment():
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def is_cancelled(self):
+        if self.data["event"] == "invitee.canceled":
+            return True
+        return False
+
+    @property
+    def is_created(self):
+        if self.data["event"] == "invitee.created":
+            return True
+        return False
+
+    @property
+    def is_interview(self):
+        raise
+
+    @property
+    def is_observation(self):
+        raise
+
+    @property
+    def school(self):
+        return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"]["email"]).first()
+
+    @property
+    def response(self):
+        raise
+
+    @property
+    def at(self):
+        raise
+
+    def checklist(self):
+        raise
+
+    def update_checklist(self):
+        c = self.checklist
+        if self.is_interview:
+            if self.is_cancelled:
+                c.interview_scheduled_at = None
+            else if self.is_created:
+                c.interview_scheduled_at = self.at
+            else:
+                raise LookupError
+        else if self.is_observation
+            if self.is_cancelled:
+                c.observation_scheduled_at = None
+            else if self.is_created:
+                c.observation_scheduled_at = self.at
+            else:
+                raise LookupError
+        else:
+            raise LookupError
         db.session.commit()
