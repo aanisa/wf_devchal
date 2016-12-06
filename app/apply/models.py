@@ -39,10 +39,10 @@ request_session.headers.update({
 class Survey():
     @lru_cache(maxsize=None)
     def __init__(self):
-        self.data = request_session.get("https://api.surveymonkey.net/v3/surveys{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+        self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
     def survey_monkey_choice_id_for_school(self, school):
-        for page in Survey(survey_id).data["pages"]:
+        for page in self.data["pages"]:
             for question in page["questions"]:
                 if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
                     for choice in question["answers"]["choices"]:
