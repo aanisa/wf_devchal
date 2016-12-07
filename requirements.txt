@@ -8,3 +8,4 @@ flask-migrate
 requests
 flask-migrate
 functools32
+combomethod

@@ -3,6 +3,8 @@ import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
 import requests
+from combomethod import combomethod
+import inspect
 
 class Base(db.Model):
     __abstract__  = True
@@ -71,10 +73,14 @@ class Response():
                         schools.append(School.query.filter(School.survey_monkey_choice_id == answer["choice_id"]).first())
         return schools
 
-    def create_checklists(self):
-        for school in self.schools():
-            school.checklists.append(Checklist(guid=self.guid))
-        db.session.commit()
+    @combomethod
+    def create_checklists(receiver, guid=None):
+        if inspect.isclass(receiver):
+            Checklist(guid).create_checklists()
+        else:
+            for school in self.schools():
+                school.checklists.append(Checklist(guid=receiver.guid))
+            db.session.commit()
 
 class Appointment():
     def __init__(self, data):
@@ -82,23 +88,19 @@ class Appointment():
 
     @property
     def is_cancelled(self):
-        if self.data["event"] == "invitee.canceled":
-            return True
-        return False
+        return True if self.data["event"] == "invitee.canceled" else False
 
     @property
     def is_created(self):
-        if self.data["event"] == "invitee.created":
-            return True
-        return False
+        return True if self.data["event"] == "invitee.created" else False
 
     @property
     def is_interview(self):
-        raise
+        return True if self.data["payload"]["event_type"]["slug"].find("interview") >= 0 else False
 
     @property
     def is_observation(self):
-        raise
+        return True if self.data["payload"]["event_type"]["slug"].find("observation") >= 0 else False
 
     @property
     def school(self):
@@ -106,31 +108,38 @@ class Appointment():
 
     @property
     def response(self):
+        # use invitee's email address to find response - look for either parent
+        # will require another setting to find correct place for answer in response
         raise
 
     @property
     def at(self):
+        # do I have to convert to datetime?
         raise
 
     def checklist(self):
-        raise
+        return Checklist.query.filter(Checklist.guid == self.response.guid, Checklist.school == self.school).first()
 
-    def update_checklist(self):
-        c = self.checklist
-        if self.is_interview:
-            if self.is_cancelled:
-                c.interview_scheduled_at = None
-            else if self.is_created:
-                c.interview_scheduled_at = self.at
-            else:
-                raise LookupError
-        else if self.is_observation
-            if self.is_cancelled:
-                c.observation_scheduled_at = None
-            else if self.is_created:
-                c.observation_scheduled_at = self.at
-            else:
-                raise LookupError
+    @combomethod
+    def update_checklist(receiver, data=None):
+        if inspect.isclass(receiver):
+            Appointment(data).update_checklist();
         else:
-            raise LookupError
-        db.session.commit()
+            c = receiver.checklist
+            if receiver.is_interview:
+                if receiver.is_cancelled:
+                    c.interview_scheduled_at = None
+                elif receiver.is_created:
+                    c.interview_scheduled_at = self.at
+                else:
+                    raise LookupError
+            elif receiver.is_observation
+                if receiver.is_cancelled:
+                    c.observation_scheduled_at = None
+                elif receiver.is_created:
+                    c.observation_scheduled_at = receiver.at
+                else:
+                    raise LookupError
+            else:
+                raise LookupError
+            db.session.commit()

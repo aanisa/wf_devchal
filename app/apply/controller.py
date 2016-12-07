@@ -9,4 +9,10 @@ def redirect_to_survey_monkey_with_guid():
 
 @apply_blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
-    pass
+    models.Response.create_checklists(request.args.get("guid"))
+    return "TBD"
+
+@apply_blueprint.route('/calendly_webhook')
+def calendly_webhook():
+    models.Appointment(request.get_json()).update_checklist()
+    return "TBD"

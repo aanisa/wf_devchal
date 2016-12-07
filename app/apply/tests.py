@@ -18,3 +18,12 @@ class TestCase(unittest.TestCase):
         response = models.Response(self.guid)
         assert isinstance(response.data, dict)
         assert len(response.schools) > 0
+
+    def test_appointment:
+        assert False
+
+    def test_after_survey_monkey:
+        assert False
+
+    def test_calendly_webhook:
+        assert False
