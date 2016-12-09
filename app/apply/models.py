@@ -120,6 +120,7 @@ class Appointment():
     def at(self):
         return dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
 
+    @property
     def checklist(self):
         return Checklist.query.filter(Checklist.guid == self.response.guid, Checklist.school == self.school).first()
 
