@@ -4,14 +4,15 @@ import flask
 from app import app, db
 import os
 from . import seed
+import click
+from click.testing import CliRunner
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        # reset db
         db.reflect()
         db.drop_all()
         db.create_all()
-        seed()
+        CliRunner().invoke(seed)
         self.guid = models.responses()["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):

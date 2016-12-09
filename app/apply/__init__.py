@@ -20,7 +20,6 @@ def seed(ctx):
     ctx.forward(seed_schools)
 cli.add_command(seed)
 
-
 @app.cli.command("seed_schools")
 def seed_schools():
     """Seed schools"""
