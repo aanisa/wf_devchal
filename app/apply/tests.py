@@ -13,13 +13,13 @@ class TestCase(unittest.TestCase):
         db.drop_all()
         db.create_all()
         CliRunner().invoke(seed)
-        self.guid = models.responses()["data"][0]["custom_variables"]["response_guid"]
+        self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
         assert isinstance(models.Survey().data, dict)
 
     def test_response(self):
-        response = models.Response(self.guid)
+        response = models.Response(guid=self.guid)
         assert isinstance(response.data, dict)
         assert len(response.schools) > 0
 

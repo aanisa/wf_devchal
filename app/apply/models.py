@@ -62,15 +62,26 @@ class Survey():
         raise LookupError
 
 @lru_cache(maxsize=None)
-def responses():
-    return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC"}).json()
+def responses(page):
+    return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
 
 class Response():
-    def __init__(self, guid):
+    def __init__(self, guid=None, email=None):
         self.guid = guid
-        for d in responses()["data"]:
-            if d["custom_variables"]["response_guid"] == self.guid:
-                self.data = d
+        for i in range(1, 100):
+            for d in responses(i)["data"]:
+                if guid:
+                    if d["custom_variables"]["response_guid"] == self.guid:
+                        self.data = d
+                        return
+                elif email:
+                    for page in d["pages"]:
+                        for question in page["questions"]:
+                            if question["id"] in app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS']:
+                                if question["answers"][0]["text"].lower() == email.lower():
+                                    self.data = d
+                                    return
+        raise LookupError
 
     @property
     def schools(self):
@@ -112,9 +123,7 @@ class Appointment():
 
     @property
     def response(self):
-        # use invitee's email address to find response - look for either parent
-        # will require another setting to find correct place for answer in response
-        raise
+        return Response(email=self.data["payload"]["invitee"]["email"])
 
     @property
     def at(self):
