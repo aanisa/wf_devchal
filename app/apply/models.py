@@ -5,6 +5,7 @@ import datetime
 import requests
 from combomethod import combomethod
 import inspect
+import dateutil.parser
 
 class Base(db.Model):
     __abstract__  = True
@@ -87,20 +88,15 @@ class Appointment():
         self.data = data
 
     @property
-    def is_cancelled(self):
+    def is_canceled(self):
         return True if self.data["event"] == "invitee.canceled" else False
 
     @property
-    def is_created(self):
-        return True if self.data["event"] == "invitee.created" else False
-
-    @property
-    def is_interview(self):
-        return True if self.data["payload"]["event_type"]["slug"].find("interview") >= 0 else False
-
-    @property
-    def is_observation(self):
-        return True if self.data["payload"]["event_type"]["slug"].find("observation") >= 0 else False
+    def type(self):
+        for t in ["interview", "observation", "visit"]:
+            if self.data["payload"]["event_type"]["slug"].find(t) >= 0:
+                return t
+        raise LookupError
 
     @property
     def school(self):
@@ -114,8 +110,8 @@ class Appointment():
 
     @property
     def at(self):
-        # do I have to convert to datetime?
-        raise
+        print dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
+        return dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
 
     def checklist(self):
         return Checklist.query.filter(Checklist.guid == self.response.guid, Checklist.school == self.school).first()
@@ -125,21 +121,5 @@ class Appointment():
         if inspect.isclass(receiver):
             Appointment(data).update_checklist();
         else:
-            c = receiver.checklist
-            if receiver.is_interview:
-                if receiver.is_cancelled:
-                    c.interview_scheduled_at = None
-                elif receiver.is_created:
-                    c.interview_scheduled_at = self.at
-                else:
-                    raise LookupError
-            elif receiver.is_observation
-                if receiver.is_cancelled:
-                    c.observation_scheduled_at = None
-                elif receiver.is_created:
-                    c.observation_scheduled_at = receiver.at
-                else:
-                    raise LookupError
-            else:
-                raise LookupError
+            setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()

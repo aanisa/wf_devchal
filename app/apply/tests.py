@@ -1,6 +1,8 @@
 import unittest
 import models
+import flask
 from app import app, db
+import os
 
 class TestCase(unittest.TestCase):
     def setUp(self):
@@ -19,11 +21,16 @@ class TestCase(unittest.TestCase):
         assert isinstance(response.data, dict)
         assert len(response.schools) > 0
 
-    def test_appointment:
+    def test_appointment(self):
         assert False
 
-    def test_after_survey_monkey:
+    def test_after_survey_monkey(self):
         assert False
 
-    def test_calendly_webhook:
+    def test_calendly_webhook(self):
+        with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
+            data = f.read()
+        with app.test_request_context():
+            response = app.test_client().post(flask.url_for('apply_blueprint.calendly_webhook'), data=data, content_type='application/json')
+        print response
         assert False

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 import models
 
 apply_blueprint = Blueprint('apply_blueprint', __name__, template_folder='templates')
@@ -12,7 +12,7 @@ def after_survey_monkey():
     models.Response.create_checklists(request.args.get("guid"))
     return "TBD"
 
-@apply_blueprint.route('/calendly_webhook')
+@apply_blueprint.route('/calendly_webhook', methods=['POST'])
 def calendly_webhook():
     models.Appointment(request.get_json()).update_checklist()
     return "TBD"

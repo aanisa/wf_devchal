@@ -4,8 +4,8 @@
   "payload":{
     "event_type":{
       "kind":"1-on-1",
-      "slug":"event_type_name",
-      "name":"Event Type Name",
+      "slug":"interview",
+      "name":"Interview",
       "duration":15
     },
     "event":{
@@ -13,11 +13,11 @@
       "assigned_to":[
         "Jane Sample Data"
       ],
-      "extended_assigned_to": [
+      "extended_assigned_to": {
         "name": "Jane Sample Data",
         "email": "user@example.com",
         "primary": false
-      ],
+      },
       "start_time":"2016-08-23T12:00:00Z",
       "start_time_pretty":"12:00pm - Tuesday, August 23, 2016",
       "invitee_start_time":"2016-08-23T12:00:00Z",
