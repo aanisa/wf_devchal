@@ -6,6 +6,9 @@ import requests
 from combomethod import combomethod
 import inspect
 import dateutil.parser
+import os
+
+table_name_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 class Base(db.Model):
     __abstract__  = True
@@ -14,17 +17,17 @@ class Base(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
 class Checklist(Base):
-    __tablename__ = "apply_checklist"
+    __tablename__ = "{0}_checklist".format(table_name_prefix)
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
-    school_id = db.Column(db.Integer, db.ForeignKey('apply_school.id'))
+    school_id = db.Column(db.Integer, db.ForeignKey("{0}_school.id".format(table_name_prefix)))
     school = sqlalchemy.orm.relationship("School", back_populates="checklists")
     interview_scheduled_at = db.Column(db.DateTime)
     observation_scheduled_at = db.Column(db.DateTime)
     visit_scheduled_at = db.Column(db.DateTime)
 
 class School(Base):
-    __tablename__ = "apply_school"
+    __tablename__ = "{0}_school".format(table_name_prefix)
     id = db.Column(db.Integer, primary_key=True)
     checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
     name = db.Column(db.String(80))

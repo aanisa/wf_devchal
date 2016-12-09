@@ -3,6 +3,7 @@ import models
 import flask
 from app import app, db
 import os
+from . import seed
 
 class TestCase(unittest.TestCase):
     def setUp(self):
@@ -10,8 +11,7 @@ class TestCase(unittest.TestCase):
         db.reflect()
         db.drop_all()
         db.create_all()
-        XXX RUN seed
-        # sensible defalts
+        seed()
         self.guid = models.responses()["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):

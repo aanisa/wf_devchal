@@ -3,24 +3,39 @@ import os
 import csv
 import models
 import ast
+import click
 
 path = os.path.dirname(os.path.realpath(__file__))
+name = path.split("/")[-1]
 
-@app.cli.command("{0}_seed".format(path.split("/")[-1]))
-def seed_command():
-    seed_schools_command()
+@app.cli.group(name = name)
+def cli():
+    """Namespace for blueprint"""
+    pass
 
-@app.cli.command("{0}_seed_schools".format(path.split("/")[-1]))
-def seed_schools_command():
-    with open("{0}/seed_schools.csv".format(path), 'rb') as f:
+@app.cli.command("seed")
+@click.pass_context
+def seed(ctx):
+    """Seed all"""
+    ctx.forward(seed_schools)
+cli.add_command(seed)
+
+
+@app.cli.command("seed_schools")
+def seed_schools():
+    """Seed schools"""
+    with open("{0}/seeds/schools.csv".format(path), 'rb') as f:
         schools = []
         for d in csv.DictReader(f):
-            s = populate(School(), d)
-            s.survey_monkey_choice_id=models.Survey().survey_monkey_choice_id_for_school(school)
-            schools.append(s)
+            school = populate(models.School(), d)
+            school.survey_monkey_choice_id=models.Survey().survey_monkey_choice_id_for_school(school)
+            schools.append(school)
         db.session.add_all(schools)
         db.session.commit()
+    click.echo("Seeded schools")
+cli.add_command(seed_schools)
 
 def populate(model, dict):
     for k in dict.keys():
-        setattr(model, k, ast.literal_eval(dict[k]))
+        setattr(model, k, ast.literal_eval("\"{0}\"".format(dict[k])))
+    return model
