@@ -32,5 +32,3 @@ class TestCase(unittest.TestCase):
             data = f.read()
         with app.test_request_context():
             response = app.test_client().post(flask.url_for('apply_blueprint.calendly_webhook'), data=data, content_type='application/json')
-        print response
-        assert False

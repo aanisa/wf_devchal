@@ -110,7 +110,6 @@ class Appointment():
 
     @property
     def at(self):
-        print dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
         return dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
 
     def checklist(self):
