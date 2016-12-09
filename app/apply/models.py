@@ -21,6 +21,7 @@ class Checklist(Base):
     school = sqlalchemy.orm.relationship("School", back_populates="checklists")
     interview_scheduled_at = db.Column(db.DateTime)
     observation_scheduled_at = db.Column(db.DateTime)
+    visit_scheduled_at = db.Column(db.DateTime)
 
 class School(Base):
     __tablename__ = "apply_school"
@@ -28,8 +29,12 @@ class School(Base):
     checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
+    interview_optional = db.Column(db.Boolean())
     schedule_interview_url = db.Column(db.String(80))
     schedule_observation_url = db.Column(db.String(80))
+    observation_optional = db.Column(db.Boolean())
+    schedule_visit_url = db.Column(db.String(80))
+    visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
     survey_monkey_choice_id = db.Column(db.String(80))
 

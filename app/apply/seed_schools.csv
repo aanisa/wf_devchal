@@ -1,10 +1,10 @@
-name,match,schedule_interview_url,schedule_observation_url,email
-Aster Montessori School,aster,http://TBD,http://TBD,mail@example.com
-Dandelion Montessori Coop,dandelion,http://TBD,http://TBD,mail@example.com
-Marigold Montessori School,marigold,http://TBD,http://TBD,mail@example.com
-Mariposa Montessori School,mariposa,http://TBD,http://TBD,mail@example.com
-Snapdragon Montessori School,snapdragon,http://TBD,http://TBD,mail@example.com
-Snowdrop Montessori,snowdrop,http://TBD,http://TBD,mail@example.com
-Violeta Montessori School,violeta,http://TBD,http://TBD,mail@example.com
-Wild Rose Montessori School,wild rose,http://TBD,http://TBD,mail@example.com
-Wildflower Montessori School,wildflower,http://TBD,http://TBD,mail@example.com
+"name","match","schedule_interview_url","schedule_observation_url","email"
+"Aster Montessori School","aster","http://TBD,http://TBD,mail@example.com"
+"Dandelion Montessori Coop","dandelion","http://TBD,http://TBD,mail@example.com"
+"Marigold Montessori School","marigold","http://TBD,http://TBD,mail@example.com"
+"Mariposa Montessori School,"mariposa","http://TBD,http://TBD,mail@example.com"
+"Snapdragon Montessori School","snapdragon","http://TBD,http://TBD,mail@example.com"
+"Snowdrop Montessori","snowdrop","http://TBD,http://TBD,mail@example.com"
+"Violeta Montessori School","violeta","http://TBD,http://TBD,mail@example.com"
+"Wild Rose Montessori School","wild rose","http://TBD,http://TBD,mail@example.com"
+"Wildflower Montessori School","wildflower","http://TBD,http://TBD,mail@example.com"

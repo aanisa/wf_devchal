@@ -10,6 +10,7 @@ class TestCase(unittest.TestCase):
         db.reflect()
         db.drop_all()
         db.create_all()
+        XXX RUN seed
         # sensible defalts
         self.guid = models.responses()["data"][0]["custom_variables"]["response_guid"]
 
