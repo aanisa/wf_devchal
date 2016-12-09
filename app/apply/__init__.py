@@ -14,8 +14,7 @@ def cli():
     pass
 
 @app.cli.command("seed")
-@click.pass_context
-def seed(ctx):
+def seed():
     """Seed"""
     for f in [f for f in os.listdir("{0}/seeds/".format(path))]:
         model_name = f.split(".")[0]
