@@ -16,25 +16,19 @@ def cli():
 @app.cli.command("seed")
 @click.pass_context
 def seed(ctx):
-    """Seed all"""
-    ctx.forward(seed_schools)
+    """Seed"""
+    for f in [f for f in os.listdir("{0}/seeds/".format(path))]:
+        model_name = f.split(".")[0]
+        with open("{0}/seeds/{1}".format(path, f), 'rb') as f:
+            seeds = []
+            click.echo("Seeding {0}".format(model_name))
+            for d in csv.DictReader(f):
+                seeds.append(populate(eval("models.{0}()".format(model_name)), d))
+    db.session.add_all(seeds)
+    db.session.commit()
 cli.add_command(seed)
 
-@app.cli.command("seed_schools")
-def seed_schools():
-    """Seed schools"""
-    with open("{0}/seeds/schools.csv".format(path), 'rb') as f:
-        schools = []
-        for d in csv.DictReader(f):
-            school = populate(models.School(), d)
-            school.survey_monkey_choice_id=models.Survey().survey_monkey_choice_id_for_school(school)
-            schools.append(school)
-        db.session.add_all(schools)
-        db.session.commit()
-    click.echo("Seeded schools")
-cli.add_command(seed_schools)
-
-def populate(model, dict):
+def populate(seed, dict):
     for k in dict.keys():
-        setattr(model, k, ast.literal_eval("\"{0}\"".format(dict[k])))
-    return model
+        setattr(seed, k, ast.literal_eval("\"{0}\"".format(dict[k])))
+    return seed
