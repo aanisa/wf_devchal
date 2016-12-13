@@ -6,13 +6,14 @@ import os
 from . import seed
 import click
 from click.testing import CliRunner
+import json
 
 class TestCase(unittest.TestCase):
     def setUp(self):
         db.reflect()
         db.drop_all()
         db.create_all()
-        CliRunner().invoke(seed)
+        print CliRunner().invoke(seed).output
         self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
@@ -24,7 +25,11 @@ class TestCase(unittest.TestCase):
         assert len(response.schools) > 0
 
     def test_appointment(self):
-        assert False
+        print models.School.query.all()
+        # with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
+        #     a = models.Appointment(json.loads(f.read()))
+        # print a.data["payload"]["event"]["extended_assigned_to"][0]["email"]
+        # print a.school
 
     def test_after_survey_monkey(self):
         assert False

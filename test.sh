@@ -5,6 +5,6 @@ else
   e="test"
 fi
 export APP_CONFIG_FILE=`pwd -P`/config/$e.py
-# export FLASK_APP=app
+export FLASK_APP=app
 
 python -m unittest $@

@@ -119,7 +119,7 @@ class Appointment():
 
     @property
     def school(self):
-        return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"]["email"]).first()
+        return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"][0]["email"]).first()
 
     @property
     def response(self):
