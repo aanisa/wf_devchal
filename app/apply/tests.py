@@ -25,11 +25,9 @@ class TestCase(unittest.TestCase):
         assert len(response.schools) > 0
 
     def test_appointment(self):
-        print models.School.query.all()
-        # with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
-        #     a = models.Appointment(json.loads(f.read()))
-        # print a.data["payload"]["event"]["extended_assigned_to"][0]["email"]
-        # print a.school
+        with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
+            a = models.Appointment(json.loads(f.read()))
+        assert a.school
 
     def test_after_survey_monkey(self):
         assert False
