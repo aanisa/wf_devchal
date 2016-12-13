@@ -67,11 +67,11 @@ def responses(page):
 
 class Response():
     def __init__(self, guid=None, email=None):
-        self.guid = guid
         for i in range(1, 100):
             for d in responses(i)["data"]:
+                self.guid = d["custom_variables"]["response_guid"]
                 if guid:
-                    if d["custom_variables"]["response_guid"] == self.guid:
+                    if d["custom_variables"]["response_guid"] == guid:
                         self.data = d
                         return
                 elif email:

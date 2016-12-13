@@ -16,10 +16,10 @@ def cli():
 @app.cli.command("seed")
 def seed():
     """Seed"""
+    seeds = []
     for f in [f for f in os.listdir("{0}/seeds/".format(path))]:
         model_name = f.split(".")[0]
         with open("{0}/seeds/{1}".format(path, f), 'rb') as f:
-            seeds = []
             click.echo("Seeding {0}".format(model_name))
             for d in csv.DictReader(f):
                 seeds.append(populate(eval("models.{0}()".format(model_name)), d))
