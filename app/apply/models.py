@@ -123,7 +123,6 @@ class Appointment():
 
     @property
     def school(self):
-        print self.data["payload"]["event"]["extended_assigned_to"][0]["email"]
         return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"][0]["email"]).first()
 
     @property

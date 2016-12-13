@@ -14,7 +14,7 @@ class TestCase(unittest.TestCase):
         db.drop_all()
         db.create_all()
         r = CliRunner().invoke(seed)
-        if r.exception: raise r.exception 
+        if r.exception: raise r.exception
         self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
