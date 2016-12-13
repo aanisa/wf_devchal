@@ -13,7 +13,8 @@ class TestCase(unittest.TestCase):
         db.reflect()
         db.drop_all()
         db.create_all()
-        print CliRunner().invoke(seed).output
+        r = CliRunner().invoke(seed)
+        if r.exception: raise r.exception 
         self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
@@ -29,7 +30,11 @@ class TestCase(unittest.TestCase):
             a = models.Appointment(json.loads(f.read()))
         assert a.school
 
+    def test_redirect_to_survey_monkey_with_guid(self):
+        assert False
+
     def test_after_survey_monkey(self):
+        # use guid 1234
         assert False
 
     def test_calendly_webhook(self):

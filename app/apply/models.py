@@ -7,6 +7,7 @@ from combomethod import combomethod
 import inspect
 import dateutil.parser
 import os
+from sqlalchemy.ext.hybrid import hybrid_property
 
 table_name_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -39,7 +40,10 @@ class School(Base):
     schedule_visit_url = db.Column(db.String(80))
     visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
-    survey_monkey_choice_id = db.Column(db.String(80))
+
+    @hybrid_property
+    def survey_monkey_choice_id(self):
+        return Survey().survey_monkey_choice_id_for_school(self)
 
 request_session = requests.session()
 request_session.headers.update({
@@ -119,6 +123,7 @@ class Appointment():
 
     @property
     def school(self):
+        print self.data["payload"]["event"]["extended_assigned_to"][0]["email"]
         return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"][0]["email"]).first()
 
     @property
