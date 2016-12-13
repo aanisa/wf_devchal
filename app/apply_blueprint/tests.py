@@ -8,6 +8,8 @@ import click
 from click.testing import CliRunner
 import json
 
+blueprint_name = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
+
 class TestCase(unittest.TestCase):
     def setUp(self):
         db.reflect()
@@ -31,14 +33,15 @@ class TestCase(unittest.TestCase):
         assert a.school
 
     def test_redirect_to_survey_monkey_with_guid(self):
-        assert False
+        with app.test_request_context():
+            response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)))
 
     def test_after_survey_monkey(self):
-        # use guid 1234
-        assert False
+        with app.test_request_context():
+            response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "guid=1234")
 
     def test_calendly_webhook(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
             data = f.read()
         with app.test_request_context():
-            response = app.test_client().post(flask.url_for('apply_blueprint.calendly_webhook'), data=data, content_type='application/json')
+            response = app.test_client().post(flask.url_for("{0}.calendly_webhook".format(blueprint_name)), data=data, content_type='application/json')
