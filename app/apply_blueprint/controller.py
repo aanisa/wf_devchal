@@ -12,7 +12,7 @@ def redirect_to_survey_monkey_with_guid():
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
     models.Response.create_checklists(request.args.get("guid"))
-    return render_template('after_survey_monkey')
+    return render_template('after_survey_monkey.html')
 
 @blueprint.route('/calendly_webhook', methods=['POST'])
 def calendly_webhook():
