@@ -1,0 +1,5 @@
+{{ school.name }}
+
+{% if school.schedule_interview_url %}Schedule interview at {{ school.schedule_interview_url }}{% if school.interview_optional == True %}(Optional){% endif %}{% endif %}
+{% if school.schedule_observation_url %}Schedule observation at {{ school.schedule_interview_url }}{% if school.observation_optional == True %}(Optional){% endif %}{% endif %}
+{% if school.schedule_visit_url %}Schedule child visit at {{ school.schedule_visit_url }}{% if school.visit_optional == True %}(Optional){% endif %}{% endif %}

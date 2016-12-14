@@ -32,10 +32,10 @@ class Checklist(Base):
     def email_checklist(self):
         mail.send(
             Message(
-                "Next steps for your application to ${0}".format(self.school.name),
-                sender = "Dan Grigsby <dan.grigsby@wildflowerschools.org>",
-                recipients = Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS'][0]),
-                body = "hi" # render_template("redirect_to_survey_monkey_with_guid.html") #
+                "Next steps for your application to {0}".format(self.school.name),
+                sender = self.school.email,
+                recipients = [Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS'][0])],
+                body = render_template("email_checklist.txt", school=self.school)
             )
         )
 

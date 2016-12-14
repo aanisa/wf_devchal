@@ -7,6 +7,8 @@ https://requestb.in/s6rz4ys6?inspect
 
 TODO:
 
+"I already [interviewed|visited|observed]"
+
 Timezones
 Seeds aren’t working for ints or true false
 parameterize apply_blueprint test

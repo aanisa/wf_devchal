@@ -1,7 +1,7 @@
 import unittest
 import models
 import flask
-from app import app, db
+from app import app, db, mail
 import os
 from . import seed
 import click
@@ -29,7 +29,10 @@ class TestCase(unittest.TestCase):
 
     def test_checklist(self):
         models.Response(guid=self.guid).create_checklists()
-        models.Checklist.query.first().email_checklist()
+        with app.app_context():
+            with mail.record_messages() as outbox:
+                models.Checklist.query.first().email_checklist()
+                assert len(outbox) > 0
 
     def test_appointment(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
