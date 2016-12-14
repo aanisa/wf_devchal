@@ -2,8 +2,10 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
+from flaskext.mail import Mail
 
 app = Flask(__name__)
+mail = Mail(app)
 
 app.config.from_object('config.default')
 app.config.from_envvar('APP_CONFIG_FILE')
