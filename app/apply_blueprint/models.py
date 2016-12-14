@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, mail
 import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
@@ -8,6 +8,8 @@ import inspect
 import dateutil.parser
 import os
 from sqlalchemy.ext.hybrid import hybrid_property
+from flask_mail import Message
+from flask import render_template
 
 table_name_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -30,10 +32,10 @@ class Checklist(Base):
     def email_checklist(self):
         mail.send(
             Message(
-                "Next steps for your application to ${0}".format(self.school.name)
+                "Next steps for your application to ${0}".format(self.school.name),
                 sender = "Dan Grigsby <dan.grigsby@wildflowerschools.org>",
                 recipients = Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS'][0]),
-                body = 
+                body = "hi" # render_template("redirect_to_survey_monkey_with_guid.html") #
             )
         )
 
@@ -51,11 +53,6 @@ class School(Base):
     visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
 
-    @hybrid_property
-    def survey_monkey_choice_id(self):
-        return Survey().survey_monkey_choice_id_for(self)
-
-
 request_session = requests.session()
 request_session.headers.update({
   "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
@@ -67,13 +64,15 @@ class Survey():
     def __init__(self):
         self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
-    def survey_monkey_choice_id_for(self, school):
+    def school_for(self, survey_monkey_choice_id):
         for page in self.data["pages"]:
             for question in page["questions"]:
                 if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
                     for choice in question["answers"]["choices"]:
-                        if choice["text"].lower().find(school.match.lower()) >= 0:
-                            return choice["id"]
+                        if choice["id"] == survey_monkey_choice_id:
+                            for school in School.query.all():
+                                if choice["text"].lower().find(school.match.lower()) >= 0:
+                                    return school
         raise LookupError
 
 @lru_cache(maxsize=None)
@@ -98,7 +97,7 @@ class Response():
                                     return
         raise LookupError
 
-    def answer_for(question_id):
+    def answer_for(self, question_id):
         for page in self.data["pages"]:
             for question in page["questions"]:
                 if question["id"] == question_id:
@@ -107,7 +106,6 @@ class Response():
                     # will have to be updated later for less simple answers
         raise LookupError
 
-
     @property
     def schools(self):
         schools = []
@@ -115,15 +113,15 @@ class Response():
             for question in page["questions"]:
                 if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
                     for answer in question["answers"]:
-                        schools.append(School.query.filter(School.survey_monkey_choice_id == answer["choice_id"]).first())
+                        schools.append(Survey().school_for(answer["choice_id"]))
         return schools
 
     @combomethod
     def create_checklists(receiver, guid=None):
         if inspect.isclass(receiver):
-            Checklist(guid).create_checklists()
+            Response(guid=guid).create_checklists()
         else:
-            for school in self.schools():
+            for school in receiver.schools:
                 school.checklists.append(Checklist(guid=receiver.guid))
             db.session.commit()
 

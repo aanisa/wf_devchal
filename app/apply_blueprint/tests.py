@@ -27,6 +27,10 @@ class TestCase(unittest.TestCase):
         assert isinstance(response.data, dict)
         assert len(response.schools) > 0
 
+    def test_checklist(self):
+        models.Response(guid=self.guid).create_checklists()
+        models.Checklist.query.first().email_checklist()
+
     def test_appointment(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
             a = models.Appointment(json.loads(f.read()))
