@@ -27,6 +27,16 @@ class Checklist(Base):
     observation_scheduled_at = db.Column(db.DateTime)
     visit_scheduled_at = db.Column(db.DateTime)
 
+    def email_checklist(self):
+        mail.send(
+            Message(
+                "Next steps for your application to ${0}".format(self.school.name)
+                sender = "Dan Grigsby <dan.grigsby@wildflowerschools.org>",
+                recipients = Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS'][0]),
+                body = 
+            )
+        )
+
 class School(Base):
     __tablename__ = "{0}_school".format(table_name_prefix)
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +53,8 @@ class School(Base):
 
     @hybrid_property
     def survey_monkey_choice_id(self):
-        return Survey().survey_monkey_choice_id_for_school(self)
+        return Survey().survey_monkey_choice_id_for(self)
+
 
 request_session = requests.session()
 request_session.headers.update({
@@ -56,7 +67,7 @@ class Survey():
     def __init__(self):
         self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
-    def survey_monkey_choice_id_for_school(self, school):
+    def survey_monkey_choice_id_for(self, school):
         for page in self.data["pages"]:
             for question in page["questions"]:
                 if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
@@ -86,6 +97,16 @@ class Response():
                                     self.data = d
                                     return
         raise LookupError
+
+    def answer_for(question_id):
+        for page in self.data["pages"]:
+            for question in page["questions"]:
+                if question["id"] == question_id:
+                    return question["answers"][0]["text"]
+                    # this only works for simple, single answer, text answers
+                    # will have to be updated later for less simple answers
+        raise LookupError
+
 
     @property
     def schools(self):
