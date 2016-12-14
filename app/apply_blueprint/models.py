@@ -121,9 +121,12 @@ class Response():
         if inspect.isclass(receiver):
             Response(guid=guid).create_checklists()
         else:
+            checklists = []
             for school in receiver.schools:
-                school.checklists.append(Checklist(guid=receiver.guid))
+                checklists.append(Checklist(guid=receiver.guid), school=school)
+            db.session.add_all(checklists)            
             db.session.commit()
+            return checklists
 
 class Appointment():
     def __init__(self, data):
