@@ -24,4 +24,9 @@ def calendly_webhook():
 @blueprint.route('/completed')
 def already():
     models.Checklist().query().filter(Checklist.id == request.args.get("id")).filter(Checklist.guid == request.args.get("guid")).first().completed(request.args.get("appointment"))
-    return "OK"
+    return render_template('completed.html')
+
+@blueprint.route('/dashboard')
+def dashboard():
+    checklists = models.Checklist().query().filter(school_id = request.args.get("id"))
+    return render_template('dashboard.html', checklists=checklists)
