@@ -39,6 +39,10 @@ class Checklist(Base):
             )
         )
 
+    def completed(self, appointment):
+        setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
+        db.session.commit()
+
 class School(Base):
     __tablename__ = "{0}_school".format(table_name_prefix)
     id = db.Column(db.Integer, primary_key=True)

@@ -14,3 +14,4 @@ Timezones
 Seeds aren’t working for ints or true false
 parameterize apply_blueprint test
 auto update surveymonkey oauth token
+Feel like I can make this more idiomatically python with static or singleton methods, automatically prepend the table names, when to db.commit

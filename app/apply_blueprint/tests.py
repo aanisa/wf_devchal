@@ -29,10 +29,14 @@ class TestCase(unittest.TestCase):
 
     def test_checklist(self):
         models.Response(guid=self.guid).create_checklists()
+        checklist = models.Checklist.query.first()
         with app.app_context():
             with mail.record_messages() as outbox:
-                models.Checklist.query.first().email_checklist()
+                checklist.email_checklist()
                 assert len(outbox) > 0
+        assertIsNone(checklist.visit_scheduled_at)
+        checklist.completed("visit")
+        assertIsNotNone(checklist.visit_scheduled_at)
 
     def test_appointment(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:

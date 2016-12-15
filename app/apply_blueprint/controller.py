@@ -20,3 +20,8 @@ def after_survey_monkey():
 def calendly_webhook():
     models.Appointment(request.get_json()).update_checklist()
     return "OK"
+
+@blueprint.route('/completed')
+def already():
+    models.Checklist().query().filter(Checklist.id == request.args.get("id")).filter(Checklist.guid == request.args.get("guid")).first().completed(request.args.get("appointment"))
+    return "OK"
