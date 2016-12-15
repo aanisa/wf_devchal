@@ -20,12 +20,12 @@ class TestCase(unittest.TestCase):
         self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
-        assert isinstance(models.Survey().data, dict)
+        self.assertIsInstance(models.Survey().data, dict)
 
     def test_response(self):
         response = models.Response(guid=self.guid)
-        assert isinstance(response.data, dict)
-        assert len(response.schools) > 0
+        self.assertIsInstance(response.data, dict)
+        self.assertGreater(len(response.schools), 0)
 
     def test_checklist(self):
         models.Response(guid=self.guid).create_checklists()
@@ -33,15 +33,15 @@ class TestCase(unittest.TestCase):
         with app.app_context():
             with mail.record_messages() as outbox:
                 checklist.email_checklist()
-                assert len(outbox) > 0
-        assertIsNone(checklist.visit_scheduled_at)
+                self.assertGreater(len(outbox), 0)
+        self.assertIsNone(checklist.visit_scheduled_at)
         checklist.completed("visit")
-        assertIsNotNone(checklist.visit_scheduled_at)
+        self.assertIsNotNone(checklist.visit_scheduled_at)
 
     def test_appointment(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
             a = models.Appointment(json.loads(f.read()))
-        assert a.school
+        self.assertIsInstance(a.school, models.School)
 
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():
