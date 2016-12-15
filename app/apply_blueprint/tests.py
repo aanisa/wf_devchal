@@ -56,3 +56,7 @@ class TestCase(unittest.TestCase):
             data = f.read()
         with app.test_request_context():
             response = app.test_client().post(flask.url_for("{0}.calendly_webhook".format(blueprint_name)), data=data, content_type='application/json')
+
+    def test_completed(self):
+        with app.test_request_context():
+            response = app.test_client().get(flask.url_for("{0}.completed".format(blueprint_name)) + "?guid=1234&id=1")
