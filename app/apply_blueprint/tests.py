@@ -12,7 +12,7 @@ blueprint_name = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        db.reflect()
+        db.session.commit() # fixes hang - see http://stackoverflow.com/questions/24289808/drop-all-freezes-in-flask-with-sqlalchemy
         db.drop_all()
         db.create_all()
         r = CliRunner().invoke(seed)
@@ -41,7 +41,7 @@ class TestCase(unittest.TestCase):
 
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():
-            response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)))
+            response = app.test_client().get(flask.url_for("{0}.redirect_to_survey_monkey_with_guid".format(blueprint_name)))
 
     def test_after_survey_monkey(self):
         with app.test_request_context():
