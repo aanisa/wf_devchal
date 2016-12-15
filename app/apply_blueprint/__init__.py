@@ -29,5 +29,5 @@ cli.add_command(seed)
 
 def populate(seed, dict):
     for k in dict.keys():
-        setattr(seed, k, None if dict[k] == "None" else ast.literal_eval("\"{0}\"".format(dict[k])))
+        setattr(seed, k, ast.literal_eval("{0}".format(dict[k])))
     return seed
