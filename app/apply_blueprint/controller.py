@@ -28,5 +28,5 @@ def completed():
 
 @blueprint.route('/dashboard')
 def dashboard():
-    checklists = models.Checklist().query.filter(models.Checklist.School == School.query.get(request.args.get("id")))
-    return render_template('dashboard.html', checklists=checklists)
+    school = models.School.query.get(request.args.get("id"))
+    return render_template('dashboard.html', school=school)

@@ -1,4 +1,24 @@
 {% extends "layout.html" %}
 {% block body %}
-  HERE
+  {% for checklist in school.checklists %}
+    {{ checklist.id }}
+    {{ checklist.guid }}
+
+    {% for t in ["interview", "observation", "visit"] %}
+      {% if eval("school.{0}_interview_url".format(t)) %}
+        {{ t }}
+        {% at = eval("checklist.{0}_scheduled_at") %}
+        {% if at <= datetime.now() %}
+          completed at {{ at }}
+        {% elif at > datetime.now() % }
+          scheduled for {{ at }}
+        {% else % }
+          not scheduled (TBD: Mark completed)
+          {% if eval("school.{0}_optional".format(t)) %}
+            (optional)
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
 {% endblock %}
