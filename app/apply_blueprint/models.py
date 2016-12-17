@@ -22,7 +22,7 @@ class Base(db.Model):
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
     id = db.Column(db.Integer, primary_key=True)
-    checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
+    checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
     interview_optional = db.Column(db.Boolean())
@@ -44,7 +44,6 @@ class Checklist(Base):
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey(School.id))
-    school = sqlalchemy.orm.relationship("School", back_populates="checklists")
     interview_scheduled_at = db.Column(db.DateTime)
     observation_scheduled_at = db.Column(db.DateTime)
     visit_scheduled_at = db.Column(db.DateTime)
