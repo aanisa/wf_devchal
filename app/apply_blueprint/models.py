@@ -10,22 +10,17 @@ import os
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
 from flask import render_template
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.declarative import declarative_base
 
-class Base(object):
+tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
+
+class Base(db.Model):
     __abstract__  = True
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    @declared_attr
-    def __tablename__(cls):
-        return "{0}_{1}".format(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], cls.__name__)
-
-Base = declarative_base(cls=Base)
-
 class School(Base):
+    __tablename__ = "{0}_school".format(tablename_prefix)
     id = db.Column(db.Integer, primary_key=True)
     checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
     name = db.Column(db.String(80))
@@ -45,6 +40,7 @@ request_session.headers.update({
 })
 
 class Checklist(Base):
+    __tablename__ = "{0}_checklist".format(tablename_prefix)
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey(School.id))
