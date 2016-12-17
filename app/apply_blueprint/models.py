@@ -10,28 +10,44 @@ import os
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
 from flask import render_template
-from sqlalchemy.ext.declarative.api import DeclarativeMeta
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative import declarative_base
 
-# class to automatically prefix the table names with the blueprint name
-class DeclarativeMetaBase(DeclarativeMeta):
+class Base(object):
     __abstract__  = True
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    def __init__(cls, classname, bases, dict_):
-        if '__tablename__' in dict_:
-            cls.__tablename__ = dict_['__tablename__'] = "{0}_{1}".format(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], cls.__tablename__)
-        return DeclarativeMeta.__init__(cls, classname, bases, dict_)
+    @declared_attr
+    def __tablename__(cls):
+        return "{0}_{1}".format(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], cls.__name__)
 
-Base = declarative_base(metaclass=DeclarativeMetaBase)
+Base = declarative_base(cls=Base)
+
+class School(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
+    name = db.Column(db.String(80))
+    match = db.Column(db.String(80))
+    interview_optional = db.Column(db.Boolean())
+    schedule_interview_url = db.Column(db.String(80))
+    schedule_observation_url = db.Column(db.String(80))
+    observation_optional = db.Column(db.Boolean())
+    schedule_visit_url = db.Column(db.String(80))
+    visit_optional = db.Column(db.Boolean())
+    email = db.Column(db.String(80))
+
+request_session = requests.session()
+request_session.headers.update({
+  "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
+  "Content-Type": "application/json"
+})
 
 class Checklist(Base):
-    __tablename__ = "checklist"
     id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
-    school_id = db.Column(db.Integer, db.ForeignKey("School.id"))
+    school_id = db.Column(db.Integer, db.ForeignKey(School.id))
     school = sqlalchemy.orm.relationship("School", back_populates="checklists")
     interview_scheduled_at = db.Column(db.DateTime)
     observation_scheduled_at = db.Column(db.DateTime)
@@ -50,26 +66,6 @@ class Checklist(Base):
     def completed(self, appointment):
         setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
         db.session.commit()
-
-class School(Base):
-    __tablename__ = "school"
-    id = db.Column(db.Integer, primary_key=True)
-    checklists = sqlalchemy.orm.relationship("Checklist", back_populates="school")
-    name = db.Column(db.String(80))
-    match = db.Column(db.String(80))
-    interview_optional = db.Column(db.Boolean())
-    schedule_interview_url = db.Column(db.String(80))
-    schedule_observation_url = db.Column(db.String(80))
-    observation_optional = db.Column(db.Boolean())
-    schedule_visit_url = db.Column(db.String(80))
-    visit_optional = db.Column(db.Boolean())
-    email = db.Column(db.String(80))
-
-request_session = requests.session()
-request_session.headers.update({
-  "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
-  "Content-Type": "application/json"
-})
 
 class Survey():
     @lru_cache(maxsize=None)

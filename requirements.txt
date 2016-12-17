@@ -11,3 +11,4 @@ functools32
 combomethod
 python-dateutil
 Flask-Mail
+flask-restful
