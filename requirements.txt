@@ -12,3 +12,4 @@ combomethod
 python-dateutil
 Flask-Mail
 flask-restful
+flask-marshmallow

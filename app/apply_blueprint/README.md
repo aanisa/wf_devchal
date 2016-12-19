@@ -7,10 +7,10 @@ https://requestb.in/s6rz4ys6?inspect
 
 TODO:
 
-Dashboard - template http://stackoverflow.com/questions/27969864/how-to-embed-python-code-in-jinja2-template-for-an-image
+API (for Dashboard)
+Dashboard (React)
 Reminders
 Dashboard ACL
-
----
+Incomplete application
 Timezones
-auto update surveymonkey oauth token
+Auto update surveymonkey oauth token

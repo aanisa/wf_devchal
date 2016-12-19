@@ -3,6 +3,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from flask_mail import Mail, Message
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
@@ -12,6 +13,7 @@ app.config.from_envvar('APP_CONFIG_FILE')
 mail = Mail(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+ma = Marshmallow(app)
 
 for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
     if f.find("_blueprint") >= 0:

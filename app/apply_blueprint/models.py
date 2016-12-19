@@ -1,4 +1,4 @@
-from app import app, db, mail
+from app import app, db, ma, mail
 import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
@@ -33,6 +33,11 @@ class School(Base):
     visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
 
+class SchoolSchema(ma.Schema):
+    class Meta:
+        model = School
+        checklists = ma.Nested(ChecklistSchema, many=True)
+
 request_session = requests.session()
 request_session.headers.update({
   "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
@@ -61,6 +66,10 @@ class Checklist(Base):
     def completed(self, appointment):
         setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
         db.session.commit()
+
+class ChecklistSchema:
+    class Meta:
+        model = Checklist
 
 class Survey():
     @lru_cache(maxsize=None)
