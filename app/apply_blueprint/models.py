@@ -33,11 +33,6 @@ class School(Base):
     visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
 
-class SchoolSchema(ma.Schema):
-    class Meta:
-        model = School
-        checklists = ma.Nested(ChecklistSchema, many=True)
-
 request_session = requests.session()
 request_session.headers.update({
   "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
@@ -67,9 +62,14 @@ class Checklist(Base):
         setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
         db.session.commit()
 
-class ChecklistSchema:
+class ChecklistSchema(ma.Schema):
     class Meta:
         model = Checklist
+
+class SchoolSchema(ma.Schema):
+    class Meta:
+        model = School
+        checklists = ma.Nested(ChecklistSchema, many=True)
 
 class Survey():
     @lru_cache(maxsize=None)

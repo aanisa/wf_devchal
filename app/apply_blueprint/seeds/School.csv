@@ -1,10 +1,10 @@
 name,match,interview_optional,schedule_interview_url,observation_optional,schedule_observation_url,visit_optional,schedule_visit_url,email
-"Aster Montessori School","aster",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Dandelion Montessori Coop","dandelion",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Marigold Montessori School","marigold",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Mariposa Montessori School","mariposa",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Snapdragon Montessori School","snapdragon",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Snowdrop Montessori","snowdrop",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Violeta Montessori School","violeta",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Wild Rose Montessori School","wild rose",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
-"Wildflower Montessori School","wildflower",False,"http://TBD",False,"http://TBD",False,"http://TBD","mail@example.com"
+Aster Montessori School,aster,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Dandelion Montessori Coop,dandelion,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Marigold Montessori School,marigold,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Mariposa Montessori School,mariposa,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Snapdragon Montessori School,snapdragon,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Snowdrop Montessori,snowdrop,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Violeta Montessori School,violeta,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Wild Rose Montessori School,wild rose,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+Wildflower Montessori School,wildflower,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
