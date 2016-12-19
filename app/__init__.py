@@ -1,5 +1,5 @@
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from flask_mail import Mail, Message
@@ -18,7 +18,7 @@ ma = Marshmallow(app)
 for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
     if f.find("_blueprint") >= 0:
         p = f[0:-10] # _blueprint is 10 chars long
-        print "Registering blueprint {0} at {1}".format(p, f)
+        print "Registering blueprint {0} at {1}".format(f, p)
         # exec("from {0}.controller import blueprint".format(f))
         exec("from {0}.controller import blueprint".format(f))
-        eval("app.register_blueprint(blueprint, url_prefix='/{1}')".format(f, p))
+        eval("app.register_blueprint(blueprint, url_prefix='/{0}')".format(p))

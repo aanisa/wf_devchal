@@ -8,7 +8,9 @@ https://requestb.in/s6rz4ys6?inspect
 TODO:
 
 API (for Dashboard)
+  Add non-sql parts of checklist
 Dashboard (React)
+Accept/waitlist/decline
 Reminders
 Dashboard ACL
 Incomplete application
