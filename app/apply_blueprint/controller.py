@@ -31,6 +31,7 @@ api = Api(blueprint)
 
 class SchoolResource(Resource):
     def get(self, school_id):
+        raise Exception # below is broken
         return models.SchoolSchema().jsonify(models.School.query.get(school_id))
 
 api.add_resource(SchoolResource, '/school/<int:school_id>')

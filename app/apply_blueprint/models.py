@@ -21,7 +21,6 @@ class Base(db.Model):
 
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
-    id = db.Column(db.Integer, primary_key=True)
     checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
@@ -41,7 +40,6 @@ request_session.headers.update({
 
 class Checklist(Base):
     __tablename__ = "{0}_checklist".format(tablename_prefix)
-    id = db.Column(db.Integer, primary_key=True)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey(School.id))
     interview_scheduled_at = db.Column(db.DateTime)
@@ -62,14 +60,14 @@ class Checklist(Base):
         setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
         db.session.commit()
 
-class ChecklistSchema(ma.Schema):
+class ChecklistSchema(ma.ModelSchema):
     class Meta:
         model = Checklist
 
-class SchoolSchema(ma.Schema):
+class SchoolSchema(ma.ModelSchema):
     class Meta:
         model = School
-        checklists = ma.Nested(ChecklistSchema, many=True)
+    checklists = ma.Nested(ChecklistSchema, many=True)
 
 class Survey():
     @lru_cache(maxsize=None)
