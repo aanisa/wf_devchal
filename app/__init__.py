@@ -8,7 +8,7 @@ from flask_marshmallow import Marshmallow
 app = Flask(__name__)
 
 app.config.from_object('config.default')
-app.config.from_envvar('APP_CONFIG_FILE')
+app.config.from_object("config.{0}".format(os.environ['APP_CONFIG_MODE']))
 
 mail = Mail(app)
 db = SQLAlchemy(app)
@@ -21,3 +21,5 @@ for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
         print "Registering blueprint {0} at {1}".format(f, p)
         exec("from {0}.controller import blueprint".format(f))
         eval("app.register_blueprint(blueprint, url_prefix='/{0}')".format(p))
+        eval("app.config.from_object('{0}.config.default')".format(f))
+        eval("app.config.from_object('{0}.config.{1}')".format(f, os.environ['APP_CONFIG_MODE']))
