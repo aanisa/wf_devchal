@@ -51,7 +51,7 @@ class Checklist(Base):
             Message(
                 "Next steps for your application to {0}".format(self.school.name),
                 sender = self.school.email,
-                recipients = [Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS'][0])],
+                recipients = [Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'])],
                 body = render_template("email_checklist.txt", school=self.school)
             )
         )
@@ -60,14 +60,8 @@ class Checklist(Base):
         setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
         db.session.commit()
 
-class ChecklistSchema(ma.ModelSchema):
-    class Meta:
-        model = Checklist
-
-class SchoolSchema(ma.ModelSchema):
-    class Meta:
-        model = School
-    checklists = ma.Nested(ChecklistSchema, many=True)
+    def response(self):
+        return Response(guid=self.guid)
 
 class Survey():
     @lru_cache(maxsize=None)
@@ -77,13 +71,21 @@ class Survey():
     def school_for(self, survey_monkey_choice_id):
         for page in self.data["pages"]:
             for question in page["questions"]:
-                if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
+                if question["id"] == app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']:
                     for choice in question["answers"]["choices"]:
                         if choice["id"] == survey_monkey_choice_id:
                             for school in School.query.all():
                                 if choice["text"].lower().find(school.match.lower()) >= 0:
                                     return school
         raise LookupError
+
+def class_factory(class_name, response, d):
+    class ClassFromFactory: pass
+    ClassFromFactory.__name__ = class_name
+    cff = ClassFromFactory()
+    for k in d:
+        setattr(cff, k, response.answer_for(d[k]))
+    return cff
 
 @lru_cache(maxsize=None)
 def responses(page):
@@ -101,7 +103,7 @@ class Response():
                 elif email:
                     for page in d["pages"]:
                         for question in page["questions"]:
-                            if question["id"] in app.config['SURVEY_MONKEY_EMAIL_QUESTION_IDS']:
+                            if question["id"] in [app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'], app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1]['EMAIL']]:
                                 if question["answers"][0]["text"].lower() == email.lower():
                                     self.data = d
                                     return
@@ -121,10 +123,21 @@ class Response():
         schools = []
         for page in self.data["pages"]:
             for question in page["questions"]:
-                if question["id"] == app.config['SURVEY_MONKEY_WHICH_SCHOOLS_QUESTION_ID']:
+                if question["id"] == app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']:
                     for answer in question["answers"]:
                         schools.append(Survey().school_for(answer["choice_id"]))
         return schools
+
+    @property
+    def parents(self):
+        return [
+            class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]),
+            class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
+        ]
+
+    @property
+    def child(self):
+        return class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
 
     @combomethod
     def create_checklists(receiver, guid=None):
@@ -176,3 +189,17 @@ class Appointment():
         else:
             setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()
+
+class ChecklistSchema(ma.ModelSchema):
+    class Meta:
+        model = Checklist
+        additional = ['response']
+
+class SchoolSchema(ma.ModelSchema):
+    class Meta:
+        model = School
+    checklists = ma.Nested(ChecklistSchema, many=True)
+
+class ResponseSchema(ma.Schema):
+    class Meta:
+        fields = ('parents', 'child', 'schools')
