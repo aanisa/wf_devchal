@@ -62,4 +62,5 @@ class TestCase(unittest.TestCase):
             response = app.test_client().get(flask.url_for("{0}.completed".format(blueprint_name)) + "?guid={0}&id=1".format(self.guid))
 
     def test_response_schema(self):
-        print  models.ResponseSchema().jsonify(models.Response(guid=self.guid))
+        with app.test_request_context():
+            print models.ResponseSchema().jsonify(models.Response(guid=self.guid))

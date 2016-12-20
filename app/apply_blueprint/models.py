@@ -10,6 +10,7 @@ import os
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
 from flask import render_template
+import json
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -80,7 +81,10 @@ class Survey():
         raise LookupError
 
 def class_factory(class_name, response, d):
-    class ClassFromFactory: pass
+    class ClassFromFactory():
+        def toJSON(self):
+                return json.dumps(self, default=lambda o: o.__dict__,
+                    sort_keys=True, indent=4)
     ClassFromFactory.__name__ = class_name
     cff = ClassFromFactory()
     for k in d:
@@ -116,7 +120,7 @@ class Response():
                     return question["answers"][0]["text"]
                     # this only works for simple, single answer, text answers
                     # will have to be updated later for less simple answers
-        raise LookupError
+        return None # not raising here because some questions won't have answers
 
     @property
     def schools(self):
