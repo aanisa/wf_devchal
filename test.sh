@@ -4,7 +4,7 @@ if [ -e `pwd -P`/config/$1.py ]; then
 else
   m="test"
 fi
-export APP_CONFIG_MODE=$e
+export APP_CONFIG_MODE=$m
 export FLASK_APP=app
 
 python -m unittest $@
