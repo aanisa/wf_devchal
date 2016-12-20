@@ -3,8 +3,7 @@ import models
 import flask
 from app import app, db, mail
 import os
-from . import seed
-import click
+import cli
 from click.testing import CliRunner
 import json
 
@@ -15,7 +14,7 @@ class TestCase(unittest.TestCase):
         db.session.commit() # fixes hang - see http://stackoverflow.com/questions/24289808/drop-all-freezes-in-flask-with-sqlalchemy
         db.drop_all()
         db.create_all()
-        r = CliRunner().invoke(seed)
+        r = CliRunner().invoke(cli.seed)
         if r.exception: raise r.exception
         self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
