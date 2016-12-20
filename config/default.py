@@ -1,4 +1,4 @@
- import os
+import os
 
 DEBUG=False
 SQLALCHEMY_TRACK_MODIFICATIONS=False
@@ -31,8 +31,8 @@ SURVEY_MONKEY_ANSWER_KEY = {
         'LAST_NAME': '69082580',
         'DOB': '69082734',
         'GENDER': '69083456'
-    }
-    'SCHOOLS': '69085210
+    },
+    'SCHOOLS': '69085210'
 }
 
 MAIL_SERVER='email-smtp.us-east-1.amazonaws.com'
