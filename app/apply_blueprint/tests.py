@@ -60,7 +60,18 @@ class TestCase(unittest.TestCase):
         with app.test_request_context():
             response = app.test_client().get(flask.url_for("{0}.completed".format(blueprint_name)) + "?guid={0}&id=1".format(self.guid))
 
+    def test_response_schema(self):
+        with app.test_request_context():
+            s = json.loads(models.ResponseSchema().jsonify(models.Response(guid=self.guid)).data)
+            self.assertIsInstance(s["parents"], list)
+            self.assertIsInstance(s["child"], dict)
+
+    def test_checklist_schema(self):
+        with app.test_request_context():
+            s = json.loads(models.ChecklistSchema().jsonify(models.Checklist.query.first()).data)
+            self.assertIsInstance(s["response"], dict)
+
     def test_school_schema(self):
         with app.test_request_context():
-            # print models.schema_factory().jsonify(models.Response(guid=self.guid).child).data
-            print models.SchoolSchema().jsonify(models.School.query.first()).data
+            s = json.loads(models.SchoolSchema().jsonify(models.School.query.first()).data)
+            self.assertIsInstance(s["checklists"], list)
