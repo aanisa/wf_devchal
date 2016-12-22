@@ -48,7 +48,7 @@ class TestCase(unittest.TestCase):
 
     def test_after_survey_monkey(self):
         with app.test_request_context():
-            response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "guid=1234")
+            response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "guid={0}".format(self.guid))
 
     def test_calendly_webhook(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
@@ -60,6 +60,7 @@ class TestCase(unittest.TestCase):
         with app.test_request_context():
             response = app.test_client().get(flask.url_for("{0}.completed".format(blueprint_name)) + "?guid={0}&id=1".format(self.guid))
 
-    def test_response_schema(self):
+    def test_school_schema(self):
         with app.test_request_context():
-            print models.ResponseSchema().jsonify(models.Response(guid=self.guid))
+            # print models.schema_factory().jsonify(models.Response(guid=self.guid).child).data
+            print models.SchoolSchema().jsonify(models.School.query.first()).data

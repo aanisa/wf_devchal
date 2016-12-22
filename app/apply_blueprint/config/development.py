@@ -22,7 +22,7 @@ SURVEY_MONKEY_ANSWER_KEY = {
         'FIRST_NAME': '69082546',
         'LAST_NAME': '69082580',
         'DOB': '69082734',
-        'GENDER': '69083456'
+        # 'GENDER': '69083456'
     },
     'SCHOOLS': '69085210'
 }

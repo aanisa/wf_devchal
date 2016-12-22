@@ -80,17 +80,6 @@ class Survey():
                                     return school
         raise LookupError
 
-def class_factory(class_name, response, d):
-    class ClassFromFactory():
-        def toJSON(self):
-                return json.dumps(self, default=lambda o: o.__dict__,
-                    sort_keys=True, indent=4)
-    ClassFromFactory.__name__ = class_name
-    cff = ClassFromFactory()
-    for k in d:
-        setattr(cff, k, response.answer_for(d[k]))
-    return cff
-
 @lru_cache(maxsize=None)
 def responses(page):
     return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
@@ -132,16 +121,24 @@ class Response():
                         schools.append(Survey().school_for(answer["choice_id"]))
         return schools
 
+    def model_factory(self, class_name, d):
+        class ModelFromFactory(): pass
+        ModelFromFactory.__name__ = class_name
+        m = ModelFromFactory()
+        for k in d:
+            setattr(m, k.lower(), self.answer_for(d[k]))
+        return m
+
     @property
     def parents(self):
         return [
-            class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]),
-            class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
+            self.model_factory("Parent", app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]),
+            self.model_factory("Parent", app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
         ]
 
     @property
     def child(self):
-        return class_factory("Parent", self, app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
+        return self.model_factory("Child", app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD'])
 
     @combomethod
     def create_checklists(receiver, guid=None):
@@ -194,16 +191,24 @@ class Appointment():
             setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()
 
+def schema_factory(name):
+    class SchemaFromFactory(ma.Schema):
+        class Meta:
+            fields = ['first_name', 'last_name']
+    SchemaFromFactory.__name__ = "{0}Schema".format(name)
+    return SchemaFromFactory()
+
+class ResponseSchema(ma.Schema):
+    guid = ma.String()
+    child = ma.Nested(schema_factory("Child"))
+    parents = ma.Nested(schema_factory("Parent"), many=True)
+
 class ChecklistSchema(ma.ModelSchema):
     class Meta:
         model = Checklist
-        additional = ['response']
+    response = ma.Nested(ResponseSchema)
 
 class SchoolSchema(ma.ModelSchema):
     class Meta:
         model = School
     checklists = ma.Nested(ChecklistSchema, many=True)
-
-class ResponseSchema(ma.Schema):
-    class Meta:
-        fields = ('parents', 'child', 'schools')
