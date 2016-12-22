@@ -191,17 +191,17 @@ class Appointment():
             setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()
 
-def schema_factory(name):
+def schema_factory(name, fields):
     class SchemaFromFactory(ma.Schema):
-        class Meta:
-            fields = ['first_name', 'last_name']
+        class Meta: pass
+        Meta.fields = fields
     SchemaFromFactory.__name__ = "{0}Schema".format(name)
     return SchemaFromFactory()
 
 class ResponseSchema(ma.Schema):
     guid = ma.String()
-    child = ma.Nested(schema_factory("Child"))
-    parents = ma.Nested(schema_factory("Parent"), many=True)
+    child = ma.Nested(schema_factory("Child", [k.lower() for k in app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD'].keys()]))
+    parents = ma.Nested(schema_factory("Parent", [k.lower() for k in app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0].keys()]), many=True)
 
 class ChecklistSchema(ma.ModelSchema):
     class Meta:
