@@ -91,3 +91,7 @@ ENV/
 *.pickle
 
 .DS_Store
+
+bundle.js
+
+node_modules

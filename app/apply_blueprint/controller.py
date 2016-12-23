@@ -4,7 +4,7 @@ from app import app
 import os
 from flask_restful import Resource, Api
 
-blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates')
+blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
 
 @blueprint.route('/redirect_to_survey_monkey_with_guid')
 def redirect_to_survey_monkey_with_guid():
