@@ -6,6 +6,7 @@ import os
 import cli
 from click.testing import CliRunner
 import json
+import flask_restful
 
 blueprint_name = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -45,20 +46,29 @@ class TestCase(unittest.TestCase):
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():
             response = app.test_client().get(flask.url_for("{0}.redirect_to_survey_monkey_with_guid".format(blueprint_name)))
+            self.assertEqual(response.status_code, 200)
 
     def test_after_survey_monkey(self):
         with app.test_request_context():
             response = app.test_client().get(flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "guid={0}".format(self.guid))
+            self.assertEqual(response.status_code, 200)
 
     def test_calendly_webhook(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
             data = f.read()
         with app.test_request_context():
             response = app.test_client().post(flask.url_for("{0}.calendly_webhook".format(blueprint_name)), data=data, content_type='application/json')
+            self.assertEqual(response.status_code, 200)
 
     def test_completed(self):
         with app.test_request_context():
             response = app.test_client().get(flask.url_for("{0}.completed".format(blueprint_name)) + "?guid={0}&id=1".format(self.guid))
+            self.assertEqual(response.status_code, 200)
+
+    def test_school_resource(self):
+        with app.test_request_context():
+            response = app.test_client().get(flask_restful.url_for("{0}.schoolresource".format(blueprint_name), school_id=1))
+            self.assertEqual(response.status_code, 200)
 
     def test_response_schema(self):
         with app.test_request_context():
