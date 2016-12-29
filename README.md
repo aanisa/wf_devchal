@@ -3,3 +3,5 @@ TODO:
   Config is still a global namspace; isolate each blueprint's config
   Add flask cli command to create scaffolding blueprint w. empty req'd files
   blueprint_name in tests feels leaky
+  requirements.txt in the blueprints, composited to root
+  webpack config in the blueprints, composited to root

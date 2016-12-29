@@ -1,6 +1,8 @@
 var webpack = require('webpack');
 module.exports = {
   entry: [
+    "whatwg-fetch",
+    "promise-polyfill",
     "./react/app.js"
   ],
   output: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'whatwg-fetch'
 
 class Checklists extends React.Component {
   render() {
@@ -64,64 +65,35 @@ class Checklists extends React.Component {
 class School extends React.Component {
   constructor() {
     super();
+    var that = this;
+    fetch('../school/1')
+      .then(function(response) {
+        return response.json()
+      }).then(function(json) {
+        that.setState({
+          school: json
+        })
+      }).catch(function(ex) {
+        alert('parsing failed:' + ex)
+      })
+
     this.state = {
-      school: {
-        "checklists": [
-          {
-            "date_created": "2016-12-15T14:52:45.797630+00:00",
-            "date_modified": "2016-12-15T14:52:45.797630+00:00",
-            "guid": "1234",
-            "id": 1,
-            "interview_scheduled_at": null,
-            "observation_scheduled_at": null,
-            "response": {
-              "child": {
-                "dob": "05/31/2006",
-                "first_name": "Kid",
-                "last_name": "Oh"
-              },
-              "guid": "1234",
-              "parents": [
-                {
-                  "address": "8513 172nd St. W\r\nLakeville, MN 55044",
-                  "email": "dan.grigsby@wildflowerschools.org",
-                  "first_name": "Dan",
-                  "last_name": "Grigsby",
-                  "phone": "612-423-3694"
-                },
-                {
-                  "address": null,
-                  "email": null,
-                  "first_name": null,
-                  "last_name": null,
-                  "phone": null
-                }
-              ]
-            },
-            "school": 1,
-            "visit_scheduled_at": null
-          }
-        ],
-        "date_created": "2016-12-15T14:52:45.797630+00:00",
-        "date_modified": "2016-12-15T14:52:45.797630+00:00",
-        "email": "mail@example.com",
-        "id": 1,
-        "interview_optional": false,
-        "match": "aster",
-        "name": "Aster Montessori School",
-        "observation_optional": false,
-        "schedule_interview_url": "http://TBD",
-        "schedule_observation_url": "http://TBD",
-        "schedule_visit_url": "http://TBD",
-        "visit_optional": false
-      }
+      school: null
     }
   }
   render() {
     return (
-      <div className="school">
-        {this.state.school.name}
-        <Checklists checklists={this.state.school.checklists} school={this.state.school}/>
+      <div>
+      { this.state.school ?
+          <div className="school">
+            {this.state.school.name}
+            <Checklists checklists={this.state.school.checklists} school={this.state.school}/>
+          </div>
+          :
+          <div className="loading">
+            Loading...
+          </div>
+        }
       </div>
     );
   }
