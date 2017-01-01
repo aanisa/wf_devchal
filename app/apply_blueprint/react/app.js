@@ -12,7 +12,8 @@ class Checklists extends React.Component {
               return <div key={checklist.id}>
                 <div className="child">
                   {checklist.response.child.first_name} {checklist.response.child.last_name}<br/>
-                  {checklist.response.child.dob}
+                  DOB: {checklist.response.child.dob}<br/>
+                  Gender: {checklist.response.child.gender}<br/>
                 </div>
                 <div className="parent">
                   {checklist.response.parents[0].first_name} {checklist.response.parents[0].last_name}<br/>

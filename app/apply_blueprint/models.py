@@ -105,6 +105,7 @@ class Response():
             for question in page["questions"]:
                 if question["id"] == question_id:
                     return question["answers"]
+        return []
 
     def value_for(self, question_id, answer):
         if "text" in answer:
@@ -114,7 +115,8 @@ class Response():
         return None
 
     def answer_for(self, question_id):
-        return self.answers_for(question_id)[0]
+        # http://stackoverflow.com/questions/363944/python-idiom-to-return-first-item-or-none
+        return next(iter(self.answers_for(question_id) or []), None)
 
     def answers_for(self, question_id):
         raw_answers = self.raw_answers_for(question_id)
