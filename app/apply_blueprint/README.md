@@ -7,9 +7,8 @@ https://requestb.in/s6rz4ys6?inspect
 
 TODO:
 
-API (for Dashboard)
-  Add non-sql parts of checklist
-Dashboard (React)
+email application to school when completed
+
 Accept/waitlist/decline
 Download response
 Reminders

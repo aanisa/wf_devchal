@@ -69,15 +69,13 @@ class Survey():
     def __init__(self):
         self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
-    def school_for(self, survey_monkey_choice_id):
+    def value_for(self, question_id, choice_id):
         for page in self.data["pages"]:
             for question in page["questions"]:
-                if question["id"] == app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']:
+                if question["id"] == question_id:
                     for choice in question["answers"]["choices"]:
-                        if choice["id"] == survey_monkey_choice_id:
-                            for school in School.query.all():
-                                if choice["text"].lower().find(school.match.lower()) >= 0:
-                                    return school
+                        if choice["id"] == choice_id:
+                            return choice["text"]
         raise LookupError
 
 @lru_cache(maxsize=None)
@@ -102,23 +100,36 @@ class Response():
                                     return
         raise LookupError
 
-    def answer_for(self, question_id):
+    def raw_answers_for(self, question_id):
         for page in self.data["pages"]:
             for question in page["questions"]:
                 if question["id"] == question_id:
-                    return question["answers"][0]["text"]
-                    # this only works for simple, single answer, text answers
-                    # will have to be updated later for less simple answers
-        return None # not raising here because some questions won't have answers
+                    return question["answers"]
+
+    def value_for(self, question_id, answer):
+        if "text" in answer:
+            return answer["text"]
+        else:
+            return Survey().value_for(question_id, answer["choice_id"])
+        return None
+
+    def answer_for(self, question_id):
+        return self.answers_for(question_id)[0]
+
+    def answers_for(self, question_id):
+        raw_answers = self.raw_answers_for(question_id)
+        answers = []
+        for raw_answer in raw_answers:
+            answers.append(self.value_for(question_id, raw_answer))
+        return answers
 
     @property
     def schools(self):
         schools = []
-        for page in self.data["pages"]:
-            for question in page["questions"]:
-                if question["id"] == app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']:
-                    for answer in question["answers"]:
-                        schools.append(Survey().school_for(answer["choice_id"]))
+        for answer in self.answers_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']):
+            for school in School.query.all():
+                if answer.lower().find(school.match.lower()) >= 0:
+                    schools.append(school)
         return schools
 
     def model_factory(self, class_name, d):

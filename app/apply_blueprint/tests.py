@@ -85,3 +85,7 @@ class TestCase(unittest.TestCase):
         with app.test_request_context():
             s = json.loads(models.SchoolSchema().jsonify(models.School.query.first()).data)
             self.assertIsInstance(s["checklists"], list)
+
+    def test_non_text_answer(self):
+        r = models.Response(guid=self.guid)
+        assert r.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['GENDER'])
