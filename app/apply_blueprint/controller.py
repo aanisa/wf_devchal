@@ -13,7 +13,7 @@ def redirect_to_survey_monkey_with_guid():
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
     checklists = models.Response.create_checklists(request.args.get("guid"))
-    for checklist in checklist:
+    for checklist in checklists:
         checklist.email_checklist()
     return render_template('after_survey_monkey.html')
 
