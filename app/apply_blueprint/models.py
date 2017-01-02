@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
 from flask import render_template
 import json
+import re
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -68,11 +69,6 @@ class Checklist(Base):
     def response(self):
         return Response(guid=self.guid)
 
-class Question():
- def __init__(self, id, text):
-     self.id = id
-     self.text = text
-
 class Survey():
     @lru_cache(maxsize=None)
     def __init__(self):
@@ -87,13 +83,25 @@ class Survey():
                             return choice["text"]
         raise LookupError
 
+    class Page(object):
+        def __init__(self, title):
+            self.title = title
+            self.questions = []
+
+    class Question(object):
+     def __init__(self, id, text):
+         self.id = id
+         self.text = text
+
     @property
-    def questions(self):
-        questions = []
-        for page in self.data["pages"]:
-            for question in page["questions"]:
-                questions.append(Question(question["id"], question["headings"][0]["heading"]))
-        return questions
+    def pages(self):
+        pages = []
+        for p in self.data["pages"]:
+            page = Survey.Page(p["title"])
+            for question in p["questions"]:
+                page.questions.append(Survey.Question(question["id"], question["headings"][0]["heading"]))
+            pages.append(page)
+        return pages
 
 @lru_cache(maxsize=None)
 def responses(page):
@@ -117,6 +125,14 @@ class Response():
                                     return
         raise LookupError
 
+    def as_text(self):
+        text = u""
+        for page in Survey().pages:
+            text = text + u"== {0} ==\n\n".format(page.title)
+            for question in page.questions:
+                text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
+        return text
+
     def email_response(self):
         pass
         # for school in self.schools:
@@ -132,7 +148,7 @@ class Response():
         if "text" in answer:
             return answer["text"]
         else:
-            return Survey().value_for(question_id, answer["choice_id"])
+            return re.sub('<[^<]+?>', '', Survey().value_for(question_id, answer["choice_id"]))
         return None
 
     def answer_for(self, question_id):

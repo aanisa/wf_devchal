@@ -28,6 +28,7 @@ class TestCase(unittest.TestCase):
         response = models.Response(guid=self.guid)
         self.assertIsInstance(response.data, dict)
         self.assertGreater(len(response.schools), 0)
+        print response.as_text()
 
     def test_checklist(self):
         models.Response(guid=self.guid).create_checklists()
