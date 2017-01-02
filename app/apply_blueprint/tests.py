@@ -21,6 +21,8 @@ class TestCase(unittest.TestCase):
 
     def test_survey(self):
         self.assertIsInstance(models.Survey().data, dict)
+        self.assertIsInstance(models.Survey().questions, list)
+        self.assertIsInstance(models.Survey().questions[0], models.Question)
 
     def test_response(self):
         response = models.Response(guid=self.guid)

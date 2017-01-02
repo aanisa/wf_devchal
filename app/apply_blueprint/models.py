@@ -68,6 +68,11 @@ class Checklist(Base):
     def response(self):
         return Response(guid=self.guid)
 
+class Question():
+ def __init__(self, id, text):
+     self.id = id
+     self.text = text
+
 class Survey():
     @lru_cache(maxsize=None)
     def __init__(self):
@@ -81,6 +86,14 @@ class Survey():
                         if choice["id"] == choice_id:
                             return choice["text"]
         raise LookupError
+
+    @property
+    def questions(self):
+        questions = []
+        for page in self.data["pages"]:
+            for question in page["questions"]:
+                questions.append(Question(question["id"], question["headings"][0]["heading"]))
+        return questions
 
 @lru_cache(maxsize=None)
 def responses(page):
@@ -103,6 +116,10 @@ class Response():
                                     self.data = d
                                     return
         raise LookupError
+
+    def email_response(self):
+        pass
+        # for school in self.schools:
 
     def raw_answers_for(self, question_id):
         for page in self.data["pages"]:
