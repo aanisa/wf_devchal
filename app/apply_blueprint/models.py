@@ -52,7 +52,11 @@ class Checklist(Base):
             Message(
                 "Next steps for your application to {0}".format(self.school.name),
                 sender = self.school.email,
-                recipients = [Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'])],
+                recipients = ["{0} {1} <{2}>".format(
+                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']),
+                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['LAST_NAME']),
+                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'])
+                )],
                 body = render_template("email_checklist.txt", school=self.school)
             )
         )
