@@ -4,8 +4,10 @@ from flask_migrate import Migrate
 import os
 from flask_mail import Mail, Message
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+CORS(app)
 
 app.config.from_object('config.default')
 app.config.from_object("config.{0}".format(os.environ['APP_CONFIG_MODE']))

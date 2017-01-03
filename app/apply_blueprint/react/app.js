@@ -1,63 +1,87 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
+import Time from 'react-time'
 
 class Checklists extends React.Component {
   render() {
     return (
       <div>
-        {
-          this.props.school.checklists.map(
+        <table className="people-table table table-condensed table-hover">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Child</th>
+              <th>Parents</th>
+              <th>Observation</th>
+              <th>Interview</th>
+              <th>Visit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              this.props.school.checklists.map(
             function(checklist) {
-              return <div key={checklist.id}>
-                <div className="child">
+              return <tr key={checklist.id}>
+                <td>
+                  <input type="checkbox" className="select"/>
+                </td>
+                <td className="child">
                   {checklist.response.child.first_name} {checklist.response.child.last_name}<br/>
-                  DOB: {checklist.response.child.dob}<br/>
-                  Gender: {checklist.response.child.gender}<br/>
-                </div>
-                <div className="parent">
+                  {checklist.response.child.dob}<br/>
+                  {checklist.response.child.gender}
+                </td>
+                <td className="parents">
                   {checklist.response.parents[0].first_name} {checklist.response.parents[0].last_name}<br/>
                   <a href="mailto:{checklist.response.parents[0].email}">{checklist.response.parents[0].email}</a><br/>
                   {checklist.response.parents[0].phone}<br/>
-                  {checklist.response.parents[0].address}<br/>
-                </div>
-                <div className="parent">
-                  {checklist.response.parents[1].first_name} {checklist.response.parents[1].last_name}<br/>
-                  <a href="mailto:{checklist.response.parents[1].email}">{checklist.response.parents[1].email}</a><br/>
-                  {checklist.response.parents[1].phone}<br/>
-                  {checklist.response.parents[1].address}<br/>
-                </div>
-                <div className="observation">
-                  observation:
+                  {checklist.response.parents[0].address.split("\n").map(function (item, i, arr) { return <span key={i}>{item}{ arr.length-1 === i ? null : <br/>}</span> }) }
+                  { checklist.response.parents[1].first_name &&
+                    <div>
+                      <hr/>
+                      {checklist.response.parents[1].first_name} {checklist.response.parents[1].last_name}<br/>
+                      <a href="mailto:{checklist.response.parents[1].email}">{checklist.response.parents[1].email}</a><br/>
+                      {checklist.response.parents[1].phone}<br/>
+                      {checklist.response.parents[1].address.split("\n").map(function (item, i, arr) { return <span key={i}>{item}{ arr.length-1 === i ? null : <br/>}</span> }) }
+                    </div>
+                  }
+                </td>
+                <td className="observation">
                   { checklist.observation_scheduled_at ?
                     <div className="scheduled_at">{ checklist.observation_scheduled_at }</div>
                     :
-                    <div className="unscheduled">unscheduled</div>
+                    <div>
+                      <div className="unscheduled">Unscheduled</div>
+                      { this.props.school.observation_optional && '(optional)' }
+                    </div>
                   }
-                  { this.props.school.observation_optional && '(optional)' }
-                </div>
-                <div className="interview">
-                  interview:
+                </td>
+                <td className="interview">
                   { checklist.interview_scheduled_at ?
-                    <div className="scheduled_at">{ checklist.interview_scheduled_at }</div>
+                    <div className="scheduled_at"><Time value={ checklist.interview_scheduled_at } format="ddd, MM/DD, h:mma"/></div>
                     :
-                    <div className="unscheduled">unscheduled</div>
+                    <div>
+                      <div className="unscheduled">Unscheduled</div>
+                      { this.props.school.interview_optional && '(optional)' }
+                    </div>
                   }
-                  { this.props.school.interview_optional && '(optional)' }
-                </div>
-                <div className="visit">
-                  visit:
+                </td>
+                <td className="visit">
                   { checklist.visit_scheduled_at ?
                     <div className="scheduled_at">{ checklist.visit_scheduled_at }</div>
                     :
-                    <div className="unscheduled">unscheduled</div>
+                    <div>
+                      <div className="unscheduled">Unscheduled</div>
+                      { this.props.school.visit_optional && '(optional)' }
+                    </div>
                   }
-                  { this.props.school.visit_optional && '(optional)' }
-                </div>
-              </div>
+                </td>
+              </tr>
             }, this
           )
-        }
+            }
+          </tbody>
+        </table>
       </div>
     )
   }
@@ -67,7 +91,7 @@ class School extends React.Component {
   constructor() {
     super();
     var that = this;
-    fetch('../school/1')
+    fetch('http://localhost:5000/apply/school/1')
       .then(function(response) {
         return response.json()
       }).then(function(json) {
@@ -85,9 +109,10 @@ class School extends React.Component {
   render() {
     return (
       <div>
+
       { this.state.school ?
           <div className="school">
-            {this.state.school.name}
+            <h1 className><span className="page-title">{this.state.school.name} Applications</span></h1>
             <Checklists checklists={this.state.school.checklists} school={this.state.school}/>
           </div>
           :
@@ -100,7 +125,12 @@ class School extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <School />,
-  document.getElementById('root')
-);
+setTimeout(function(){
+  if (location.pathname.endsWith('wf/admin/applications')) {
+    document.title = 'Applications';
+    ReactDOM.render(
+      <School />,
+      document.getElementById('foundation')
+    );
+  }
+}, 200);

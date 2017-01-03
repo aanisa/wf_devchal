@@ -4,12 +4,17 @@ curl --header "X-TOKEN: FILL_IN_TOKEN_HERE" --data "url=http://requestb.in/s6rz4
 
 https://requestb.in/s6rz4ys6?inspect
 
+
+
+ `TCPlugins` into the JS global namespace, and has a prop `userApiToken`
+
+
+
 TODO:
 
-email application to school when completed
+HARDCODED SCHOOLS API URL!!!
 
 Accept/waitlist/decline
-Download response
 Reminders
 Dashboard ACL
 Incomplete application

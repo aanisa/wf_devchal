@@ -14,3 +14,4 @@ Flask-Mail
 flask-restful
 flask-marshmallow
 marshmallow-sqlalchemy
+flask-cors

@@ -3,6 +3,7 @@ import models
 from app import app
 import os
 from flask_restful import Resource, Api
+from flask_cors import cross_origin
 
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
 
@@ -12,9 +13,9 @@ def redirect_to_survey_monkey_with_guid():
 
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
-    response = models.Response(guid=request.args.get("guid"))
+    response = models.Response(guid=request.args.get("response_guid"))
     response.email_response()
-    for checklist in response.create_checklists:
+    for checklist in response.create_checklists():
         checklist.email_checklist()
     return render_template('after_survey_monkey.html')
 

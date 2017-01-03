@@ -3,6 +3,8 @@ module.exports = {
   entry: [
     "whatwg-fetch",
     "promise-polyfill",
+    "moment",
+    "react-time",
     "./react/app.js"
   ],
   output: {
