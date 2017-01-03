@@ -125,6 +125,7 @@ class Response():
                                     return
         raise LookupError
 
+    @property
     def as_text(self):
         text = u""
         for page in Survey().pages:
@@ -134,8 +135,16 @@ class Response():
         return text
 
     def email_response(self):
-        pass
-        # for school in self.schools:
+        text = self.as_text
+        for school in self.schools:
+            mail.send(
+                Message(
+                    "Application for {0} {1}".format(self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['FIRST_NAME']), self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['LAST_NAME'])),
+                    sender = "Wildflower <noreply@wildflowerschools.org>",
+                    recipients = [school.email],
+                    body = text
+                )
+            )
 
     def raw_answers_for(self, question_id):
         for page in self.data["pages"]:

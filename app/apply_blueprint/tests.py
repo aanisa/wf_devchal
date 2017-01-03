@@ -28,7 +28,10 @@ class TestCase(unittest.TestCase):
         response = models.Response(guid=self.guid)
         self.assertIsInstance(response.data, dict)
         self.assertGreater(len(response.schools), 0)
-        print response.as_text()
+        with app.app_context():
+            with mail.record_messages() as outbox:
+                response.email_response()
+                self.assertGreater(len(outbox), 0)
 
     def test_checklist(self):
         models.Response(guid=self.guid).create_checklists()
@@ -78,6 +81,7 @@ class TestCase(unittest.TestCase):
             s = json.loads(models.ResponseSchema().jsonify(models.Response(guid=self.guid)).data)
             self.assertIsInstance(s["parents"], list)
             self.assertIsInstance(s["child"], dict)
+
 
     def test_checklist_schema(self):
         with app.test_request_context():
