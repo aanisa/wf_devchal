@@ -99,5 +99,6 @@ class TestCase(unittest.TestCase):
 
     def test_school(self):
         school = models.School.query.first()
-        print school.emails[0].email.address
+        # print school.emails[0].email.address
+        print school.foo[0]
         # self.assertIsInstance(school.emails[0], String)
