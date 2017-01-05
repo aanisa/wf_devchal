@@ -23,6 +23,7 @@ class Base(db.Model):
 
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
+    tc_school_id = db.Column(db.Integer)
     checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
