@@ -1,9 +1,8 @@
 To create Calendly webhooks:
 
-curl --header "X-TOKEN: FILL_IN_TOKEN_HERE" --data "url=http://requestb.in/s6rz4ys6&events[]=invitee.created&events[]=invitee.canceled" https://calendly.com/api/v1/hooks
+curl --header "X-TOKEN: FILL_IN_TOKEN_HERE" --data "url=http://requestb.in/qdsf4jqd&events[]=invitee.created&events[]=invitee.canceled" https://calendly.com/api/v1/hooks
 
-https://requestb.in/s6rz4ys6?inspect
-
+http://requestb.in/qdsf4jqd?inspect
 
 
  `TCPlugins` into the JS global namespace, and has a prop `userApiToken`

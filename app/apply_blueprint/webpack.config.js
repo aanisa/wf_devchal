@@ -5,6 +5,7 @@ module.exports = {
     "promise-polyfill",
     "moment",
     "react-time",
+    "classnames",
     "./react/app.js"
   ],
   output: {

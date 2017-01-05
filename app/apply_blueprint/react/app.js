@@ -3,10 +3,19 @@ import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
 import Time from 'react-time'
 
+var classNames = require('classnames');
+
 class Checklists extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {allSelected: false}
     this.checked = Array.apply(null, Array(this.props.school.checklists.length)).map(Boolean.prototype.valueOf, false);
+  }
+  selectAll() {
+    console.log("here")
+    // this.setState({allSelected: !this.state.allSelected})
+    // console.log(this.state.allSelected);
+    // alert(this.allSelected)
   }
   checkBoxClicked(i) {
     if (this.checked[i]) {
@@ -14,18 +23,23 @@ class Checklists extends React.Component {
     } else {
       this.checked[i] = true;
     }
-    this.forceUpdate();
+    this.setState({checked: this.checked[i]});
   }
-  rowClass(i) {
-    if (this.checked[i] == true) {
-      return "selected";
-    } else {
-      return null;
-    }
+  classForRow(i) {
+    return this.checked[i] ? "selected" : null;
   }
   render() {
+    var contextualActionsClass = classNames({
+      'contextual-actions': true,
+      'active': this.checked.some(x => x)
+    });
     return (
       <div>
+        <div className={contextualActionsClass}>
+          <button className="btn btn-default btn-sm"><input key="select-all" className="select-all" value={this.state.allSelected} type="checkbox" onClick={this.selectAll()}/></button>&nbsp;
+          <a className="btn btn-default" href="#">Accept Applications</a>&nbsp;
+          <a className="btn btn-default" href="#">Reject Applications</a>
+        </div>
         <table className="people-table table table-condensed table-hover">
           <thead>
             <tr>
@@ -42,9 +56,9 @@ class Checklists extends React.Component {
               this.props.school.checklists.map(
                 function(checklist, i) {
                   checklist.checked = false;
-                  return <tr key={checklist.id} className={this.rowClass(i)}>
+                  return <tr key={checklist.id} className={this.classForRow(i)}>
                     <td>
-                      <input type="checkbox" className="select" onClick={() => this.checkBoxClicked(i)}/>
+                      <input key="select-one" type="checkbox" className="select" onClick={() => this.checkBoxClicked(i)}/>
                     </td>
                     <td className="child">
                       {checklist.response.child.first_name} {checklist.response.child.last_name}<br/>
