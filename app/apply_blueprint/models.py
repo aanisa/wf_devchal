@@ -25,13 +25,14 @@ class EmailSchool(Base):
     __tablename__ = "{0}_email_school".format(tablename_prefix)
     email_id = db.Column('email_id', db.Integer, db.ForeignKey("{0}_email.id".format(tablename_prefix)))
     school_id = db.Column('school_id', db.Integer, db.ForeignKey("{0}_school.id".format(tablename_prefix)))
-    school = db.relationship('School', back_populates='emails')
-    email = db.relationship('Email', back_populates='schools')
+    school = db.relationship('School', back_populates='emails_association')
+    email = db.relationship('Email', back_populates='schools_association')
 
 class Email(Base):
     __tablename__ = "{0}_email".format(tablename_prefix)
     address = db.Column(db.String(80))
-    schools = db.relationship('EmailSchool', back_populates="email")
+    schools_association = db.relationship('EmailSchool', back_populates="email")
+    schools = db.relationship('School', secondary=EmailSchool.__tablename__)
 
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
@@ -45,8 +46,8 @@ class School(Base):
     parent_observation_optional = db.Column(db.Boolean())
     schedule_child_visit_url = db.Column(db.String(80))
     child_visit_optional = db.Column(db.Boolean())
-    emails = db.relationship('EmailSchool', back_populates="school")
-    foo = db.relationship('Email', secondary="apply_blueprint_email_school")
+    emails_association = db.relationship('EmailSchool', back_populates="school")
+    emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
 
 request_session = requests.session()
 request_session.headers.update({
