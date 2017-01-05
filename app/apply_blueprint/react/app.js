@@ -47,7 +47,7 @@ class Checklists extends React.Component {
               <th>Child</th>
               <th>Parents</th>
               <th>Parent Observation</th>
-              <th>Parent Conversation</th>
+              <th>Parent-Teacher Conversation</th>
               <th>Child Visit</th>
             </tr>
           </thead>
@@ -90,9 +90,9 @@ class Checklists extends React.Component {
                         </div>
                       }
                     </td>
-                    <td className="parent-conversation">
-                      { checklist.parent_conversation_scheduled_at ?
-                        <div className="scheduled_at"><Time value={ checklist.parent_conversation_scheduled_at } format="ddd, MM/DD, h:mma"/></div>
+                    <td className="parent-teacher-conversation">
+                      { checklist.parent_teacher_conversation_scheduled_at ?
+                        <div className="scheduled_at"><Time value={ checklist.parent_teacher_conversation_scheduled_at } format="ddd, MM/DD, h:mma"/></div>
                         :
                         <div>
                           <div className="unscheduled">Unscheduled</div>

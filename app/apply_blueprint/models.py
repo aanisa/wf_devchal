@@ -26,8 +26,8 @@ class School(Base):
     checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
-    schedule_parent_conversation_url = db.Column(db.String(80))
-    parent_conversation_optional = db.Column(db.Boolean())
+    schedule_parent_teacher_conversation_url = db.Column(db.String(80))
+    parent_teacher_conversation_optional = db.Column(db.Boolean())
     schedule_parent_observation_url = db.Column(db.String(80))
     parent_observation_optional = db.Column(db.Boolean())
     schedule_child_visit_url = db.Column(db.String(80))
@@ -44,7 +44,7 @@ class Checklist(Base):
     __tablename__ = "{0}_checklist".format(tablename_prefix)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey(School.id))
-    parent_conversation_scheduled_at = db.Column(db.DateTime)
+    parent_teacher_conversation_scheduled_at = db.Column(db.DateTime)
     parent_observation_scheduled_at = db.Column(db.DateTime)
     child_visit_scheduled_at = db.Column(db.DateTime)
 

@@ -1,4 +1,4 @@
-name,match,parent_conversation_optional,schedule_parent_conversation_url,parent_observation_optional,schedule_parent_observation_url,child_visit_optional,schedule_child_visit_url,email
+name,match,parent_teacher_conversation_optional,schedule_parent_teacher_conversation_url,parent_observation_optional,schedule_parent_observation_url,child_visit_optional,schedule_child_visit_url,email
 Aster Montessori School,aster,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
 Dandelion Montessori Coop,dandelion,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
 Marigold Montessori School,marigold,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
