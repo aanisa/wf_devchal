@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
 import Time from 'react-time'
 
+var scripts = document.getElementsByTagName("script");
+var thisUrl = scripts[scripts.length-1].src;
+
 var classNames = require('classnames');
 
 class Checklists extends React.Component {
@@ -127,7 +130,8 @@ class School extends React.Component {
     super();
     this.state = { school: null };
     var that = this;
-    fetch('http://localhost:5000/apply/school/1')
+    console.log(tc.env.currentSchoolId);
+    fetch(thisUrl + "/../../school/1")
       .then(function(response) {
         return response.json()
       }).then(function(json) {
