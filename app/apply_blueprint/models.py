@@ -68,7 +68,7 @@ class Checklist(Base):
         mail.send(
             Message(
                 "Next steps for your application to {0}".format(self.school.name),
-                sender = self.school.email,
+                sender = self.school.emails[0].address,
                 recipients = ["{0} {1} <{2}>".format(
                     Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']),
                     Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['LAST_NAME']),
@@ -153,14 +153,15 @@ class Response():
     def email_response(self):
         text = self.as_text
         for school in self.schools:
-            mail.send(
-                Message(
-                    "Application for {0} {1}".format(self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['FIRST_NAME']), self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['LAST_NAME'])),
-                    sender = "Wildflower <noreply@wildflowerschools.org>",
-                    recipients = [school.email],
-                    body = text
+            for email in school.emails:
+                mail.send(
+                    Message(
+                        "Application for {0} {1}".format(self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['FIRST_NAME']), self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['LAST_NAME'])),
+                        sender = "Wildflower <noreply@wildflowerschools.org>",
+                        recipients = [email.address],
+                        body = text
+                    )
                 )
-            )
 
     def raw_answers_for(self, question_id):
         for page in self.data["pages"]:

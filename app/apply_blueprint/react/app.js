@@ -143,7 +143,7 @@ class School extends React.Component {
       <div>
         { this.state.school ?
           <div className="school">
-            <h1 className><span className="page-title">{this.state.school.name} Applications</span></h1>
+            <h1 className><span className="page-title">Applications</span></h1>
             <Checklists school={this.state.school}/>
           </div>
           :
