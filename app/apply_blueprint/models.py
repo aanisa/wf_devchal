@@ -62,6 +62,7 @@ class Checklist(Base):
     parent_teacher_conversation_scheduled_at = db.Column(db.DateTime)
     parent_observation_scheduled_at = db.Column(db.DateTime)
     child_visit_scheduled_at = db.Column(db.DateTime)
+    status = db.Column(db.Enum("new", "accepted", "deleted", name="status_enum"))
 
     def email_checklist(self):
         mail.send(
