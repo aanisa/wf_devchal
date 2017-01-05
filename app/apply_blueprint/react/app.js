@@ -130,8 +130,7 @@ class School extends React.Component {
     super();
     this.state = { school: null };
     var that = this;
-    console.log(tc.env.currentSchoolId);
-    fetch(thisUrl + "/../../school/1")
+    fetch(thisUrl + "/../../school/" + tc.env.currentSchoolId + "/" + tc.env.userApiToken)
       .then(function(response) {
         return response.json()
       }).then(function(json) {

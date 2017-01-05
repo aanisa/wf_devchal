@@ -32,7 +32,7 @@ def completed():
 api = Api(blueprint)
 
 class SchoolResource(Resource):
-    def get(self, school_id):
-        return models.SchoolSchema().jsonify(models.School.query.get(school_id))
+    def get(self, tc_school_id, tc_api_token):
+        return models.SchoolSchema().jsonify(models.School.query.filter_by(tc_school_id=tc_school_id).first())
 
-api.add_resource(SchoolResource, '/school/<int:school_id>')
+api.add_resource(SchoolResource, '/school/<int:tc_school_id>/<string:tc_api_token>')

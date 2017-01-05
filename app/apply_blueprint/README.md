@@ -7,12 +7,14 @@ http://requestb.in/qdsf4jqd?inspect
 
 TODO:
 
+API to fill in Application
 Finish UI
-Server that serves up script for better URL handling? else something...
-Use JS variables to get classroom and teacher id, use API for ACL
-Update to use classroom ID in API call
+Use API for ACL
 Hide / integrate with navigation
 Error message page
 
 Reminders
 Incomplete application
+
+Multiple classroom support?
+Different status (per Cam)
