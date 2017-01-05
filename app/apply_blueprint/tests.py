@@ -40,9 +40,9 @@ class TestCase(unittest.TestCase):
             with mail.record_messages() as outbox:
                 checklist.email_checklist()
                 self.assertGreater(len(outbox), 0)
-        self.assertIsNone(checklist.visit_scheduled_at)
-        checklist.completed("visit")
-        self.assertIsNotNone(checklist.visit_scheduled_at)
+        self.assertIsNone(checklist.child_visit_scheduled_at)
+        checklist.completed("child_visit")
+        self.assertIsNotNone(checklist.child_visit_scheduled_at)
 
     def test_appointment(self):
         with open("{0}/calendly_sample.json".format(os.path.dirname(os.path.realpath(__file__))), 'r') as f:

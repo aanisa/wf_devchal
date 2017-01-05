@@ -46,9 +46,9 @@ class Checklists extends React.Component {
               <th></th>
               <th>Child</th>
               <th>Parents</th>
-              <th>Observation</th>
-              <th>Interview</th>
-              <th>Visit</th>
+              <th>Parent Observation</th>
+              <th>Parent Conversation</th>
+              <th>Child Visit</th>
             </tr>
           </thead>
           <tbody>
@@ -80,33 +80,33 @@ class Checklists extends React.Component {
                         </div>
                       }
                     </td>
-                    <td className="observation">
-                      { checklist.observation_scheduled_at ?
-                        <div className="scheduled_at">{ checklist.observation_scheduled_at }</div>
+                    <td className="parent-observation">
+                      { checklist.parent_observation_scheduled_at ?
+                        <div className="scheduled_at">{ checklist.parent_observation_scheduled_at }</div>
                         :
                         <div>
                           <div className="unscheduled">Unscheduled</div>
-                          { this.props.school.observation_optional && '(optional)' }
+                          { this.props.school.parent_observation_optional && '(optional)' }
                         </div>
                       }
                     </td>
-                    <td className="interview">
-                      { checklist.interview_scheduled_at ?
-                        <div className="scheduled_at"><Time value={ checklist.interview_scheduled_at } format="ddd, MM/DD, h:mma"/></div>
+                    <td className="parent-conversation">
+                      { checklist.parent_conversation_scheduled_at ?
+                        <div className="scheduled_at"><Time value={ checklist.parent_conversation_scheduled_at } format="ddd, MM/DD, h:mma"/></div>
                         :
                         <div>
                           <div className="unscheduled">Unscheduled</div>
-                          { this.props.school.interview_optional && '(optional)' }
+                          { this.props.school.parent_conversation_optional && '(optional)' }
                         </div>
                       }
                     </td>
-                    <td className="visit">
+                    <td className="child-visit">
                       { checklist.visit_scheduled_at ?
-                        <div className="scheduled_at">{ checklist.visit_scheduled_at }</div>
+                        <div className="scheduled_at">{ checklist.child_visit_scheduled_at }</div>
                         :
                         <div>
                           <div className="unscheduled">Unscheduled</div>
-                          { this.props.school.visit_optional && '(optional)' }
+                          { this.props.school.child_visit_optional && '(optional)' }
                         </div>
                       }
                     </td>

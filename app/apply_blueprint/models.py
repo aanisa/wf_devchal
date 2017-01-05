@@ -26,12 +26,12 @@ class School(Base):
     checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
-    interview_optional = db.Column(db.Boolean())
-    schedule_interview_url = db.Column(db.String(80))
-    schedule_observation_url = db.Column(db.String(80))
-    observation_optional = db.Column(db.Boolean())
-    schedule_visit_url = db.Column(db.String(80))
-    visit_optional = db.Column(db.Boolean())
+    schedule_parent_conversation_url = db.Column(db.String(80))
+    parent_conversation_optional = db.Column(db.Boolean())
+    schedule_parent_observation_url = db.Column(db.String(80))
+    parent_observation_optional = db.Column(db.Boolean())
+    schedule_child_visit_url = db.Column(db.String(80))
+    child_visit_optional = db.Column(db.Boolean())
     email = db.Column(db.String(80))
 
 request_session = requests.session()
@@ -44,9 +44,9 @@ class Checklist(Base):
     __tablename__ = "{0}_checklist".format(tablename_prefix)
     guid = db.Column(db.String(36)) # used to link to Survey Monkey results
     school_id = db.Column(db.Integer, db.ForeignKey(School.id))
-    interview_scheduled_at = db.Column(db.DateTime)
-    observation_scheduled_at = db.Column(db.DateTime)
-    visit_scheduled_at = db.Column(db.DateTime)
+    parent_conversation_scheduled_at = db.Column(db.DateTime)
+    parent_observation_scheduled_at = db.Column(db.DateTime)
+    child_visit_scheduled_at = db.Column(db.DateTime)
 
     def email_checklist(self):
         mail.send(
@@ -221,7 +221,7 @@ class Appointment():
 
     @property
     def type(self):
-        for t in ["interview", "observation", "visit"]:
+        for t in ["conversation", "observation", "visit"]:
             if self.data["payload"]["event_type"]["slug"].find(t) >= 0:
                 return t
         raise LookupError
