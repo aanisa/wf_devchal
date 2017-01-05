@@ -11,11 +11,11 @@ http://requestb.in/qdsf4jqd?inspect
 
 TODO:
 
-HARDCODED SCHOOLS API URL!!!
+Finish UI
+Server that serves up script for better URL handling? else something...
+Use JS variables to get classroom and teacher id, use API for ACL
+Update to use classroom ID in API call
+Error message page
 
-Accept/waitlist/decline
 Reminders
-Dashboard ACL
 Incomplete application
-Timezones
-Auto update surveymonkey oauth token

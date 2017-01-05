@@ -222,7 +222,7 @@ class Response():
         else:
             checklists = []
             for school in receiver.schools:
-                checklists.append(Checklist(guid=receiver.guid, school=school))
+                checklists.append(Checklist(guid=receiver.guid, school=school, status="new"))
             db.session.add_all(checklists)
             db.session.commit()
             return checklists

@@ -12,10 +12,13 @@ class Checklists extends React.Component {
     this.checked = Array.apply(null, Array(this.props.school.checklists.length)).map(Boolean.prototype.valueOf, false);
   }
   selectAll() {
-    console.log("here")
-    // this.setState({allSelected: !this.state.allSelected})
-    // console.log(this.state.allSelected);
-    // alert(this.allSelected)
+    this.state.allSelected = ! this.state.allSelected;
+    console.log(this.state.allSelected);
+    if (this.state.allSelected) {
+      // select all
+    } else {
+      // unselect all
+    }
   }
   checkBoxClicked(i) {
     if (this.checked[i]) {
@@ -36,7 +39,7 @@ class Checklists extends React.Component {
     return (
       <div>
         <div className={contextualActionsClass}>
-          <button className="btn btn-default btn-sm"><input key="select-all" className="select-all" value={this.state.allSelected} type="checkbox" onClick={this.selectAll()}/></button>&nbsp;
+          <button className="btn btn-default btn-sm"><input className="select-all" value={this.state.allSelected} type="checkbox" onClick={() => this.selectAll()}/></button>&nbsp;
           <a className="btn btn-default" href="#">Accept Applications</a>&nbsp;
           <a className="btn btn-default" href="#">Reject Applications</a>
         </div>
