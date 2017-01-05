@@ -13,12 +13,12 @@ class Checklists extends React.Component {
   }
   selectAll() {
     this.state.allSelected = ! this.state.allSelected;
-    console.log(this.state.allSelected);
     if (this.state.allSelected) {
-      // select all
+      this.checked.fill(true);
     } else {
-      // unselect all
+      this.checked.fill(false);
     }
+    this.setState({checked: this.checked});
   }
   checkBoxClicked(i) {
     if (this.checked[i]) {
@@ -39,9 +39,9 @@ class Checklists extends React.Component {
     return (
       <div>
         <div className={contextualActionsClass}>
-          <button className="btn btn-default btn-sm"><input className="select-all" value={this.state.allSelected} type="checkbox" onClick={() => this.selectAll()}/></button>&nbsp;
+          <button className="btn btn-default btn-sm"><input className="select-all" type="checkbox" onClick={() => this.selectAll()}/></button>&nbsp;
           <a className="btn btn-default" href="#">Accept Applications</a>&nbsp;
-          <a className="btn btn-default" href="#">Reject Applications</a>
+          <a className="btn btn-default" href="#">Delete Applications</a>
         </div>
         <table className="people-table table table-condensed table-hover">
           <thead>
@@ -61,7 +61,7 @@ class Checklists extends React.Component {
                   checklist.checked = false;
                   return <tr key={checklist.id} className={this.classForRow(i)}>
                     <td>
-                      <input key="select-one" type="checkbox" className="select" onClick={() => this.checkBoxClicked(i)}/>
+                      <input key="select-one" type="checkbox" checked={this.checked[i]} className="select" onClick={() => this.checkBoxClicked(i)}/>
                     </td>
                     <td className="child">
                       {checklist.response.child.first_name} {checklist.response.child.last_name}<br/>
