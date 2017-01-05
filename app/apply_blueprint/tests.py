@@ -96,3 +96,8 @@ class TestCase(unittest.TestCase):
     def test_non_text_answer(self):
         r = models.Response(guid=self.guid)
         assert r.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['GENDER'])
+
+    def test_school(self):
+        school = models.School.query.first()
+        print school.emails[0].email.address
+        # self.assertIsInstance(school.emails[0], String)

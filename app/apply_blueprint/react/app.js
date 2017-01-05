@@ -69,14 +69,12 @@ class Checklists extends React.Component {
                       {checklist.response.parents[0].first_name} {checklist.response.parents[0].last_name}<br/>
                       <a href="mailto:{checklist.response.parents[0].email}">{checklist.response.parents[0].email}</a><br/>
                       {checklist.response.parents[0].phone}<br/>
-                      {checklist.response.parents[0].address.split("\n").map(function (item, i, arr) { return <span key={i}>{item}{ arr.length-1 === i ? null : <br/>}</span> }) }
                       { checklist.response.parents[1].first_name &&
                         <div>
                           <hr/>
                           {checklist.response.parents[1].first_name} {checklist.response.parents[1].last_name}<br/>
                           <a href="mailto:{checklist.response.parents[1].email}">{checklist.response.parents[1].email}</a><br/>
                           {checklist.response.parents[1].phone}<br/>
-                          {checklist.response.parents[1].address.split("\n").map(function (item, i, arr) { return <span key={i}>{item}{ arr.length-1 === i ? null : <br/>}</span> }) }
                         </div>
                       }
                     </td>
