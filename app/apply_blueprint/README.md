@@ -4,10 +4,16 @@ curl --header "X-TOKEN: FILL_IN_TOKEN_HERE" --data "url=http://requestb.in/qdsf4
 
 http://requestb.in/qdsf4jqd?inspect
 
-
 TODO:
 
 API to fill in Application
+  Need to handle:
+    TC
+      session
+      program
+
+
+
 Finish UI
 Use API for ACL
 Hide / integrate with navigation
@@ -16,5 +22,6 @@ Error message page
 Reminders
 Incomplete application
 
-Multiple classroom support?
-Different status (per Cam)
+Different statuses (per Cam)
+
+--
