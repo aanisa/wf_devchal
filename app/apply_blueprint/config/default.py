@@ -8,7 +8,7 @@ SURVEY_MONKEY_COLLECTOR_ID='FQDVNM3'
 ANSWER_KEY = {
     'PARENTS': [
         {
-            'FIRST_NAME': {'SURVEY_MONKEY': '69078793', 'TC': 'first_parent_name.first'}
+            'FIRST_NAME': {'SURVEY_MONKEY': '69078793', 'TC': 'first_parent_name.first'},
             'LAST_NAME': {'SURVEY_MONKEY': '77425064', 'TC': 'first_parent_name.last'} ,
             'EMAIL': {'SURVEY_MONKEY': '69078871', 'TC': 'first_parent_email'},
             'PHONE': {'SURVEY_MONKEY': '69079428', 'TC': 'first_parent_mobile_number'},
@@ -28,7 +28,7 @@ ANSWER_KEY = {
         'DOB': {'SURVEY_MONKEY': '69082734', 'TC': 'child_birth_date'},
         'GENDER': {'SURVEY_MONKEY': '69083456', 'TC': 'child_gender'}
     },
-    'SCHOOLS': '69085210',
+    'SCHOOLS': {'SURVEY_MONKEY': '69085210'},
     'QUESTIONS': [
         {'SURVEY_MONKEY': '69092809', 'TC': 'how_hear'},
         {'SURVEY_MONKEY': '69092811', 'TC': 'caregivers'},

@@ -95,4 +95,4 @@ class TestCase(unittest.TestCase):
 
     def test_non_text_answer(self):
         r = models.Response(guid=self.guid)
-        assert r.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['GENDER'])
+        assert r.answer_for(app.config['ANSWER_KEY']['CHILD']['GENDER']['SURVEY_MONKEY'])

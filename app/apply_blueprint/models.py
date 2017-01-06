@@ -72,9 +72,9 @@ class Checklist(Base):
                 "Next steps for your application to {0}".format(self.school.name),
                 sender = self.school.emails[0].address,
                 recipients = ["{0} {1} <{2}>".format(
-                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']),
-                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['LAST_NAME']),
-                    Response(guid=self.guid).answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'])
+                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
+                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
+                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
                 )],
                 body = render_template("email_checklist.txt", school=self.school)
             )
@@ -143,7 +143,7 @@ class Response():
                 elif email:
                     for page in d["pages"]:
                         for question in page["questions"]:
-                            if question["id"] in [app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]['EMAIL'], app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1]['EMAIL']]:
+                            if question["id"] in [app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['PARENTS'][1]['EMAIL']['SURVEY_MONKEY']]:
                                 if question["answers"][0]["text"].lower() == email.lower():
                                     self.data = d
                                     return
@@ -164,7 +164,7 @@ class Response():
             for email in school.emails:
                 mail.send(
                     Message(
-                        "Application for {0} {1}".format(self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['FIRST_NAME']), self.answer_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD']['LAST_NAME'])),
+                        "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
                         sender = "Wildflower <noreply@wildflowerschools.org>",
                         recipients = [email.address],
                         body = text
@@ -199,7 +199,7 @@ class Response():
     @property
     def schools(self):
         schools = []
-        for answer in self.answers_for(app.config['SURVEY_MONKEY_ANSWER_KEY']['SCHOOLS']):
+        for answer in self.answers_for(app.config['ANSWER_KEY']['SCHOOLS']['SURVEY_MONKEY']):
             for school in School.query.all():
                 if answer.lower().find(school.match.lower()) >= 0:
                     schools.append(school)
@@ -216,13 +216,13 @@ class Response():
     @property
     def parents(self):
         return [
-            self.model_factory("Parent", app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0]),
-            self.model_factory("Parent", app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][1])
+            self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][0]),
+            self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][1])
         ]
 
     @property
     def child(self):
-        return self.model_factory("Child", app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD'])
+        return self.model_factory("Child", app.config['ANSWER_KEY']['CHILD'])
 
     @combomethod
     def create_checklists(receiver, guid=None):
@@ -284,8 +284,8 @@ def schema_factory(name, fields):
 
 class ResponseSchema(ma.Schema):
     guid = ma.String()
-    child = ma.Nested(schema_factory("Child", [k.lower() for k in app.config['SURVEY_MONKEY_ANSWER_KEY']['CHILD'].keys()]))
-    parents = ma.Nested(schema_factory("Parent", [k.lower() for k in app.config['SURVEY_MONKEY_ANSWER_KEY']['PARENTS'][0].keys()]), many=True)
+    child = ma.Nested(schema_factory("Child", [k.lower() for k in app.config['ANSWER_KEY']['CHILD'].keys()]))
+    parents = ma.Nested(schema_factory("Parent", [k.lower() for k in app.config['ANSWER_KEY']['PARENTS'][0].keys()]), many=True)
 
 class ChecklistSchema(ma.ModelSchema):
     class Meta:
