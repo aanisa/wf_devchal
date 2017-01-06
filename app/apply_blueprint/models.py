@@ -210,7 +210,8 @@ class Response():
         ModelFromFactory.__name__ = class_name
         m = ModelFromFactory()
         for k in d:
-            setattr(m, k.lower(), self.answer_for(d[k]))
+            print d[k]
+            setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
         return m
 
     @property
