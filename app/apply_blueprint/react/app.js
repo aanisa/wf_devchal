@@ -3,70 +3,48 @@ import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
 import Time from 'react-time'
 
-// var scripts = document.getElementsByTagName("script");
-// var thisUrl = scripts[scripts.length-1].src;
-var thisUrl="http://localhost:5000/apply/static/bundle.js"
+var scripts = document.getElementsByTagName("script");
+var thisUrl = scripts[scripts.length-1].src;
 
 var classNames = require('classnames');
 
 class Checklists extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {allSelected: false}
-    this.checked = Array.apply(null, Array(this.props.school.checklists.length)).map(Boolean.prototype.valueOf, false);
+    this.checklists = this.props.school.checklists;
   }
-  selectAll() {
-    this.state.allSelected = ! this.state.allSelected;
-    if (this.state.allSelected) {
-      this.checked.fill(true);
-    } else {
-      this.checked.fill(false);
-    }
-    this.setState({checked: this.checked});
-  }
-  checkBoxClicked(i) {
-    if (this.checked[i]) {
-      this.checked[i] = false;
-    } else {
-      this.checked[i] = true;
-    }
-    this.setState({checked: this.checked[i]});
-  }
-  classForRow(i) {
-    return this.checked[i] ? "selected" : null;
+  statusChanged(event, index) {
+    this.checklists[index].value = event.target.value;
+    this.checklists[index].status = event.target.value
+    fetch(thisUrl + "/../../checklist/" + this.checklists[index].id, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({'status': this.checklists[index].status})
+    }).catch(function(ex) {
+      alert('updating status failed:' + ex);
+    })
+    this.setState({checklists: this.checklists});
   }
   render() {
-    var contextualActionsClass = classNames({
-      'contextual-actions': true,
-      'active': this.checked.some(x => x)
-    });
     return (
       <div>
-        <div className={contextualActionsClass}>
-          <button className="btn btn-default btn-sm"><input className="select-all" type="checkbox" onClick={() => this.selectAll()}/></button>&nbsp;
-          <a className="btn btn-default" href="#">Accept Applications</a>&nbsp;
-          <a className="btn btn-default" href="#">Delete Applications</a>
-        </div>
         <table className="people-table table table-condensed table-hover">
           <thead>
             <tr>
-              <th></th>
               <th>Child</th>
               <th>Parents</th>
               <th>Parent Observation</th>
               <th>Parent-Teacher Conversation</th>
               <th>Child Visit</th>
+              <th>Application Status</th>
             </tr>
           </thead>
           <tbody>
             {
-              this.props.school.checklists.map(
+              this.checklists.map(
                 function(checklist, i) {
                   checklist.checked = false;
-                  return <tr key={checklist.id} className={this.classForRow(i)}>
-                    <td>
-                      <input key="select-one" type="checkbox" checked={this.checked[i]} className="select" onClick={() => this.checkBoxClicked(i)}/>
-                    </td>
+                  return <tr key={checklist.id}>
                     <td className="child">
                       {checklist.response.child.first_name} {checklist.response.child.last_name}<br/>
                       {checklist.response.child.dob}<br/>
@@ -115,6 +93,17 @@ class Checklists extends React.Component {
                         </div>
                       }
                     </td>
+                    <td className="application-status">
+                        <select data-index={i} className="form-control input-sm state-select" name="application_status" value={checklist.status} onChange={(event) => this.statusChanged(event, i)}>
+                          <option>New Application</option>
+                          <option>In Process</option>
+                          <option>Offer Out</option>
+                          <option>Offer Accepted</option>
+                          <option>Offer Rejected</option>
+                          <option>Waitlisted</option>
+                          <option>Rejected</option>
+                        </select>
+                    </td>
                   </tr>
                 }, this
               )
@@ -139,7 +128,7 @@ class School extends React.Component {
           school: json
         })
       }).catch(function(ex) {
-        alert('parsing failed:' + ex)
+        alert('parsing failed:' + ex);
       })
   }
   render() {

@@ -211,7 +211,6 @@ class Response():
         ModelFromFactory.__name__ = class_name
         m = ModelFromFactory()
         for k in d:
-            print d[k]
             setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
         return m
 
@@ -307,8 +306,6 @@ class TCAPI(object):
           "X-TransparentClassroomToken": tc_api_token,
           "Content-Type": "application/json"
         })
-        print tc_api_token
-        print self.base_url
 
     def params_key(self, item, all):
         if type(item) == dict:
@@ -316,20 +313,19 @@ class TCAPI(object):
                 all.append(item)
             else:
                 for key in item:
-                    # print "key: {0} with value {1}".format(key, item[key])
                     all = self.params_key(item[key], all)
         elif type(item) == list:
             for i in item:
-                # print "list item: {0}".format(i)
                 all = self.params_key(i, all)
-        # print "after: {0}".format(all)
         return all
 
     def submit_application(self, response):
         tc_params = {}
         for item in self.params_key(app.config['ANSWER_KEY'], []):
             tc_params[item['TC']] = response.answer_for(item['SURVEY_MONKEY'])
-        print "{0}/online_applications.json".format(self.base_url)
+
+        # TODO add session and program to hash
+
         response = request_session.post("{0}/online_applications.json".format(self.base_url), params=tc_params).json()
         print response
 

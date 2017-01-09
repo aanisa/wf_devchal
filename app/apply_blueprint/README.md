@@ -13,7 +13,8 @@ API to fill in Application
       program
 
 Finish UI
-Use API for ACL
+ACL token (on School and Checklist) until TC API for ACL
+
 Hide / integrate with navigation
 Error message page
 
