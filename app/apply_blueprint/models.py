@@ -64,7 +64,8 @@ class Checklist(Base):
     parent_teacher_conversation_scheduled_at = db.Column(db.DateTime)
     parent_observation_scheduled_at = db.Column(db.DateTime)
     child_visit_scheduled_at = db.Column(db.DateTime)
-    status = db.Column(db.Enum("new", "accepted", "deleted", name="checklist_status_enum"))
+
+    status = db.Column(db.Enum("New Application", "Offer Accepted", "In Process", "Offer Out", "Offer Rejected", "Waitlisted", "Rejected", name="checklist_status_enum"))
 
     def email_checklist(self):
         mail.send(
@@ -232,7 +233,7 @@ class Response():
         else:
             checklists = []
             for school in receiver.schools:
-                checklists.append(Checklist(guid=receiver.guid, school=school, status="new"))
+                checklists.append(Checklist(guid=receiver.guid, school=school, status="New Application"))
             db.session.add_all(checklists)
             db.session.commit()
             return checklists
@@ -297,3 +298,41 @@ class SchoolSchema(ma.ModelSchema):
     class Meta:
         model = School
     checklists = ma.Nested(ChecklistSchema, many=True)
+
+class TCAPI(object):
+    def __init__(self, tc_api_token):
+        self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
+        self.request_session = requests.session()
+        self.request_session.headers.update({
+          "X-TransparentClassroomToken": tc_api_token,
+          "Content-Type": "application/json"
+        })
+        print tc_api_token
+        print self.base_url
+
+    def params_key(self, item, all):
+        if type(item) == dict:
+            if "TC" in item:
+                all.append(item)
+            else:
+                for key in item:
+                    # print "key: {0} with value {1}".format(key, item[key])
+                    all = self.params_key(item[key], all)
+        elif type(item) == list:
+            for i in item:
+                # print "list item: {0}".format(i)
+                all = self.params_key(i, all)
+        # print "after: {0}".format(all)
+        return all
+
+    def submit_application(self, response):
+        tc_params = {}
+        for item in self.params_key(app.config['ANSWER_KEY'], []):
+            tc_params[item['TC']] = response.answer_for(item['SURVEY_MONKEY'])
+        print "{0}/online_applications.json".format(self.base_url)
+        response = request_session.post("{0}/online_applications.json".format(self.base_url), params=tc_params).json()
+        print response
+
+    def accept_application(self, tc_application_id):
+        # accepts applicaiton, creates child, creates parent(s)
+        pass

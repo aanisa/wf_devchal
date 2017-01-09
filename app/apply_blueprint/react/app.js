@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
 import Time from 'react-time'
 
-var scripts = document.getElementsByTagName("script");
-var thisUrl = scripts[scripts.length-1].src;
+// var scripts = document.getElementsByTagName("script");
+// var thisUrl = scripts[scripts.length-1].src;
+var thisUrl="http://localhost:5000/apply/static/bundle.js"
 
 var classNames = require('classnames');
 

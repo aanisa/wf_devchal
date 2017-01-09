@@ -12,8 +12,6 @@ API to fill in Application
       session
       program
 
-
-
 Finish UI
 Use API for ACL
 Hide / integrate with navigation
@@ -21,7 +19,3 @@ Error message page
 
 Reminders
 Incomplete application
-
-Different statuses (per Cam)
-
---

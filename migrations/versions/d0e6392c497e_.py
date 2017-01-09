@@ -38,11 +38,11 @@ def upgrade():
     )
 
     # added by dan
-    checklist_status = postgresql.ENUM('new', 'accepted', 'deleted', name='checklist_status_enum')
+    checklist_status = postgresql.ENUM("New Application", "Offer Accepted", "In Process", "Offer Out", "Offer Rejected", "Waitlisted", "Rejected", name='checklist_status_enum')
     checklist_status.create(op.get_bind())
     # end
 
-    op.add_column(u'apply_blueprint_checklist', sa.Column('status', sa.Enum('new', 'accepted', 'deleted', name='checklist_status_enum'), nullable=True))
+    op.add_column(u'apply_blueprint_checklist', sa.Column('status', sa.Enum("New Application", "Offer Accepted", "In Process", "Offer Out", "Offer Rejected", "Waitlisted", "Rejected", name='checklist_status_enum'), nullable=True))
     op.drop_column(u'apply_blueprint_school', 'email')
     # ### end Alembic commands ###
 

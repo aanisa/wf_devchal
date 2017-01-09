@@ -96,3 +96,7 @@ class TestCase(unittest.TestCase):
     def test_non_text_answer(self):
         r = models.Response(guid=self.guid)
         assert r.answer_for(app.config['ANSWER_KEY']['CHILD']['GENDER']['SURVEY_MONKEY'])
+
+    def test_tcapi_submit_application(self):
+        r = models.Response(guid=self.guid)
+        models.TCAPI("hy4385yczauTVD66ufUC").submit_application(r)
