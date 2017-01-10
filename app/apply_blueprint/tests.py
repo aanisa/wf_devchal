@@ -17,15 +17,16 @@ class TestCase(unittest.TestCase):
         db.create_all()
         r = CliRunner().invoke(cli.seed)
         if r.exception: raise r.exception
-        self.guid = models.responses(1)["data"][0]["custom_variables"]["response_guid"]
+        self.guid = models.SurveyMonkey.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
-        self.assertIsInstance(models.Survey().data, dict)
-        self.assertIsInstance(models.Survey().questions, list)
-        self.assertIsInstance(models.Survey().questions[0], models.Question)
+        s = models.Survey()
+        self.assertIsInstance(s.data, dict)
+        self.assertIsInstance(s.questions, list)
+        self.assertIsInstance(s.questions[0], models.SurveyMonkey.Question)
 
     def test_response(self):
-        response = models.Response(guid=self.guid)
+        response = models.SurveyMonkey.Response(guid=self.guid)
         self.assertIsInstance(response.data, dict)
         self.assertGreater(len(response.schools), 0)
         with app.app_context():
@@ -47,9 +48,9 @@ class TestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_non_text_answer(self):
-        r = models.Response(guid=self.guid)
+        r = models.SurveyMonkey.Response(guid=self.guid)
         assert r.answer_for(app.config['ANSWER_KEY']['CHILD']['GENDER']['SURVEY_MONKEY'])
 
     def test_transparent_classroom_submit_application(self):
-        r = models.Response(guid=self.guid)
+        r = models.SurveyMonkeyResponse(guid=self.guid)
         self.assertIsInstance(i, models.TransparentClassroom(3).submit_application(r, "Children's House: Morning Program (8:30a-12:30p)"))

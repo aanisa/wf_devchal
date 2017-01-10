@@ -13,8 +13,9 @@ def redirect_to_survey_monkey_with_guid():
 
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
-    response = models.Response(guid=request.args.get("response_guid"))
+    response = models.SurveyMonkey.Response(guid=request.args.get("response_guid"))
+    response.submit_to_transparent_classroom()
     response.email_response()
-    for checklist in response.create_checklists():
-        checklist.email_checklist()
+    response.email_next_steps()
+
     return render_template('after_survey_monkey.html')

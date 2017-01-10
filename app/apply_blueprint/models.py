@@ -107,18 +107,19 @@ class SurveyMonkey:
             return text
 
         def email_next_steps(self):
-            mail.send(
-                Message(
-                    "Next steps for your application to {0}".format(self.school.name),
-                    sender = self.school.emails[0].address,
-                    recipients = ["{0} {1} <{2}>".format(
-                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
-                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
-                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
-                    )],
-                    body = render_template("email_checklist.txt", school=self.school)
+            for school in self.schools:
+                mail.send(
+                    Message(
+                        "Next steps for your application to {0}".format(school.name),
+                        sender = "Wildflower Schools <noreply@wildflowerschools.org>",
+                        recipients = ["{0} {1} <{2}>".format(
+                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
+                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
+                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
+                        )],
+                        body = render_template("email_checklist.txt", school=school)
+                    )
                 )
-            )
 
         def email_response(self):
             text = self.as_text
@@ -132,6 +133,10 @@ class SurveyMonkey:
                             body = text
                         )
                     )
+
+        def submit_to_transparent_classroom(self):
+            for school in self.schools:
+                TransparentClassroom(school.tc_school_id).submit_application(self)
 
         def raw_answers_for(self, question_id):
             for page in self.data["pages"]:
@@ -186,18 +191,6 @@ class SurveyMonkey:
         def child(self):
             return self.model_factory("Child", app.config['ANSWER_KEY']['CHILD'])
 
-        @combomethod
-        def create_checklists(receiver, guid=None):
-            if inspect.isclass(receiver):
-                Response(guid=guid).create_checklists()
-            else:
-                checklists = []
-                for school in receiver.schools:
-                    checklists.append(Checklist(guid=receiver.guid, school=school, status="New Application"))
-                db.session.add_all(checklists)
-                db.session.commit()
-                return checklists
-
 class TransparentClassroom(object):
     def __init__(self, tc_school_id):
         self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
@@ -212,7 +205,7 @@ class TransparentClassroom(object):
 
     def params_key(self, item, all):
         if type(item) == dict:
-            if "TC" in item:
+            if "TRANSPARENT_CLASSROOM" in item:
                 all.append(item)
             else:
                 for key in item:
@@ -222,10 +215,10 @@ class TransparentClassroom(object):
                 all = self.params_key(i, all)
         return all
 
-    def submit_application(self, response, program):
+    def submit_application(self, response):
         tc_params = {
             "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
-            "program": program
+            "program": "TBD"
         }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
             tc_params[item['TRANSPARENT_CLASSROOM']] = response.answer_for(item['SURVEY_MONKEY'])
