@@ -299,13 +299,20 @@ class SchoolSchema(ma.ModelSchema):
     checklists = ma.Nested(ChecklistSchema, many=True)
 
 class TCAPI(object):
-    def __init__(self, tc_api_token):
+    def __init__(self, tc_api_token, tc_school_id):
         self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
         self.request_session = requests.session()
         self.request_session.headers.update({
           "X-TransparentClassroomToken": tc_api_token,
-          "Content-Type": "application/json"
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-TransparentClassroomMasqueradeId": "2"
         })
+        self.tc_school_id = tc_school_id
+
+    def authorize(self):
+        if self.tc_school_id not in [i["id"] for i in self.request_session.get("{0}/schools.json".format(self.base_url)).json()]:
+            raise LookupError
 
     def params_key(self, item, all):
         if type(item) == dict:
@@ -319,16 +326,19 @@ class TCAPI(object):
                 all = self.params_key(i, all)
         return all
 
-    def submit_application(self, response):
-        tc_params = {}
+    def submit_application(self, response, program):
+        self.authorize()
+        tc_params = {
+            "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
+            "program": program
+        }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
             tc_params[item['TC']] = response.answer_for(item['SURVEY_MONKEY'])
-
-        # TODO add session and program to hash
-
-        response = request_session.post("{0}/online_applications.json".format(self.base_url), params=tc_params).json()
+        print tc_params
+        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params})).json()
         print response
 
     def accept_application(self, tc_application_id):
-        # accepts applicaiton, creates child, creates parent(s)
+        self.authorize
+        # accepts application, creates child, creates parent(s)
         pass

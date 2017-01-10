@@ -99,4 +99,4 @@ class TestCase(unittest.TestCase):
 
     def test_tcapi_submit_application(self):
         r = models.Response(guid=self.guid)
-        models.TCAPI("hy4385yczauTVD66ufUC").submit_application(r)
+        models.TCAPI("hy4385yczauTVD66ufUC", 3).submit_application(r, "Children's House: Morning Program (8:30a-12:30p)")
