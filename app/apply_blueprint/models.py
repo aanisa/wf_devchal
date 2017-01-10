@@ -81,10 +81,6 @@ class Checklist(Base):
             )
         )
 
-    def completed(self, appointment):
-        setattr(self, "{0}_scheduled_at".format(appointment), db.func.current_timestamp())
-        db.session.commit()
-
     def response(self):
         return Response(guid=self.guid)
 
@@ -237,45 +233,6 @@ class SurveyMonkey:
                 db.session.add_all(checklists)
                 db.session.commit()
                 return checklists
-
-class Appointment():
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def is_canceled(self):
-        return True if self.data["event"] == "invitee.canceled" else False
-
-    @property
-    def type(self):
-        for t in ["conversation", "observation", "visit"]:
-            if self.data["payload"]["event_type"]["slug"].find(t) >= 0:
-                return t
-        raise LookupError
-
-    @property
-    def school(self):
-        return School.query.filter(School.email == self.data["payload"]["event"]["extended_assigned_to"][0]["email"]).first()
-
-    @property
-    def response(self):
-        return Response(email=self.data["payload"]["invitee"]["email"])
-
-    @property
-    def at(self):
-        return dateutil.parser.parse(self.data["payload"]["event"]["start_time"])
-
-    @property
-    def checklist(self):
-        return Checklist.query.filter(Checklist.guid == self.response.guid, Checklist.school == self.school).first()
-
-    @combomethod
-    def update_checklist(receiver, data=None):
-        if inspect.isclass(receiver):
-            Appointment(data).update_checklist();
-        else:
-            setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
-            db.session.commit()
 
 class TransparentClassroom(object):
     def __init__(self, tc_school_id):

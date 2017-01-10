@@ -18,8 +18,3 @@ def after_survey_monkey():
     for checklist in response.create_checklists():
         checklist.email_checklist()
     return render_template('after_survey_monkey.html')
-
-@blueprint.route('/calendly_webhook', methods=['POST'])
-def calendly_webhook():
-    models.Appointment(request.get_json()).update_checklist()
-    return "OK"
