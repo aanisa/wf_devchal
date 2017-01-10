@@ -276,28 +276,6 @@ class Appointment():
             setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()
 
-def schema_factory(name, fields):
-    class SchemaFromFactory(ma.Schema):
-        class Meta: pass
-        Meta.fields = fields
-    SchemaFromFactory.__name__ = "{0}Schema".format(name)
-    return SchemaFromFactory()
-
-class ResponseSchema(ma.Schema):
-    guid = ma.String()
-    child = ma.Nested(schema_factory("Child", [k.lower() for k in app.config['ANSWER_KEY']['CHILD'].keys()]))
-    parents = ma.Nested(schema_factory("Parent", [k.lower() for k in app.config['ANSWER_KEY']['PARENTS'][0].keys()]), many=True)
-
-class ChecklistSchema(ma.ModelSchema):
-    class Meta:
-        model = Checklist
-    response = ma.Nested(ResponseSchema)
-
-class SchoolSchema(ma.ModelSchema):
-    class Meta:
-        model = School
-    checklists = ma.Nested(ChecklistSchema, many=True)
-
 class TCAPI(object):
     def __init__(self, tc_api_token, tc_school_id):
         self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
