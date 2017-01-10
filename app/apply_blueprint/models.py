@@ -88,154 +88,155 @@ class Checklist(Base):
     def response(self):
         return Response(guid=self.guid)
 
-request_session = requests.session()
-request_session.headers.update({
-  "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
-  "Content-Type": "application/json"
-})
+class SurveyMonkey:
+    request_session = requests.session()
+    request_session.headers.update({
+      "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
+      "Content-Type": "application/json"
+    })
 
-class Survey():
+    class Survey():
+        @lru_cache(maxsize=None)
+        def __init__(self):
+            self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+
+        def value_for(self, question_id, choice_id):
+            for page in self.data["pages"]:
+                for question in page["questions"]:
+                    if question["id"] == question_id:
+                        for choice in question["answers"]["choices"]:
+                            if choice["id"] == choice_id:
+                                return choice["text"]
+            raise LookupError
+
+        class Page(object):
+            def __init__(self, title):
+                self.title = title
+                self.questions = []
+
+        class Question(object):
+         def __init__(self, id, text):
+             self.id = id
+             self.text = text
+
+        @property
+        def pages(self):
+            pages = []
+            for p in self.data["pages"]:
+                page = Survey.Page(p["title"])
+                for question in p["questions"]:
+                    page.questions.append(Survey.Question(question["id"], question["headings"][0]["heading"]))
+                pages.append(page)
+            return pages
+
     @lru_cache(maxsize=None)
-    def __init__(self):
-        self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+    def responses(page):
+        return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
 
-    def value_for(self, question_id, choice_id):
-        for page in self.data["pages"]:
-            for question in page["questions"]:
-                if question["id"] == question_id:
-                    for choice in question["answers"]["choices"]:
-                        if choice["id"] == choice_id:
-                            return choice["text"]
-        raise LookupError
+    class Response():
+        def __init__(self, guid=None, email=None):
+            for i in range(1, 100):
+                for d in responses(i)["data"]:
+                    self.guid = d["custom_variables"]["response_guid"]
+                    if guid:
+                        if d["custom_variables"]["response_guid"] == guid:
+                            self.data = d
+                            return
+                    elif email:
+                        for page in d["pages"]:
+                            for question in page["questions"]:
+                                if question["id"] in [app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['PARENTS'][1]['EMAIL']['SURVEY_MONKEY']]:
+                                    if question["answers"][0]["text"].lower() == email.lower():
+                                        self.data = d
+                                        return
+            raise LookupError
 
-    class Page(object):
-        def __init__(self, title):
-            self.title = title
-            self.questions = []
+        @property
+        def as_text(self):
+            text = u""
+            for page in Survey().pages:
+                text = text + u"== {0} ==\n\n".format(page.title)
+                for question in page.questions:
+                    text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
+            return text
 
-    class Question(object):
-     def __init__(self, id, text):
-         self.id = id
-         self.text = text
-
-    @property
-    def pages(self):
-        pages = []
-        for p in self.data["pages"]:
-            page = Survey.Page(p["title"])
-            for question in p["questions"]:
-                page.questions.append(Survey.Question(question["id"], question["headings"][0]["heading"]))
-            pages.append(page)
-        return pages
-
-@lru_cache(maxsize=None)
-def responses(page):
-    return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
-
-class Response():
-    def __init__(self, guid=None, email=None):
-        for i in range(1, 100):
-            for d in responses(i)["data"]:
-                self.guid = d["custom_variables"]["response_guid"]
-                if guid:
-                    if d["custom_variables"]["response_guid"] == guid:
-                        self.data = d
-                        return
-                elif email:
-                    for page in d["pages"]:
-                        for question in page["questions"]:
-                            if question["id"] in [app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['PARENTS'][1]['EMAIL']['SURVEY_MONKEY']]:
-                                if question["answers"][0]["text"].lower() == email.lower():
-                                    self.data = d
-                                    return
-        raise LookupError
-
-    @property
-    def as_text(self):
-        text = u""
-        for page in Survey().pages:
-            text = text + u"== {0} ==\n\n".format(page.title)
-            for question in page.questions:
-                text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
-        return text
-
-    def email_response(self):
-        text = self.as_text
-        for school in self.schools:
-            for email in school.emails:
-                mail.send(
-                    Message(
-                        "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
-                        sender = "Wildflower <noreply@wildflowerschools.org>",
-                        recipients = [email.address],
-                        body = text
+        def email_response(self):
+            text = self.as_text
+            for school in self.schools:
+                for email in school.emails:
+                    mail.send(
+                        Message(
+                            "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
+                            sender = "Wildflower <noreply@wildflowerschools.org>",
+                            recipients = [email.address],
+                            body = text
+                        )
                     )
-                )
 
-    def raw_answers_for(self, question_id):
-        for page in self.data["pages"]:
-            for question in page["questions"]:
-                if question["id"] == question_id:
-                    return question["answers"]
-        return []
+        def raw_answers_for(self, question_id):
+            for page in self.data["pages"]:
+                for question in page["questions"]:
+                    if question["id"] == question_id:
+                        return question["answers"]
+            return []
 
-    def value_for(self, question_id, answer):
-        if "text" in answer:
-            return answer["text"]
-        else:
-            return re.sub('<[^<]+?>', '', Survey().value_for(question_id, answer["choice_id"]))
-        return None
+        def value_for(self, question_id, answer):
+            if "text" in answer:
+                return answer["text"]
+            else:
+                return re.sub('<[^<]+?>', '', Survey().value_for(question_id, answer["choice_id"]))
+            return None
 
-    def answer_for(self, question_id):
-        # http://stackoverflow.com/questions/363944/python-idiom-to-return-first-item-or-none
-        return next(iter(self.answers_for(question_id) or []), None)
+        def answer_for(self, question_id):
+            # http://stackoverflow.com/questions/363944/python-idiom-to-return-first-item-or-none
+            return next(iter(self.answers_for(question_id) or []), None)
 
-    def answers_for(self, question_id):
-        raw_answers = self.raw_answers_for(question_id)
-        answers = []
-        for raw_answer in raw_answers:
-            answers.append(self.value_for(question_id, raw_answer))
-        return answers
+        def answers_for(self, question_id):
+            raw_answers = self.raw_answers_for(question_id)
+            answers = []
+            for raw_answer in raw_answers:
+                answers.append(self.value_for(question_id, raw_answer))
+            return answers
 
-    @property
-    def schools(self):
-        schools = []
-        for answer in self.answers_for(app.config['ANSWER_KEY']['SCHOOLS']['SURVEY_MONKEY']):
-            for school in School.query.all():
-                if answer.lower().find(school.match.lower()) >= 0:
-                    schools.append(school)
-        return schools
+        @property
+        def schools(self):
+            schools = []
+            for answer in self.answers_for(app.config['ANSWER_KEY']['SCHOOLS']['SURVEY_MONKEY']):
+                for school in School.query.all():
+                    if answer.lower().find(school.match.lower()) >= 0:
+                        schools.append(school)
+            return schools
 
-    def model_factory(self, class_name, d):
-        class ModelFromFactory(): pass
-        ModelFromFactory.__name__ = class_name
-        m = ModelFromFactory()
-        for k in d:
-            setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
-        return m
+        def model_factory(self, class_name, d):
+            class ModelFromFactory(): pass
+            ModelFromFactory.__name__ = class_name
+            m = ModelFromFactory()
+            for k in d:
+                setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
+            return m
 
-    @property
-    def parents(self):
-        return [
-            self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][0]),
-            self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][1])
-        ]
+        @property
+        def parents(self):
+            return [
+                self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][0]),
+                self.model_factory("Parent", app.config['ANSWER_KEY']['PARENTS'][1])
+            ]
 
-    @property
-    def child(self):
-        return self.model_factory("Child", app.config['ANSWER_KEY']['CHILD'])
+        @property
+        def child(self):
+            return self.model_factory("Child", app.config['ANSWER_KEY']['CHILD'])
 
-    @combomethod
-    def create_checklists(receiver, guid=None):
-        if inspect.isclass(receiver):
-            Response(guid=guid).create_checklists()
-        else:
-            checklists = []
-            for school in receiver.schools:
-                checklists.append(Checklist(guid=receiver.guid, school=school, status="New Application"))
-            db.session.add_all(checklists)
-            db.session.commit()
-            return checklists
+        @combomethod
+        def create_checklists(receiver, guid=None):
+            if inspect.isclass(receiver):
+                Response(guid=guid).create_checklists()
+            else:
+                checklists = []
+                for school in receiver.schools:
+                    checklists.append(Checklist(guid=receiver.guid, school=school, status="New Application"))
+                db.session.add_all(checklists)
+                db.session.commit()
+                return checklists
 
 class Appointment():
     def __init__(self, data):
@@ -276,12 +277,12 @@ class Appointment():
             setattr(receiver.checklist, "{0}_scheduled_at".format(receiver.type), None if receiver.is_canceled else receiver.at)
             db.session.commit()
 
-class TCAPI(object):
-    def __init__(self, tc_api_token, tc_school_id):
+class TransparentClassroom(object):
+    def __init__(self, tc_school_id):
         self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
         self.request_session = requests.session()
         self.request_session.headers.update({
-          "X-TransparentClassroomToken": tc_api_token,
+          "X-TransparentClassroomToken": app.config['TC_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
           "X-TransparentClassroomMasqueradeId": "2"
@@ -306,7 +307,7 @@ class TCAPI(object):
             "program": program
         }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
-            tc_params[item['TC']] = response.answer_for(item['SURVEY_MONKEY'])
+            tc_params[item['TRANSPARENT_CLASSROOM']] = response.answer_for(item['SURVEY_MONKEY'])
         response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params}))
         if response.status_code != 201:
             raise LookupError, response.body
