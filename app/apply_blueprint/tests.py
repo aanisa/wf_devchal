@@ -31,18 +31,10 @@ class TestCase(unittest.TestCase):
         with app.app_context():
             with mail.record_messages() as outbox:
                 response.email_response()
-                self.assertGreater(len(outbox), 0)
-
-    def test_checklist(self):
-        models.Response(guid=self.guid).create_checklists()
-        checklist = models.Checklist.query.first()
-        with app.app_context():
-            with mail.record_messages() as outbox:
-                checklist.email_checklist()
-                self.assertGreater(len(outbox), 0)
-        self.assertIsNone(checklist.child_visit_scheduled_at)
-        checklist.completed("child_visit")
-        self.assertIsNotNone(checklist.child_visit_scheduled_at)
+                i = len(outbox)
+                self.assertGreater(i, 0)
+                checklist.email_next_steps()
+                self.assertGreater(len(outbox), i)
 
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():
@@ -58,6 +50,6 @@ class TestCase(unittest.TestCase):
         r = models.Response(guid=self.guid)
         assert r.answer_for(app.config['ANSWER_KEY']['CHILD']['GENDER']['SURVEY_MONKEY'])
 
-    def test_tcapi_submit_application(self):
+    def test_transparent_classroom_submit_application(self):
         r = models.Response(guid=self.guid)
-        self.assertIsInstance(i, models.TCAPI("hy4385yczauTVD66ufUC", 3).submit_application(r, "Children's House: Morning Program (8:30a-12:30p)"))
+        self.assertIsInstance(i, models.TransparentClassroom(3).submit_application(r, "Children's House: Morning Program (8:30a-12:30p)"))

@@ -21,25 +21,10 @@ class Base(db.Model):
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-class EmailSchool(Base):
-    __tablename__ = "{0}_email_school".format(tablename_prefix)
-    email_id = db.Column('email_id', db.Integer, db.ForeignKey("{0}_email.id".format(tablename_prefix)))
-    school_id = db.Column('school_id', db.Integer, db.ForeignKey("{0}_school.id".format(tablename_prefix)))
-    school = db.relationship('School', back_populates='emails_association')
-    email = db.relationship('Email', back_populates='schools_association')
-
-class Email(Base):
-    __tablename__ = "{0}_email".format(tablename_prefix)
-    address = db.Column(db.String(80))
-    schools_association = db.relationship('EmailSchool', back_populates="email")
-    schools = db.relationship('School', secondary=EmailSchool.__tablename__)
-
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
     tc_school_id = db.Column(db.Integer)
     tc_session_id = db.Column(db.Integer)
-    classrooms = db.relationship('Classroom', backref='school', lazy='dynamic')
-    checklists = db.relationship('Checklist', backref='school', lazy='dynamic')
     name = db.Column(db.String(80))
     match = db.Column(db.String(80))
     schedule_parent_teacher_conversation_url = db.Column(db.String(80))
@@ -48,41 +33,6 @@ class School(Base):
     parent_observation_optional = db.Column(db.Boolean())
     schedule_child_visit_url = db.Column(db.String(80))
     child_visit_optional = db.Column(db.Boolean())
-    emails_association = db.relationship('EmailSchool', back_populates="school")
-    emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
-
-class Classroom(Base):
-    __tablename__ = "{0}_classroom".format(tablename_prefix)
-    school_id = db.Column(db.Integer, db.ForeignKey(School.id))
-    tc_classroom_id = db.Column(db.Integer)
-    name = db.Column(db.String(80))
-
-class Checklist(Base):
-    __tablename__ = "{0}_checklist".format(tablename_prefix)
-    guid = db.Column(db.String(36)) # used to link to Survey Monkey results
-    school_id = db.Column(db.Integer, db.ForeignKey(School.id))
-    parent_teacher_conversation_scheduled_at = db.Column(db.DateTime)
-    parent_observation_scheduled_at = db.Column(db.DateTime)
-    child_visit_scheduled_at = db.Column(db.DateTime)
-
-    status = db.Column(db.Enum("New Application", "Offer Accepted", "In Process", "Offer Out", "Offer Rejected", "Waitlisted", "Rejected", name="checklist_status_enum"))
-
-    def email_checklist(self):
-        mail.send(
-            Message(
-                "Next steps for your application to {0}".format(self.school.name),
-                sender = self.school.emails[0].address,
-                recipients = ["{0} {1} <{2}>".format(
-                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
-                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
-                    Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
-                )],
-                body = render_template("email_checklist.txt", school=self.school)
-            )
-        )
-
-    def response(self):
-        return Response(guid=self.guid)
 
 class SurveyMonkey:
     request_session = requests.session()
@@ -155,6 +105,20 @@ class SurveyMonkey:
                 for question in page.questions:
                     text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
             return text
+
+        def email_next_steps(self):
+            mail.send(
+                Message(
+                    "Next steps for your application to {0}".format(self.school.name),
+                    sender = self.school.emails[0].address,
+                    recipients = ["{0} {1} <{2}>".format(
+                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
+                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
+                        Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
+                    )],
+                    body = render_template("email_checklist.txt", school=self.school)
+                )
+            )
 
         def email_response(self):
             text = self.as_text
