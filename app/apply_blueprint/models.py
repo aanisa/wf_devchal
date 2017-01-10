@@ -334,9 +334,10 @@ class TCAPI(object):
         }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
             tc_params[item['TC']] = response.answer_for(item['SURVEY_MONKEY'])
-        print tc_params
-        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params})).json()
-        print response
+        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params}))
+        if response.status_code != 201:
+            raise LookupError, response.body
+        return response.json()['data']['id']
 
     def accept_application(self, tc_application_id):
         self.authorize
