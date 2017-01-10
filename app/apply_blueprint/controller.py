@@ -24,11 +24,6 @@ def calendly_webhook():
     models.Appointment(request.get_json()).update_checklist()
     return "OK"
 
-@blueprint.route('/completed')
-def completed():
-    models.Checklist.query.filter(models.Checklist.id == request.args.get("id")).filter(models.Checklist.guid == request.args.get("guid")).first().completed(request.args.get("appointment"))
-    return render_template('completed.html')
-
 api = Api(blueprint)
 
 class SchoolResource(Resource):

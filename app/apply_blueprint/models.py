@@ -310,10 +310,6 @@ class TCAPI(object):
         })
         self.tc_school_id = tc_school_id
 
-    def authorize(self):
-        if self.tc_school_id not in [i["id"] for i in self.request_session.get("{0}/schools.json".format(self.base_url)).json()]:
-            raise LookupError
-
     def params_key(self, item, all):
         if type(item) == dict:
             if "TC" in item:
@@ -327,7 +323,6 @@ class TCAPI(object):
         return all
 
     def submit_application(self, response, program):
-        self.authorize()
         tc_params = {
             "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
             "program": program
@@ -338,8 +333,3 @@ class TCAPI(object):
         if response.status_code != 201:
             raise LookupError, response.body
         return response.json()['data']['id']
-
-    def accept_application(self, tc_application_id):
-        self.authorize
-        # accepts application, creates child, creates parent(s)
-        pass
