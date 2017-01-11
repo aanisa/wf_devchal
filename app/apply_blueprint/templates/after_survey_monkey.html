@@ -1,4 +1,28 @@
 {% extends "layout.html" %}
 {% block body %}
-  Thanks.
+<img src="static/img/logo.png" width="250"/>
+
+<h1>Congratulations!</h1>
+
+<div>
+  You have completed {{ child }}'s
+    {% if schools|length > 1 %}
+      applications
+    {% else %}
+      application
+    {% endif %}
+  for:
+</div>
+
+<ol>
+  {% for school in schools %}
+    <li>{{ school }}</li>
+  {% endfor %}
+</ol>
+
+<div>
+  You should receive an email in your inbox with next steps for each school you applied to - if you don't, please email <a href="mailto:admissions@wildflowerschools.org">admissions@wildflowerschools.org</a>.</div>
+
+<div>Thank you for your interest in Wildflower! We look forward to getting to know your family.</div>
+
 {% endblock %}

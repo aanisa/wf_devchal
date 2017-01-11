@@ -95,7 +95,7 @@ class SurveyMonkey:
         @classmethod
         @lru_cache(maxsize=None)
         def responses(cls):
-            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"])).json()
+            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]),  params={"sort_order": "DESC"}).json()
 
         def __init__(self, guid=None, email=None):
             for d in SurveyMonkey.Response.responses["data"]:
@@ -133,7 +133,7 @@ class SurveyMonkey:
                             SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
                             SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
                         )],
-                        body = render_template("email_checklist.txt", school=school)
+                        html = render_template("email_next_steps.html", school=school)
                     )
                 )
 
@@ -146,7 +146,7 @@ class SurveyMonkey:
                             "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
                             sender = "Wildflower Schools <noreply@wildflowerschools.org>",
                             recipients = [email.address],
-                            body = text
+                            body = text + "\n\nThis application is also available online in Transparent Classroom"
                         )
                     )
 

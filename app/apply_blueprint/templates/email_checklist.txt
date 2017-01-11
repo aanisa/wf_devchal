@@ -1,5 +1,0 @@
-{{ school.name }}
-
-{% if school.schedule_parent_teacher_conversation_url %}Schedule parent-teacher conversation at {{ school.schedule_parent_teacher_conversation_url }}{% if school.parent_teacher_conversation_optional == True %}(Optional){% endif %}{% endif %}
-{% if school.schedule_parent_observation_url %}Schedule parent observation at {{ school.schedule_parent_observation_url }}{% if school.parent_observation_optional == True %}(Optional){% endif %}{% endif %}
-{% if school.schedule_child_visit_url %}Schedule child visit at {{ school.schedule_child_visit_url }}{% if school.child_visit_optional == True %}(Optional){% endif %}{% endif %}
