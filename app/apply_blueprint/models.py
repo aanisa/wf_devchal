@@ -59,7 +59,7 @@ class SurveyMonkey:
     class Survey():
         @lru_cache(maxsize=None)
         def __init__(self):
-            self.data = request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+            self.data = SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
 
         def value_for(self, question_id, choice_id):
             for page in self.data["pages"]:
@@ -84,39 +84,39 @@ class SurveyMonkey:
         def pages(self):
             pages = []
             for p in self.data["pages"]:
-                page = Survey.Page(p["title"])
+                page = SurveyMonkey.Survey.Page(p["title"])
                 for question in p["questions"]:
-                    page.questions.append(Survey.Question(question["id"], question["headings"][0]["heading"]))
+                    page.questions.append(SurveyMonkey.Survey.Question(question["id"], question["headings"][0]["heading"]))
                 pages.append(page)
             return pages
 
-    @lru_cache(maxsize=None)
-    @classmethod
-    def responses(cls, page):
-        return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
-
     class Response():
+        # this is a classmethod so that it can be used in the tests
+        @classmethod
+        @lru_cache(maxsize=None)
+        def responses(cls):
+            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"])).json()
+
         def __init__(self, guid=None, email=None):
-            for i in range(1, 100):
-                for d in responses(i)["data"]:
-                    self.guid = d["custom_variables"]["response_guid"]
-                    if guid:
-                        if d["custom_variables"]["response_guid"] == guid:
-                            self.data = d
-                            return
-                    elif email:
-                        for page in d["pages"]:
-                            for question in page["questions"]:
-                                if question["id"] in [app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['PARENTS'][1]['EMAIL']['SURVEY_MONKEY']]:
-                                    if question["answers"][0]["text"].lower() == email.lower():
-                                        self.data = d
-                                        return
+            for d in SurveyMonkey.Response.responses["data"]:
+                self.guid = d["custom_variables"]["response_guid"]
+                if guid:
+                    if d["custom_variables"]["response_guid"] == guid:
+                        self.data = d
+                        return
+                elif email:
+                    for page in d["pages"]:
+                        for question in page["questions"]:
+                            if question["id"] in [app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['PARENTS'][1]['EMAIL']['SURVEY_MONKEY']]:
+                                if question["answers"][0]["text"].lower() == email.lower():
+                                    self.data = d
+                                    return
             raise LookupError
 
         @property
         def as_text(self):
             text = u""
-            for page in Survey().pages:
+            for page in SurveyMonkey.Survey().pages:
                 text = text + u"== {0} ==\n\n".format(page.title)
                 for question in page.questions:
                     text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
@@ -129,9 +129,9 @@ class SurveyMonkey:
                         "Next steps for your application to {0}".format(school.name),
                         sender = school.emails[0].address,
                         recipients = ["{0} {1} <{2}>".format(
-                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
-                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
-                            Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
+                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
+                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
+                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
                         )],
                         body = render_template("email_checklist.txt", school=school)
                     )
@@ -165,7 +165,7 @@ class SurveyMonkey:
             if "text" in answer:
                 return answer["text"]
             else:
-                return re.sub('<[^<]+?>', '', Survey().value_for(question_id, answer["choice_id"]))
+                return re.sub('<[^<]+?>', '', SurveyMonkey.Survey().value_for(question_id, answer["choice_id"]))
             return None
 
         def answer_for(self, question_id):
@@ -209,10 +209,10 @@ class SurveyMonkey:
 
 class TransparentClassroom(object):
     def __init__(self, tc_school_id):
-        self.base_url = "{0}/api/v1".format(app.config["TC_BASE_URL"])
+        self.base_url = "{0}/api/v1".format(app.config["TRANSPARENT_CLASSROOM_BASE_URL"])
         self.request_session = requests.session()
         self.request_session.headers.update({
-          "X-TransparentClassroomToken": app.config['TC_API_TOKEN'],
+          "X-TransparentClassroomToken": app.config['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
           "X-TransparentClassroomMasqueradeId": "2"
