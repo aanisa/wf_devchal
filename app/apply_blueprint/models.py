@@ -21,6 +21,19 @@ class Base(db.Model):
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+class EmailSchool(Base):
+    __tablename__ = "{0}_email_school".format(tablename_prefix)
+    email_id = db.Column('email_id', db.Integer, db.ForeignKey("{0}_email.id".format(tablename_prefix)))
+    school_id = db.Column('school_id', db.Integer, db.ForeignKey("{0}_school.id".format(tablename_prefix)))
+    school = db.relationship('School', back_populates='emails_association')
+    email = db.relationship('Email', back_populates='schools_association')
+
+class Email(Base):
+    __tablename__ = "{0}_email".format(tablename_prefix)
+    address = db.Column(db.String(80))
+    schools_association = db.relationship('EmailSchool', back_populates="email")
+    schools = db.relationship('School', secondary=EmailSchool.__tablename__)
+
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
     tc_school_id = db.Column(db.Integer)
@@ -33,6 +46,8 @@ class School(Base):
     parent_observation_optional = db.Column(db.Boolean())
     schedule_child_visit_url = db.Column(db.String(80))
     child_visit_optional = db.Column(db.Boolean())
+    emails_association = db.relationship('EmailSchool', back_populates="school")
+    emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
 
 class SurveyMonkey:
     request_session = requests.session()
@@ -111,7 +126,7 @@ class SurveyMonkey:
                 mail.send(
                     Message(
                         "Next steps for your application to {0}".format(school.name),
-                        sender = "Wildflower Schools <noreply@wildflowerschools.org>",
+                        sender = school.emails[0].address,
                         recipients = ["{0} {1} <{2}>".format(
                             Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
                             Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
@@ -128,7 +143,7 @@ class SurveyMonkey:
                     mail.send(
                         Message(
                             "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
-                            sender = "Wildflower <noreply@wildflowerschools.org>",
+                            sender = "Wildflower Schools <noreply@wildflowerschools.org>",
                             recipients = [email.address],
                             body = text
                         )

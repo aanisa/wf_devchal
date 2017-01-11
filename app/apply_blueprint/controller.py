@@ -17,5 +17,4 @@ def after_survey_monkey():
     response.submit_to_transparent_classroom()
     response.email_response()
     response.email_next_steps()
-
     return render_template('after_survey_monkey.html')
