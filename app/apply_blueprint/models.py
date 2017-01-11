@@ -91,7 +91,8 @@ class SurveyMonkey:
             return pages
 
     @lru_cache(maxsize=None)
-    def responses(page):
+    @classmethod
+    def responses(cls, page):
         return request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]), params={"sort_order": "DESC", "page": page}).json()
 
     class Response():

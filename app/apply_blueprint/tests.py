@@ -20,7 +20,7 @@ class TestCase(unittest.TestCase):
         self.guid = models.SurveyMonkey.responses(1)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
-        s = models.Survey()
+        s = models.SurveyMonkey.Survey()
         self.assertIsInstance(s.data, dict)
         self.assertIsInstance(s.questions, list)
         self.assertIsInstance(s.questions[0], models.SurveyMonkey.Question)
