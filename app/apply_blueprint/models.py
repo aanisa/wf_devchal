@@ -49,6 +49,7 @@ class School(Base):
     emails_association = db.relationship('EmailSchool', back_populates="school")
     emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
 
+
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
     # the http library uses stdout for logging, not the logger, so you can't
@@ -126,13 +127,13 @@ class SurveyMonkey(object):
         # this is a classmethod so that it can be used in the tests
         @classmethod
         @lru_cache(maxsize=None)
-        def responses(cls):
+        def responses(cls, key): # important to have the key for the caching to work properly 
             return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]),  params={"sort_order": "DESC"}).json()
             # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     return json.load(f)
 
         def __init__(self, guid=None, email=None):
-            for d in SurveyMonkey.Response.responses()["data"]:
+            for d in SurveyMonkey.Response.responses("{0}{1}".format(guid, email))["data"]:
                 self.guid = d["custom_variables"]["response_guid"]
                 if guid:
                     if d["custom_variables"]["response_guid"] == guid:
@@ -149,29 +150,28 @@ class SurveyMonkey(object):
 
         def email_next_steps(self):
             for school in self.schools:
-                mail.send(
-                    Message(
-                        "Next steps for your application to {0}".format(school.name),
-                        sender = school.emails[0].address,
-                        recipients = ["{0} {1} <{2}>".format(
-                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
-                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
-                            SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
-                        )],
-                        bcc = ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                        html = render_template("email_next_steps.html", school=school)
-                    )
-                )
+                message = {
+                    "subject": "Next steps for your application to {0}".format(school.name),
+                    "sender": school.emails[0].address,
+                    "recipients": ["{0} {1} <{2}>".format(
+                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
+                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
+                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
+                    )],
+                    "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                    "html": render_template("email_next_steps.html", school=school)
+                }
+                mail.send(Message(**message))
 
         def email_response(self):
-            mail.send(
-                Message(
-                    "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
-                    sender = "Wildflower Schools <noreply@wildflowerschools.org>",
-                    recipients = sum([[e.address for e in s.emails] for s in self.schools], []) + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                    html = render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
-                )
-            )
+            message = {
+                "subject": "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
+                "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
+                "recipients": sum([[e.address for e in s.emails] for s in self.schools], []) + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                "html": render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
+
+            }
+            mail.send(Message(**message))
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:

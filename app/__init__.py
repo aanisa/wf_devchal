@@ -18,6 +18,13 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
 
+class MailWithLogging(Mail):
+    def send(self, message):
+        app.logger.debug(message)
+        super(Mail, self).send(message)
+
+mail = MailWithLogging(app)
+
 for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
     if f.find("_blueprint") >= 0:
         p = f[0:-10] # _blueprint is 10 chars long

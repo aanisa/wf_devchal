@@ -18,6 +18,7 @@ class TestCase(unittest.TestCase):
         r = CliRunner().invoke(cli.seed)
         if r.exception: raise r.exception
         self.guid = models.SurveyMonkey.Response.responses()["data"][0]["custom_variables"]["response_guid"]
+        print models.SurveyMonkey.Response.responses("foo")
         # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
         #     self.guid = json.load(f)["data"][0]["custom_variables"]["response_guid"]
 
