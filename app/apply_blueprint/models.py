@@ -160,7 +160,6 @@ class SurveyMonkey(object):
                 )
 
         def email_response(self):
-
             mail.send(
                 Message(
                     "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
@@ -169,7 +168,6 @@ class SurveyMonkey(object):
                     html = render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
                 )
             )
-            print render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:
@@ -236,7 +234,7 @@ class TransparentClassroom(object):
           "X-TransparentClassroomToken": app.config['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "X-TransparentClassroomMasqueradeId": "2"
+          "X-TransparentClassroomSchoolId": tc_school_id
         })
         self.tc_school_id = tc_school_id
 
@@ -255,7 +253,7 @@ class TransparentClassroom(object):
     def submit_application(self, response):
         tc_params = {
             "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
-            "program": "TBD"
+            "program": "Default"
         }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
             tc_params[item['TRANSPARENT_CLASSROOM']] = response.answer_for(item['SURVEY_MONKEY'])

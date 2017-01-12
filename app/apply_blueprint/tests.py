@@ -28,14 +28,8 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(s.pages[0].questions, list)
         self.assertIsInstance(s.pages[0].questions[0], models.SurveyMonkey.Survey.Question)
 
-    def test_email_response(self):
-        with app.app_context():
-            response = models.SurveyMonkey.Response(guid=self.guid)
-            response.email_response()
-
     def test_response(self):
         response = models.SurveyMonkey.Response(guid=self.guid)
-        response.submit_to_transparent_classroom()
         self.assertIsInstance(response.data, dict)
         self.assertGreater(len(response.schools), 0)
         with app.app_context():
@@ -62,4 +56,4 @@ class TestCase(unittest.TestCase):
 
     def test_transparent_classroom_submit_application(self):
         r = models.SurveyMonkey.Response(guid=self.guid)
-        self.assertIsInstance(i, models.TransparentClassroom(3).submit_application(r, "Children's House: Morning Program (8:30a-12:30p)"))
+        self.assertIsInstance(i, models.TransparentClassroom(3).submit_application(r))
