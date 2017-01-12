@@ -17,6 +17,6 @@ def after_survey_monkey():
     response.submit_to_transparent_classroom()
     response.email_response()
     response.email_next_steps()
-    schools = [s.name s in response.schools]
-    child = "{0} {1}".format(response.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])
+    schools = [s.name for s in response.schools]
+    child = "{0} {1}".format(response.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY'], app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY']))
     return render_template('after_survey_monkey.html', schools=['Violeta Montessori School', 'Wildflower Montessori School'], child="First Last")

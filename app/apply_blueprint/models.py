@@ -49,12 +49,27 @@ class School(Base):
     emails_association = db.relationship('EmailSchool', back_populates="school")
     emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
 
-class SurveyMonkey:
-    request_session = requests.session()
-    request_session.headers.update({
-      "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
-      "Content-Type": "application/json"
-    })
+class SurveyMonkey(object):
+    # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
+    # the http library uses stdout for logging, not the logger, so you can't
+    # reasonably filter it's output; having *all* the headers is too much
+    # consequently, I'm subclassing the request library and having the get
+    # method (the only one I'm currently using) do the logging
+    class Session(requests.Session):
+        def __init__(self):
+            super(type(self), self).__init__()
+            self.headers.update({
+              "Authorization": "Bearer {0}".format(app.config['SURVEY_MONKEY_OAUTH_TOKEN']),
+              "Content-Type": "application/json"
+            })
+
+        def get(self, url, params=None, **kwargs):
+            response = super(type(self), self).get(url, params=None, **kwargs)
+            if "X-Ratelimit-App-Global-Day-Remaining" in response.headers:
+                app.logger.info("SurveyMonkey: X-Ratelimit-App-Global-Day-Remaining: {0}".format(response.headers["X-Ratelimit-App-Global-Day-Remaining"]))
+            return response
+
+    request_session = Session()
 
     class Survey():
         @lru_cache(maxsize=None)
