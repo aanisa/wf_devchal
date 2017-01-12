@@ -74,7 +74,9 @@ class SurveyMonkey(object):
     class Survey():
         @lru_cache(maxsize=None)
         def __init__(self):
-            self.data = SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+            # self.data = SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
+            with open("{0}/sample-survey-monkey-survey-details.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
+                self.data = json.load(f)
 
         def value_for(self, question_id, choice_id):
             for page in self.data["pages"]:
@@ -110,10 +112,12 @@ class SurveyMonkey(object):
         @classmethod
         @lru_cache(maxsize=None)
         def responses(cls):
-            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]),  params={"sort_order": "DESC"}).json()
+            # return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]),  params={"sort_order": "DESC"}).json()
+            with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
+                return json.load(f)
 
         def __init__(self, guid=None, email=None):
-            for d in SurveyMonkey.Response.responses["data"]:
+            for d in SurveyMonkey.Response.responses()["data"]:
                 self.guid = d["custom_variables"]["response_guid"]
                 if guid:
                     if d["custom_variables"]["response_guid"] == guid:
@@ -128,15 +132,6 @@ class SurveyMonkey(object):
                                     return
             raise LookupError
 
-        @property
-        def as_text(self):
-            text = u""
-            for page in SurveyMonkey.Survey().pages:
-                text = text + u"== {0} ==\n\n".format(page.title)
-                for question in page.questions:
-                    text = text + u"{0}\n{1}\n\n".format(question.text, u"\n".join(self.answers_for(question.id)))
-            return text
-
         def email_next_steps(self):
             for school in self.schools:
                 mail.send(
@@ -148,22 +143,21 @@ class SurveyMonkey(object):
                             SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
                             SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
                         )],
+                        bcc = ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
                         html = render_template("email_next_steps.html", school=school)
                     )
                 )
 
         def email_response(self):
-            text = self.as_text
-            for school in self.schools:
-                for email in school.emails:
-                    mail.send(
-                        Message(
-                            "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
-                            sender = "Wildflower Schools <noreply@wildflowerschools.org>",
-                            recipients = [email.address],
-                            body = text + "\n\nThis application is also available online in Transparent Classroom"
-                        )
-                    )
+            mail.send(
+                Message(
+                    "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
+                    sender = "Wildflower Schools <noreply@wildflowerschools.org>",
+                    recipients = sum([[e.address for e in s.emails] for s in self.schools], []) + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                    html = render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
+                )
+            )
+            print render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:

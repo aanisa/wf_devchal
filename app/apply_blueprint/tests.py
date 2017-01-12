@@ -17,7 +17,9 @@ class TestCase(unittest.TestCase):
         db.create_all()
         r = CliRunner().invoke(cli.seed)
         if r.exception: raise r.exception
-        self.guid = models.SurveyMonkey.Response.responses()["data"][0]["custom_variables"]["response_guid"]
+        # self.guid = models.SurveyMonkey.Response.responses().json()["data"][0]["custom_variables"]["response_guid"]
+        with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
+            self.guid = json.load(f)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
         s = models.SurveyMonkey.Survey()
@@ -25,6 +27,11 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(s.pages, list)
         self.assertIsInstance(s.pages[0].questions, list)
         self.assertIsInstance(s.pages[0].questions[0], models.SurveyMonkey.Survey.Question)
+
+    def test_email_response(self):
+        with app.app_context():
+            response = models.SurveyMonkey.Response(guid=self.guid)
+            response.email_response()
 
     def test_response(self):
         response = models.SurveyMonkey.Response(guid=self.guid)

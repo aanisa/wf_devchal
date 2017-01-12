@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% for page in survey.pages %}
+  <h3>{{ page.title }}</h3>
+  {% for question in page.questions %}
+    <h4>{{ question.text }}</h4>
+    <div>
+      {% for answer in response.answers_for(question.id) %}
+        {{ answer }}<br>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endfor %}
+
+<div>This application is also available in Transparent Classroom.</div>
+
+{% endblock %}
