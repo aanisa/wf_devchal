@@ -2,17 +2,21 @@
 {% block body %}
 
 {% for page in survey.pages %}
-  <h3>{{ page.title }}</h3>
-  {% for question in page.questions %}
-    <h4>{{ question.text }}</h4>
-    <div>
-      {% for answer in response.answers_for(question.id) %}
-        {{ answer }}<br>
-      {% endfor %}
-    </div>
-  {% endfor %}
+  {% if page.show_for(response) %}
+    <h3>{{ page.title }}</h3>
+    {% for question in page.questions %}
+      {% if question.show_for(response) %}
+        <h4>{{ question.text }}</h4>
+        <div>
+          {% for answer in response.answers_for(question.id) %}
+            {{ answer }}<br>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 {% endfor %}
 
-<div>This application is also available in Transparent Classroom.</div>
+<h3>This application is also available in Transparent Classroom.</h3>
 
 {% endblock %}

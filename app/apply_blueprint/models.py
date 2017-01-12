@@ -92,10 +92,21 @@ class SurveyMonkey(object):
                 self.title = title
                 self.questions = []
 
+            def show_for(self, response):
+                for question in self.questions:
+                    if response.answers_for(question.id) != []:
+                        return True
+                return False
+
         class Question(object):
-         def __init__(self, id, text):
-             self.id = id
-             self.text = text
+            def __init__(self, id, text):
+                self.id = id
+                self.text = text
+
+            def show_for(self, response):
+                if response.answers_for(self.id) != []:
+                    return True
+                return False
 
         @property
         def pages(self):
@@ -149,6 +160,7 @@ class SurveyMonkey(object):
                 )
 
         def email_response(self):
+
             mail.send(
                 Message(
                     "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
