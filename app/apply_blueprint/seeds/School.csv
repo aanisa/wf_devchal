@@ -1,10 +1,9 @@
-tc_school_id,tc_session_id,name,match,parent_teacher_conversation_optional,schedule_parent_teacher_conversation_url,parent_observation_optional,schedule_parent_observation_url,child_visit_optional,schedule_child_visit_url,email
-3,17,Aster Montessori School,aster,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Dandelion Montessori Coop,dandelion,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Marigold Montessori School,marigold,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Mariposa Montessori School,mariposa,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Snapdragon Montessori School,snapdragon,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Snowdrop Montessori,snowdrop,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Violeta Montessori School,violeta,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Wild Rose Montessori School,wild rose,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
-3,17,Wildflower Montessori School,wildflower,False,http://TBD,False,http://TBD,False,http://TBD,mail@example.com
+tc_school_id,tc_session_id,name,match,parent_teacher_conversation_optional,schedule_parent_teacher_conversation_url,parent_observation_optional,schedule_parent_observation_url,child_visit_optional,schedule_child_visit_url
+3,17,Aster Montessori School,aster,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Dandelion Montessori Coop,dandelion,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Marigold Montessori School,marigold,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Snapdragon Montessori School,snapdragon,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Snowdrop Montessori,snowdrop,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Violeta Montessori School,violeta,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
+3,17,Wild Rose Montessori School,wild rose,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,https://calendly.com/dan-grigsby/child-visit
+3,17,Wildflower Montessori School,wildflower,False,https://calendly.com/dan-grigsby/parent-teacher-conversation,False,https://calendly.com/dan-grigsby/parent-observation,False,
