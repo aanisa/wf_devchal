@@ -234,7 +234,7 @@ class TransparentClassroom(object):
           "X-TransparentClassroomToken": app.config['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "X-TransparentClassroomSchoolId": tc_school_id
+          "X-TransparentClassroomSchoolId": "{0}".format(tc_school_id)
         })
         self.tc_school_id = tc_school_id
 
@@ -256,8 +256,9 @@ class TransparentClassroom(object):
             "program": "Default"
         }
         for item in self.params_key(app.config['ANSWER_KEY'], []):
-            tc_params[item['TRANSPARENT_CLASSROOM']] = response.answer_for(item['SURVEY_MONKEY'])
+            answer = response.answer_for(item['SURVEY_MONKEY'])
+            if answer:
+                tc_params[item['TRANSPARENT_CLASSROOM']] = answer
         response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params}))
         if response.status_code != 201:
             raise LookupError, response.body
-        return response.json()['data']['id']

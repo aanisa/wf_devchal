@@ -56,4 +56,4 @@ class TestCase(unittest.TestCase):
 
     def test_transparent_classroom_submit_application(self):
         r = models.SurveyMonkey.Response(guid=self.guid)
-        self.assertIsInstance(i, models.TransparentClassroom(3).submit_application(r))
+        models.TransparentClassroom(3).submit_application(r)
