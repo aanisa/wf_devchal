@@ -75,7 +75,6 @@ class SurveyMonkey(object):
         @classmethod
         @lru_cache(maxsize=None)
         def survey(cls):
-            print "FETCH SURVEY"
             return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
             # with open("{0}/sample-survey-monkey-survey-details.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     self.data = json.load(f)
