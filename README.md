@@ -1,3 +1,10 @@
+Global Heroku config/env vars:
+
+  heroku config:set APP_CONFIG_MODE=production
+  heroku config:set MAIL_USERNAME=TBD
+  heroku config:set MAIL_PASSWORD=TBD
+
+
 TODO:
   Automatically prefix table names in blueprints (flask_sqlalchemy is causing problems)
   Config is still a global namspace; isolate each blueprint's config
