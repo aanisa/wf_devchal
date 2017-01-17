@@ -2,3 +2,29 @@ Blueprint Heroku config/env vars:
 
   heroku config:set SURVEY_MONKEY_OAUTH_TOKEN=TBD
   heroku config:set TRANSPARENT_CLASSROOM_API_TOKEN=TBD
+
+Google Account + Calendly Setup
+
+  Create Google Account:
+    Create Google apps account named "SCHOOLNAME-appointments"
+    In incognito window:
+      Log in to new account
+
+  Set up Calendly:
+    Log in to Calendly as user with Admin or Owner privs
+    Add new Google account as user
+
+    In incognito window from above:
+      Open Calendly invite email, click link, sign up/accept.
+      Set timezone
+      Update event types with appropriate days of week/times of days
+
+  Set up DB:
+    Update seeds with correct URLs, email addresses
+
+  Add teachers to Google Account:
+    In incognito window (from above):
+      Add/authorize forwarding addresses
+      For each forwarding address:
+        Create filter
+          Forward email sent to the account's address to each forwarding address
