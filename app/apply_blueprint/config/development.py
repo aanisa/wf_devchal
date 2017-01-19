@@ -1,1 +1,1 @@
-TRANSPARENT_CLASSROOM_BASE_URL = "http://localhost:3000"
+transparent_classroom_BASE_URL = "http://localhost:3000"
