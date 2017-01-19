@@ -48,8 +48,8 @@ class TestCase(unittest.TestCase):
 
     def test_after_survey_monkey(self):
         with app.test_request_context():
-            url= flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "?hub=cambridge&response_guid={0}".format(self.guid)
-            response = app.test_client().get()
+            url = flask.url_for("{0}.after_survey_monkey".format(blueprint_name)) + "?hub=cambridge&response_guid={0}".format(self.guid)
+            response = app.test_client().get(url)
             self.assertEqual(response.status_code, 200)
 
     def test_non_text_answer(self):

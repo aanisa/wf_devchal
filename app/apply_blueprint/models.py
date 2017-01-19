@@ -161,7 +161,7 @@ class SurveyMonkey(object):
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:
-                TransparentClassroom(self.hub, school).submit_application(self)
+                TransparentClassroom(school).submit_application(self)
 
         def raw_answers_for(self, question_id):
             for page in self.data["pages"]:
@@ -202,7 +202,7 @@ class SurveyMonkey(object):
             ModelFromFactory.__name__ = class_name
             m = ModelFromFactory()
             for k in d:
-                setattr(m, k.lower(), self.answer_for(d[k]['survey_monkey']))
+                setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
             return m
 
         @property
@@ -245,12 +245,10 @@ class TransparentClassroom(object):
             "session_id": self.school.tc_session_id,
             "program": "Default"
         }
-
         for item in self.params_key(app.config['HUBS'][self.school.hub.upper()]['ANSWER_KEY'], []):
             answer = response.answer_for(item['SURVEY_MONKEY'])
             if answer:
                 fields[item['TRANSPARENT_CLASSROOM']] = answer
-
         response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": fields}))
         if response.status_code != 201:
             raise LookupError, response
