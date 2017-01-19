@@ -53,7 +53,7 @@ class TestCase(unittest.TestCase):
 
     def test_non_text_answer(self):
         r = models.SurveyMonkey.Response(guid=self.guid)
-        assert r.answer_for(app.config['answer_key']['child']['gender']['survey_monkey'])
+        assert r.answer_for(app.config['ANSWER_KEY']['child']['gender']['survey_monkey'])
 
     def test_transparent_classroom_submit_application(self):
         r = models.SurveyMonkey.Response(guid=self.guid)
