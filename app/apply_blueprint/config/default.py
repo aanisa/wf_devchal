@@ -6,7 +6,7 @@ transparent_classroom_api_token=os.environ['transparent_classroom_api_token']
 hubs = {
     'cambridge': {
         'survey_monkey_survey_id': '111419034',
-        'survey_monkey_collector_id': 'FQDVNM3'
+        'survey_monkey_collector_id': 'FQDVNM3',
         'answer_key': {
             'parents': [
                 {

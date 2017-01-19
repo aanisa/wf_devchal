@@ -9,7 +9,8 @@ blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 @blueprint.route('/redirect_to_survey_monkey_with_guid')
 def redirect_to_survey_monkey_with_guid():
-    return render_template('redirect_to_survey_monkey_with_guid.html', survey_monkey_collector_id=app.config['survey_monkey_collector_id'])
+    hub = request.args.get("hub")
+    return render_template('redirect_to_survey_monkey_with_guid.html', hub=hub, survey_monkey_collector_id=app.config['hubs'][hub]['survey_monkey_collector_id'])
 
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
