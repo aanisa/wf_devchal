@@ -43,7 +43,7 @@ class SurveyMonkey(object):
     # consequently, I'm subclassing the request library and having the get
     # method (the only one I'm currently using) do the logging
     class Session(requests.Session):
-        def __init__(self):
+        def __init__(self, hub):
             super(type(self), self).__init__()
             self.headers.update({
               "Authorization": "Bearer {0}".format(app.config['survey_monkey_oauth_token']),
@@ -62,7 +62,7 @@ class SurveyMonkey(object):
         @classmethod
         @lru_cache(maxsize=None)
         def survey(cls, hub):
-            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['survey_monkey_survey_id'])).json()
+            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['hubs'][hub]['survey_monkey_survey_id'])).json()
             # with open("{0}/sample-survey-monkey-survey-details.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     self.data = json.load(f)
 
@@ -113,13 +113,14 @@ class SurveyMonkey(object):
         # this is a classmethod so that it can be used in the tests
         @classmethod
         @lru_cache(maxsize=None)
-        def responses(cls, key): # important to have the key for the caching to work properly
-            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["survey_monkey_survey_id"]),  params={"sort_order": "DESC"}).json()
+        def responses(cls, hub, key): # important to have the key for the caching to work properly
+            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config['hubs'][hub]['survey_monkey_survey_id']),  params={'sort_order': 'DESC'}).json()
             # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     return json.load(f)
 
-        def __init__(self, guid=None, email=None):
-            for d in SurveyMonkey.Response.responses("{0}{1}".format(guid, email))["data"]:
+        def __init__(self, hub, guid=None, email=None):
+            self.hub = hub
+            for d in SurveyMonkey.Response.responses(self.hub, "{0}{1}".format(guid, email))["data"]:
                 self.guid = d["custom_variables"]["response_guid"]
                 if guid:
                     if d["custom_variables"]["response_guid"] == guid:
@@ -128,7 +129,7 @@ class SurveyMonkey(object):
                 elif email:
                     for page in d["pages"]:
                         for question in page["questions"]:
-                            if question["id"] in [app.config['answer_key']['parents'][0]['email']['survey_monkey'], app.config['answer_key']['parents'][1]['email']['survey_monkey']]:
+                            if question["id"] in [app.config['hubs'][self.hub]['answer_key']['parents'][0]['email']['survey_monkey'], app.config['hubs'][self.hub]['answer_key']['parents'][1]['email']['survey_monkey']]:
                                 if question["answers"][0]["text"].lower() == email.lower():
                                     self.data = d
                                     return
@@ -140,9 +141,9 @@ class SurveyMonkey(object):
                     "subject": "Next steps for your application to {0}".format(school.name),
                     "sender": school.email,
                     "recipients": ["{0} {1} <{2}>".format(
-                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['answer_key']['parents'][0]['first_name']['survey_monkey']),
-                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['answer_key']['parents'][0]['last_name']['survey_monkey']),
-                        SurveyMonkey.Response(guid=self.guid).answer_for(app.config['answer_key']['parents'][0]['email']['survey_monkey'])
+                        self.answer_for(app.config['hubs'][self.hub]['answer_key']['parents'][0]['first_name']['survey_monkey']),
+                        self.answer_for(app.config['hubs'][self.hub]['answer_key']['parents'][0]['last_name']['survey_monkey']),
+                        self.answer_for(app.config['hubs'][self.hub]['answer_key']['parents'][0]['email']['survey_monkey'])
                     )],
                     "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
                     "html": render_template("email_next_steps.html", school=school)
@@ -151,16 +152,16 @@ class SurveyMonkey(object):
 
         def email_response(self):
             message = {
-                "subject": "Application for {0} {1}".format(self.answer_for(app.config['answer_key']['child']['first_name']['survey_monkey']), self.answer_for(app.config['answer_key']['child']['last_name']['survey_monkey'])),
+                "subject": "Application for {0} {1}".format(self.answer_for(app.config['hubs'][self.hub]['answer_key']['child']['first_name']['survey_monkey']), self.answer_for(app.config['hubs'][self.hub]['answer_key']['child']['last_name']['survey_monkey'])),
                 "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
                 "recipients": [s.email for s in self.schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
+                "html": render_template("email_response.html", response=self, survey=SurveyMonkey.Survey(self.hub))
             }
             mail.send(Message(**message))
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:
-                TransparentClassroom(school.tc_school_id).submit_application(self)
+                TransparentClassroom(self.hub, school.tc_school_id).submit_application(self)
 
         def raw_answers_for(self, question_id):
             for page in self.data["pages"]:
@@ -173,7 +174,7 @@ class SurveyMonkey(object):
             if "text" in answer:
                 return answer["text"]
             else:
-                return re.sub('<[^<]+?>', '', SurveyMonkey.Survey().value_for(question_id, answer["choice_id"]))
+                return re.sub('<[^<]+?>', '', SurveyMonkey.Survey(self.hub).value_for(question_id, answer["choice_id"]))
             return None
 
         def answer_for(self, question_id):
@@ -190,8 +191,8 @@ class SurveyMonkey(object):
         @property
         def schools(self):
             schools = []
-            for answer in self.answers_for(app.config['answer_key']['schools']['survey_monkey']):
-                for school in School.query.all():
+            for answer in self.answers_for(app.config['hubs'][self.hub]['answer_key']['schools']['survey_monkey']):
+                for school in School.query.filter_by(hub=self.hub).all():
                     if answer.lower().find(school.match.lower()) >= 0:
                         schools.append(school)
             return schools
@@ -207,17 +208,18 @@ class SurveyMonkey(object):
         @property
         def parents(self):
             return [
-                self.model_factory("Parent", app.config['answer_key']['parents'][0]),
-                self.model_factory("Parent", app.config['answer_key']['parents'][1])
+                self.model_factory("Parent", app.config['hubs'][self.hub]['answer_key']['parents'][0]),
+                self.model_factory("Parent", app.config['hubs'][self.hub]['answer_key']['parents'][1])
             ]
 
         @property
         def child(self):
-            return self.model_factory("Child", app.config['answer_key']['child'])
+            return self.model_factory("Child", app.config['hubs'][self.hub]['answer_key']['child'])
 
 class TransparentClassroom(object):
-    def __init__(self, tc_school_id):
-        self.base_url = "{0}/api/v1".format(app.config["transparent_classroom_BASE_URL"])
+    def __init__(self, hub, tc_school_id):
+        self.hub = hub
+        self.base_url = "{0}/api/v1".format(app.config["transparent_classroom_base_url"])
         self.request_session = requests.session()
         self.request_session.headers.update({
           "X-TransparentClassroomToken": app.config['transparent_classroom_api_token'],
@@ -244,7 +246,7 @@ class TransparentClassroom(object):
             "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
             "program": "Default"
         }
-        for item in self.params_key(app.config['answer_key'], []):
+        for item in self.params_key(app.config['hubs'][self.hub]['answer_key'], []):
             answer = response.answer_for(item['survey_monkey'])
             if answer:
                 tc_params[item['transparent_classroom']] = answer

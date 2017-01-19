@@ -13,10 +13,9 @@ def redirect_to_survey_monkey_with_guid():
 
 @blueprint.route('/after_survey_monkey')
 def after_survey_monkey():
-    response = models.SurveyMonkey.Response(guid=request.args.get("response_guid"))
+    hub = request.args.get("hub")
+    response = models.SurveyMonkey.Response(hub, guid=request.args.get("response_guid"))
     response.submit_to_transparent_classroom()
     response.email_response()
     response.email_next_steps()
-    schools = [s.name for s in response.schools]
-    child = "{0} {1}".format(response.answer_for(app.config['answer_key']['child']['first_name']['survey_monkey']), response.answer_for(app.config['answer_key']['child']['last_name']['survey_monkey']))
-    return render_template('after_survey_monkey.html', schools=schools, child=child)
+    return render_template('after_survey_monkey.html', schools=response.schools, child=response.child)

@@ -5,7 +5,7 @@
 <h1>Congratulations!</h1>
 
 <div>
-  You have completed {{ child }}'s
+  You have completed {{ child.first_name }}'s
     {% if schools|length > 1 %}
       applications
     {% else %}
@@ -16,7 +16,7 @@
 
 <ul>
   {% for school in schools %}
-    <li>{{ school }}</li>
+    <li>{{ school.name }}</li>
   {% endfor %}
 </ul>
 

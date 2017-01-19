@@ -1,1 +1,1 @@
-transparent_classroom_BASE_URL = "https://www.transparentclassroom.com"
+transparent_classroom_base_url = "https://www.transparentclassroom.com"
