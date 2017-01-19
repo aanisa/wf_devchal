@@ -21,19 +21,6 @@ class Base(db.Model):
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-class EmailSchool(Base):
-    __tablename__ = "{0}_email_school".format(tablename_prefix)
-    email_id = db.Column('email_id', db.Integer, db.ForeignKey("{0}_email.id".format(tablename_prefix)))
-    school_id = db.Column('school_id', db.Integer, db.ForeignKey("{0}_school.id".format(tablename_prefix)))
-    school = db.relationship('School', back_populates='emails_association')
-    email = db.relationship('Email', back_populates='schools_association')
-
-class Email(Base):
-    __tablename__ = "{0}_email".format(tablename_prefix)
-    address = db.Column(db.String(80))
-    schools_association = db.relationship('EmailSchool', back_populates="email")
-    schools = db.relationship('School', secondary=EmailSchool.__tablename__)
-
 class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
     tc_school_id = db.Column(db.Integer)
@@ -46,9 +33,8 @@ class School(Base):
     parent_observation_optional = db.Column(db.Boolean())
     schedule_child_visit_url = db.Column(db.String(80))
     child_visit_optional = db.Column(db.Boolean())
-    emails_association = db.relationship('EmailSchool', back_populates="school")
-    emails = db.relationship('Email', secondary=EmailSchool.__tablename__)
-
+    email = db.Column(db.String(80))
+    hub = db.Column(db.String(80))
 
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
@@ -75,13 +61,13 @@ class SurveyMonkey(object):
     class Survey():
         @classmethod
         @lru_cache(maxsize=None)
-        def survey(cls):
+        def survey(cls, hub):
             return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/details".format(app.config['SURVEY_MONKEY_SURVEY_ID'])).json()
             # with open("{0}/sample-survey-monkey-survey-details.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     self.data = json.load(f)
 
-        def __init__(self):
-            self.data = SurveyMonkey.Survey.survey()
+        def __init__(self, hub):
+            self.data = SurveyMonkey.Survey.survey(hub)
 
         def value_for(self, question_id, choice_id):
             for page in self.data["pages"]:
@@ -127,7 +113,7 @@ class SurveyMonkey(object):
         # this is a classmethod so that it can be used in the tests
         @classmethod
         @lru_cache(maxsize=None)
-        def responses(cls, key): # important to have the key for the caching to work properly 
+        def responses(cls, key): # important to have the key for the caching to work properly
             return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config["SURVEY_MONKEY_SURVEY_ID"]),  params={"sort_order": "DESC"}).json()
             # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
             #     return json.load(f)
@@ -152,7 +138,7 @@ class SurveyMonkey(object):
             for school in self.schools:
                 message = {
                     "subject": "Next steps for your application to {0}".format(school.name),
-                    "sender": school.emails[0].address,
+                    "sender": school.email,
                     "recipients": ["{0} {1} <{2}>".format(
                         SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
                         SurveyMonkey.Response(guid=self.guid).answer_for(app.config['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
@@ -167,9 +153,8 @@ class SurveyMonkey(object):
             message = {
                 "subject": "Application for {0} {1}".format(self.answer_for(app.config['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
                 "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
-                "recipients": sum([[e.address for e in s.emails] for s in self.schools], []) + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                "recipients": [s.email for s in self.schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
                 "html": render_template("email_response.html", response=self, survey=SurveyMonkey.Survey())
-
             }
             mail.send(Message(**message))
 
