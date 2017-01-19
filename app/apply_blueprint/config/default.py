@@ -13,16 +13,16 @@ HUBS = {
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': '69078793', 'TRANSPARENT_CLASSROOM': 'first_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': '77425064', 'TRANSPARENT_CLASSROOM': 'first_parent_name.last'} ,
-                    'EMAIL': {'SURVEY_MONKEY': '69078871', 'TRANSPARENT_CLASSROOM': 'first_parent_EMAIL'},
+                    'EMAIL': {'SURVEY_MONKEY': '69078871', 'TRANSPARENT_CLASSROOM': 'first_parent_email'},
                     'PHONE': {'SURVEY_MONKEY': '69079428', 'TRANSPARENT_CLASSROOM': 'first_parent_mobile_number'},
-                    'ADDRESS': {'SURVEY_MONKEY': '69078976', 'TRANSPARENT_CLASSROOM': 'first_parent_ADDRESS'}
+                    'ADDRESS': {'SURVEY_MONKEY': '69078976', 'TRANSPARENT_CLASSROOM': 'first_parent_address'}
                 },
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': '69079990', 'TRANSPARENT_CLASSROOM': 'second_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': '77425213', 'TRANSPARENT_CLASSROOM': 'second_parent_name.last'},
-                    'EMAIL': {'SURVEY_MONKEY': '69079992', 'TRANSPARENT_CLASSROOM': 'second_parent_EMAIL'},
+                    'EMAIL': {'SURVEY_MONKEY': '69079992', 'TRANSPARENT_CLASSROOM': 'second_parent_email'},
                     'PHONE': {'SURVEY_MONKEY': '69079993', 'TRANSPARENT_CLASSROOM': 'second_parent_mobile_number'},
-                    'ADDRESS': {'SURVEY_MONKEY': '69079994', 'TRANSPARENT_CLASSROOM': 'second_parent_ADDRESS'}
+                    'ADDRESS': {'SURVEY_MONKEY': '69079994', 'TRANSPARENT_CLASSROOM': 'second_parent_address'}
                 }
             ],
             'CHILD': {

@@ -18,11 +18,13 @@ def seed():
     """Seed"""
     seeds = []
     for f in [f for f in os.listdir("{0}/seeds/".format(path))]:
-        model_name = f.split(".")[0]
-        with open("{0}/seeds/{1}".format(path, f), 'rb') as f:
-            click.echo("Seeding {0}".format(model_name))
-            for d in csv.DictReader(f):
-                seeds.append(populate(eval("models.{0}()".format(model_name)), d))
+        parts = f.split(".")
+        if parts[1] == os.environ['APP_CONFIG_MODE']:
+            model_name = parts[0]
+            with open("{0}/seeds/{1}".format(path, f), 'rb') as f:
+                click.echo("Seeding {0}".format(model_name))
+                for d in csv.DictReader(f):
+                    seeds.append(populate(eval("models.{0}()".format(model_name)), d))
     db.session.add_all(seeds)
     db.session.commit()
 cli.add_command(seed)

@@ -25,16 +25,16 @@ class School(Base):
     __tablename__ = "{0}_school".format(tablename_prefix)
     tc_school_id = db.Column(db.Integer)
     tc_session_id = db.Column(db.Integer)
-    name = db.Column(db.String(80))
-    match = db.Column(db.String(80))
-    schedule_parent_teacher_conversation_url = db.Column(db.String(80))
+    name = db.Column(db.String(120))
+    match = db.Column(db.String(120))
+    schedule_parent_teacher_conversation_url = db.Column(db.String(120))
     parent_teacher_conversation_optional = db.Column(db.Boolean())
-    schedule_parent_observation_url = db.Column(db.String(80))
+    schedule_parent_observation_url = db.Column(db.String(120))
     parent_observation_optional = db.Column(db.Boolean())
-    schedule_child_visit_url = db.Column(db.String(80))
+    schedule_child_visit_url = db.Column(db.String(120))
     child_visit_optional = db.Column(db.Boolean())
-    email = db.Column(db.String(80))
-    hub = db.Column(db.String(80))
+    email = db.Column(db.String(120))
+    hub = db.Column(db.String(120))
 
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
@@ -161,7 +161,7 @@ class SurveyMonkey(object):
 
         def submit_to_transparent_classroom(self):
             for school in self.schools:
-                TransparentClassroom(self.hub, school.tc_school_id).submit_application(self)
+                TransparentClassroom(self.hub, school).submit_application(self)
 
         def raw_answers_for(self, question_id):
             for page in self.data["pages"]:
@@ -217,21 +217,20 @@ class SurveyMonkey(object):
             return self.model_factory("Child", app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['CHILD'])
 
 class TransparentClassroom(object):
-    def __init__(self, hub, tc_school_id):
-        self.hub = hub
+    def __init__(self, school):
         self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
         self.request_session = requests.session()
         self.request_session.headers.update({
           "X-TransparentClassroomToken": app.config['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "X-TransparentClassroomSchoolId": "{0}".format(tc_school_id)
+          "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development
         })
-        self.tc_school_id = tc_school_id
+        self.school = school
 
     def params_key(self, item, all):
         if type(item) == dict:
-            if "transparent_classroom" in item:
+            if "TRANSPARENT_CLASSROOM" in item:
                 all.append(item)
             else:
                 for key in item:
@@ -242,14 +241,16 @@ class TransparentClassroom(object):
         return all
 
     def submit_application(self, response):
-        tc_params = {
-            "session_id": School.query.filter_by(tc_school_id=self.tc_school_id).first().tc_session_id,
+        fields = {
+            "session_id": self.school.tc_session_id,
             "program": "Default"
         }
-        for item in self.params_key(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY'], []):
-            answer = response.answer_for(item['survey_monkey'])
+
+        for item in self.params_key(app.config['HUBS'][self.school.hub.upper()]['ANSWER_KEY'], []):
+            answer = response.answer_for(item['SURVEY_MONKEY'])
             if answer:
-                tc_params[item['transparent_classroom']] = answer
-        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": tc_params}))
+                fields[item['TRANSPARENT_CLASSROOM']] = answer
+
+        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": fields}))
         if response.status_code != 201:
-            raise LookupError, response.body
+            raise LookupError, response
