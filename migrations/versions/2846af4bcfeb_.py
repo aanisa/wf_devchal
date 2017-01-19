@@ -22,11 +22,11 @@ def upgrade():
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.Column('date_modified', sa.DateTime(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=80), nullable=True),
-    sa.Column('schedule_interview_url', sa.String(length=80), nullable=True),
-    sa.Column('schedule_observation_url', sa.String(length=80), nullable=True),
-    sa.Column('email', sa.String(length=80), nullable=True),
-    sa.Column('survey_monkey_choice_id', sa.String(length=80), nullable=True),
+    sa.Column('name', sa.String(length=120), nullable=True),
+    sa.Column('schedule_interview_url', sa.String(length=120), nullable=True),
+    sa.Column('schedule_observation_url', sa.String(length=120), nullable=True),
+    sa.Column('email', sa.String(length=120), nullable=True),
+    sa.Column('survey_monkey_choice_id', sa.String(length=120), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('apply_blueprint_checklist',

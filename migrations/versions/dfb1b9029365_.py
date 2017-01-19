@@ -31,7 +31,7 @@ def downgrade():
     sa.Column('id', sa.INTEGER(), server_default=sa.text(u"nextval('apply_blueprint_email_id_seq'::regclass)"), nullable=False),
     sa.Column('date_created', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
     sa.Column('date_modified', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
-    sa.Column('address', sa.VARCHAR(length=80), autoincrement=False, nullable=True),
+    sa.Column('address', sa.VARCHAR(length=120), autoincrement=False, nullable=True),
     sa.PrimaryKeyConstraint('id', name=u'apply_blueprint_email_pkey'),
     postgresql_ignore_search_path=False
     )
@@ -41,7 +41,7 @@ def downgrade():
     sa.Column('date_modified', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
     sa.Column('school_id', sa.INTEGER(), autoincrement=False, nullable=True),
     sa.Column('tc_classroom_id', sa.INTEGER(), autoincrement=False, nullable=True),
-    sa.Column('name', sa.VARCHAR(length=80), autoincrement=False, nullable=True),
+    sa.Column('name', sa.VARCHAR(length=120), autoincrement=False, nullable=True),
     sa.ForeignKeyConstraint(['school_id'], [u'apply_blueprint_school.id'], name=u'apply_blueprint_classroom_school_id_fkey'),
     sa.PrimaryKeyConstraint('id', name=u'apply_blueprint_classroom_pkey')
     )

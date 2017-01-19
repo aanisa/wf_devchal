@@ -24,7 +24,7 @@ def upgrade():
     sa.Column('date_modified', sa.DateTime(), nullable=True),
     sa.Column('school_id', sa.Integer(), nullable=True),
     sa.Column('tc_classroom_id', sa.Integer(), nullable=True),
-    sa.Column('name', sa.String(length=80), nullable=True),
+    sa.Column('name', sa.String(length=120), nullable=True),
     sa.ForeignKeyConstraint(['school_id'], [u'apply_blueprint_school.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

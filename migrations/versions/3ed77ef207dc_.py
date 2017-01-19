@@ -21,7 +21,7 @@ def upgrade():
     op.add_column('apply_blueprint_checklist', sa.Column('visit_scheduled_at', sa.DateTime(), nullable=True))
     op.add_column('apply_blueprint_school', sa.Column('interview_optional', sa.Boolean(), nullable=True))
     op.add_column('apply_blueprint_school', sa.Column('observation_optional', sa.Boolean(), nullable=True))
-    op.add_column('apply_blueprint_school', sa.Column('schedule_visit_url', sa.String(length=80), nullable=True))
+    op.add_column('apply_blueprint_school', sa.Column('schedule_visit_url', sa.String(length=120), nullable=True))
     op.add_column('apply_blueprint_school', sa.Column('visit_optional', sa.Boolean(), nullable=True))
     # ### end Alembic commands ###
 
