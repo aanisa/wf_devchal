@@ -5,6 +5,9 @@ Blueprint Heroku config/env vars:
 
 Update config map if changes to Survey Monkey or Transparent Classroom form
 
+When embedding redirect_to_survey_monkey_with_guid links in website,
+  be sure to include ?hub=lowercase_hub_name_from_config 
+
 Google Account + Calendly Setup
 
   Create Google Account:
