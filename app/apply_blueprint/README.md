@@ -3,10 +3,12 @@ Blueprint Heroku config/env vars:
   heroku config:set survey_monkey_oauth_token=TBD
   heroku config:set transparent_classroom_api_token=TBD
 
+Update config map if changes to Survey Monkey or Transparent Classroom form
+
 Google Account + Calendly Setup
 
   Create Google Account:
-    Create Google apps account named "SCHOOLNAME-appointments"
+    Create Google apps account named "SCHOOL-NAME-appointments"
     In incognito window:
       Log in to new account
 
@@ -28,3 +30,4 @@ Google Account + Calendly Setup
       For each forwarding address:
         Create filter
           Forward email sent to the account's address to each forwarding address
+      In calendar, share with forwarding address, with "make changes" permission
