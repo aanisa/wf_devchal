@@ -22,8 +22,6 @@ mail = Mail(app)
 #
 # mail = MailWithLogging(app)
 
-print app.config
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)

@@ -1,10 +1,14 @@
-if [ -e `pwd -P`/config/$1.py ]; then
-  m=$1
-  shift
+if [ ${APP_CONFIG_MODE} ]; then
+  echo "APP_CONFIG_MODE set from enviroment variable to ${APP_CONFIG_MODE}"
 else
-  m="test"
+  if [ -e `pwd -P`/config/$1.py ]; then
+    m=$1
+    shift
+  else
+    m="test"
+  fi
+  export APP_CONFIG_MODE=$m
 fi
-export APP_CONFIG_MODE=$m
-export FLASK_APP=app
 
+export FLASK_APP=app
 python -m unittest $@
