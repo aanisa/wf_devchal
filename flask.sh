@@ -12,5 +12,9 @@ else
   export APP_CONFIG_MODE=$m
 fi
 
+if [ $m = "development" ]; then
+  export FLASK_DEBUG=1
+fi
+
 export FLASK_APP=app
 python -m flask $@

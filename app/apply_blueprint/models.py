@@ -218,10 +218,11 @@ class SurveyMonkey(object):
 
 class TransparentClassroom(object):
     def __init__(self, school):
+        self.hub = school.hub.upper()
         self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
         self.request_session = requests.session()
         self.request_session.headers.update({
-          "X-TransparentClassroomToken": app.config['HUBS'][[self.school.hub.upper()]]['TRANSPARENT_CLASSROOM_API_TOKEN'],
+          "X-TransparentClassroomToken": app.config['HUBS'][self.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
           "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development
@@ -245,7 +246,7 @@ class TransparentClassroom(object):
             "session_id": self.school.tc_session_id,
             "program": "Default"
         }
-        for item in self.params_key(app.config['HUBS'][self.school.hub.upper()]['ANSWER_KEY'], []):
+        for item in self.params_key(app.config['HUBS'][self.hub]['ANSWER_KEY'], []):
             answer = response.answer_for(item['SURVEY_MONKEY'])
             if answer:
                 fields[item['TRANSPARENT_CLASSROOM']] = answer
