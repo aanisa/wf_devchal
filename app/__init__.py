@@ -35,3 +35,5 @@ for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
         exec("from {0}.controller import blueprint".format(f))
         eval("app.register_blueprint(blueprint, url_prefix='/{0}')".format(p))
         exec("import {0}.cli".format(f))
+
+print app.config['HUBS']

@@ -221,7 +221,7 @@ class TransparentClassroom(object):
         self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
         self.request_session = requests.session()
         self.request_session.headers.update({
-          "X-TransparentClassroomToken": app.config['TRANSPARENT_CLASSROOM_API_TOKEN'],
+          "X-TransparentClassroomToken": app.config['HUBS'][[self.school.hub.upper()]]['TRANSPARENT_CLASSROOM_API_TOKEN'],
           "Accept": "application/json",
           "Content-Type": "application/json",
           "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development

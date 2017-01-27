@@ -8,7 +8,7 @@ Update config map if changes to Survey Monkey or Transparent Classroom form
 When embedding redirect_to_survey_monkey_with_guid links in website,
   be sure to include ?hub=lowercase_hub_name_from_config
   e.g.,
-  https://wildflower-sunbeam.herokuapp.com/apply/redirect_to_survey_monkey_with_guid?hub=cambridge 
+  https://wildflower-sunbeam.herokuapp.com/apply/redirect_to_survey_monkey_with_guid?hub=cambridge
 
 Google Account + Calendly Setup
 
