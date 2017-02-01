@@ -7,6 +7,7 @@ import cli
 from click.testing import CliRunner
 import json
 import flask_restful
+import types
 
 blueprint_name = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -58,4 +59,11 @@ class TestCase(unittest.TestCase):
 
     def test_transparent_classroom_submit_application(self):
         r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
+        models.TransparentClassroom(r.schools[0]).submit_application(r)
+
+    def test_transparent_classroom_submit_application_that_breaks_validations(self):
+        r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
+        def answer_x(self, i):
+            return "x"
+        r.answer_for = types.MethodType(answer_x, r)
         models.TransparentClassroom(r.schools[0]).submit_application(r)

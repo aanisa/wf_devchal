@@ -247,9 +247,18 @@ class TransparentClassroom(object):
             "program": "Default"
         }
         for item in self.params_key(app.config['HUBS'][self.hub]['ANSWER_KEY'], []):
+            print item
             answer = response.answer_for(item['SURVEY_MONKEY'])
             if answer:
-                fields[item['TRANSPARENT_CLASSROOM']] = answer
-        response = self.request_session.post("{0}/online_applications.json".format(self.base_url), data=json.dumps({"fields": fields}))
+                if 'VALIDATOR' in item:
+                    if item['VALIDATOR'](answer):
+                        fields[item['TRANSPARENT_CLASSROOM']] = answer
+                else:
+                    fields[item['TRANSPARENT_CLASSROOM']] = answer
+        url = "{0}/online_applications.json".format(self.base_url)
+        data = json.dumps({"fields": fields})
+        print data
+        response = self.request_session.post(url, data=data)
         if response.status_code != 201:
+            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
             raise LookupError, response

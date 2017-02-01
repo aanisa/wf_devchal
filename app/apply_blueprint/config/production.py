@@ -1,8 +1,11 @@
 import os
+import re
 
 TRANSPARENT_CLASSROOM_BASE_URL = "https://www.transparentclassroom.com"
 
 SURVEY_MONKEY_OAUTH_TOKEN=os.environ['SURVEY_MONKEY_OAUTH_TOKEN']
+
+phone_valid = lambda p: not p or re.match('^\D*(\d\D*){6,}$', p) != None
 
 HUBS = {
     'CAMBRIDGE': {
@@ -14,15 +17,15 @@ HUBS = {
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': '69078793', 'TRANSPARENT_CLASSROOM': 'first_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': '77425064', 'TRANSPARENT_CLASSROOM': 'first_parent_name.last'} ,
-                    'EMAIL': {'SURVEY_MONKEY': '69078871', 'TRANSPARENT_CLASSROOM': 'first_parent_email'},
-                    'PHONE': {'SURVEY_MONKEY': '69079428', 'TRANSPARENT_CLASSROOM': 'first_parent_mobile_number'},
+                    'EMAIL': {'SURVEY_MONKEY': '69078871', 'TRANSPARENT_CLASSROOM': 'first_parent_email'}, # Validated at SurveyMonkey
+                    'PHONE': {'SURVEY_MONKEY': '69079428', 'TRANSPARENT_CLASSROOM': 'first_parent_mobile_number', 'VALIDATOR': phone_valid},
                     'ADDRESS': {'SURVEY_MONKEY': '69078976', 'TRANSPARENT_CLASSROOM': 'first_parent_address'}
                 },
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': '69079990', 'TRANSPARENT_CLASSROOM': 'second_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': '77425213', 'TRANSPARENT_CLASSROOM': 'second_parent_name.last'},
-                    'EMAIL': {'SURVEY_MONKEY': '69079992', 'TRANSPARENT_CLASSROOM': 'second_parent_email'},
-                    'PHONE': {'SURVEY_MONKEY': '69079993', 'TRANSPARENT_CLASSROOM': 'second_parent_mobile_number'},
+                    'EMAIL': {'SURVEY_MONKEY': '69079992', 'TRANSPARENT_CLASSROOM': 'second_parent_email'}, # Validated at SurveyMonkey
+                    'PHONE': {'SURVEY_MONKEY': '69079993', 'TRANSPARENT_CLASSROOM': 'second_parent_mobile_number', 'VALIDATOR': phone_valid},
                     'ADDRESS': {'SURVEY_MONKEY': '69079994', 'TRANSPARENT_CLASSROOM': 'second_parent_address'}
                 }
             ],
