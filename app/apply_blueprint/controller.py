@@ -1,11 +1,25 @@
 from flask import Blueprint, render_template, request
 import models
-from app import app, db
+from app import app, db, mail
 import os
 from flask_restful import Resource, Api
 from flask_cors import cross_origin
+from flask_mail import Message
+import traceback
 
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
+
+@blueprint.errorhandler(500)
+def five_hundred(e):
+    mail.send(
+        Message(
+            "500 - URL: {0} Error: {1}".format(request.url, e),
+            sender="Wildflower Schools <noreply@wildflowerschools.org>",
+            recipients=['dan.grigsby@wildflowerschools.org'],
+            body=traceback.format_exc()
+        )
+    )
+    return render_template('500.html')
 
 @blueprint.route('/redirect_to_survey_monkey_with_guid')
 def redirect_to_survey_monkey_with_guid():

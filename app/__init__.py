@@ -17,7 +17,7 @@ mail = Mail(app)
 
 # class MailWithLogging(Mail):
 #     def send(self, message):
-#         app.logger.debug(message)
+#         app.logger.critical(message)
 #         super(Mail, self).send(message)
 #
 # mail = MailWithLogging(app)
