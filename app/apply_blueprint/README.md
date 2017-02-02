@@ -38,8 +38,8 @@ Google Account + Calendly Setup
 
 
 Survey Monkey API call examples:
-  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/"
+  curl -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/"
 
-  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/111419034/details"
+  curl -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/113377045/details"
 
-  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/111419034/responses/bulk?sort_order=DESC"
+  curl -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/113377045/responses/bulk?sort_order=DESC"
