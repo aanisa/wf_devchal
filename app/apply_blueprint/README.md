@@ -7,8 +7,7 @@ Update config map if changes to Survey Monkey or Transparent Classroom form
 
 When embedding redirect_to_survey_monkey_with_guid links in website,
   be sure to include ?hub=lowercase_hub_name_from_config
-  e.g.,
-  https://wildflower-sunbeam.herokuapp.com/apply/redirect_to_survey_monkey_with_guid?hub=cambridge
+  e.g., https://wildflower-sunbeam.herokuapp.com/apply/redirect_to_survey_monkey_with_guid?hub=cambridge
 
 Google Account + Calendly Setup
 
@@ -36,3 +35,11 @@ Google Account + Calendly Setup
         Create filter
           Forward email sent to the account's address to each forwarding address
       In calendar, share with forwarding address, with "make changes" permission
+
+
+Survey Monkey API call examples:
+  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/"
+
+  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/111419034/details"
+
+  curl -i -X GET -H "Authorization:bearer $SURVEY_MONKEY_OAUTH_TOKEN" -H "Content-Type": "application/json" "https://api.surveymonkey.net/v3/surveys/111419034/responses/bulk?sort_order=DESC"

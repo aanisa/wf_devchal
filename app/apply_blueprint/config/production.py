@@ -10,8 +10,8 @@ phone_valid = lambda p: not p or re.match('^\D*(\d\D*){6,}$', p) != None
 HUBS = {
     'CAMBRIDGE': {
         'TRANSPARENT_CLASSROOM_API_TOKEN': os.environ['TRANSPARENT_CLASSROOM_API_TOKEN_CAMBRIDGE'],
-        'SURVEY_MONKEY_SURVEY_ID': '111419034',
-        'SURVEY_MONKEY_COLLECTOR_ID': 'FQDVNM3',
+        'SURVEY_MONKEY_SURVEY_ID': '113377045',
+        'SURVEY_MONKEY_COLLECTOR_ID': '7CRLTCY',
         'ANSWER_KEY': {
             'PARENTS': [
                 {
@@ -69,8 +69,8 @@ HUBS = {
     },
     'SANDBOX': {
         'TRANSPARENT_CLASSROOM_API_TOKEN': os.environ['TRANSPARENT_CLASSROOM_API_TOKEN_SANDBOX'],
-        'SURVEY_MONKEY_SURVEY_ID': '111419034',
-        'SURVEY_MONKEY_COLLECTOR_ID': 'FQDVNM3',
+        'SURVEY_MONKEY_SURVEY_ID': '113377045',
+        'SURVEY_MONKEY_COLLECTOR_ID': '7CRLTCY',
         'ANSWER_KEY': {
             'PARENTS': [
                 {
