@@ -19,8 +19,6 @@ class TestCase(unittest.TestCase):
         r = CliRunner().invoke(cli.seed)
         if r.exception: raise r.exception
         self.guid = models.SurveyMonkey.Response.responses("cambridge", "foo")["data"][0]["custom_variables"]["response_guid"]
-        # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
-        #     self.guid = json.load(f)["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
         s = models.SurveyMonkey.Survey("cambridge")
@@ -32,14 +30,27 @@ class TestCase(unittest.TestCase):
     def test_response(self):
         response = models.SurveyMonkey.Response("cambridge", guid=self.guid)
         self.assertIsInstance(response.data, dict)
-        self.assertGreater(len(response.schools), 0)
-        with app.app_context():
-            with mail.record_messages() as outbox:
-                response.email_response()
-                i = len(outbox)
-                self.assertGreater(i, 0)
-                response.email_next_steps()
-                self.assertGreater(len(outbox), i)
+        children = response.children
+        self.assertGreater(len(response.children), 0)
+        child = children[0]
+        self.assertEqual(type(child.child_gender), unicode) # test one of the dictionary set attributes
+        schools = child.schools
+        self.assertGreater(len(schools), 0)
+        school = schools[0]
+        self.assertIsInstance(school, models.School)
+        parents = response.parents
+        self.assertGreater(len(parents), 0)
+        parent = parents[0]
+        self.assertEqual(type(parent.phXXXone), unicode) # test one of the dictionary set attributes
+
+
+        # with app.app_context():
+        #     with mail.record_messages() as outbox:
+        #         response.email_response()
+        #         i = len(outbox)
+        #         self.assertGreater(i, 0)
+        #         response.email_next_steps()
+        #         self.assertGreater(len(outbox), i)
 
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():

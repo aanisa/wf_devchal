@@ -31,44 +31,44 @@ HUBS = {
             ],
             'QUESTIONS': [
                 # Parent/Guardian page questions
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'how_hear'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'caregivers'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'how_many_children_how_old'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'parenting_style'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'typical_weekday'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'typical_weekend'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'ideal_school'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'montessori'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'what_age'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'involvement'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'enrich'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'anything_else_family'},
+                {'SURVEY_MONKEY': "83225159", 'TRANSPARENT_CLASSROOM': 'how_hear'},
+                {'SURVEY_MONKEY': "83225160", 'TRANSPARENT_CLASSROOM': 'caregivers'},
+                {'SURVEY_MONKEY': "83233417", 'TRANSPARENT_CLASSROOM': 'how_many_children_how_old'},
+                {'SURVEY_MONKEY': "83225164", 'TRANSPARENT_CLASSROOM': 'parenting_style'},
+                {'SURVEY_MONKEY': "83225165", 'TRANSPARENT_CLASSROOM': 'typical_weekday'},
+                {'SURVEY_MONKEY': "83225166", 'TRANSPARENT_CLASSROOM': 'typical_weekend'},
+                {'SURVEY_MONKEY': "83225167", 'TRANSPARENT_CLASSROOM': 'ideal_school'},
+                {'SURVEY_MONKEY': "83225169", 'TRANSPARENT_CLASSROOM': 'montessori'},
+                {'SURVEY_MONKEY': "83225170", 'TRANSPARENT_CLASSROOM': 'what_age'},
+                {'SURVEY_MONKEY': "83225172", 'TRANSPARENT_CLASSROOM': 'involvement'},
+                {'SURVEY_MONKEY': "83225173", 'TRANSPARENT_CLASSROOM': 'enrich'},
+                {'SURVEY_MONKEY': "83230265", 'TRANSPARENT_CLASSROOM': 'anything_else_family'},
                 # Members in household pages questions
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'members_in_household'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'},
-                {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}
+                {'SURVEY_MONKEY': "83225197", 'TRANSPARENT_CLASSROOM': 'members_in_household'},
+                {'SURVEY_MONKEY': "83225179", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 2 member household
+                {'SURVEY_MONKEY': "83225181", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 3
+                {'SURVEY_MONKEY': "83225183", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 4
+                {'SURVEY_MONKEY': "83225185", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 5
+                {'SURVEY_MONKEY': "83225187", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 6
+                {'SURVEY_MONKEY': "83225189", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 7
+                {'SURVEY_MONKEY': "83225191", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 8
+                {'SURVEY_MONKEY': "83225193", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}, # 9
+                {'SURVEY_MONKEY': "83225195", 'TRANSPARENT_CLASSROOM': 'income_less_than_free_reduced_threshold'}  # 10
             ],
             'CHILDREN': [
                 {
-                    'FIRST_NAME': {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'child_name.first'},
-                    'LAST_NAME': {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'child_name.last'},
-                    'DOB': {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'child_birth_date'},
-                    'GENDER': {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'child_gender'},
-                    'SCHOOLS': {'SURVEY_MONKEY': ''},
+                    'FIRST_NAME': {'SURVEY_MONKEY': "83225154", 'TRANSPARENT_CLASSROOM': 'child_name.first'},
+                    'LAST_NAME': {'SURVEY_MONKEY': "83225157", 'TRANSPARENT_CLASSROOM': 'child_name.last'},
+                    'DOB': {'SURVEY_MONKEY': "83225155", 'TRANSPARENT_CLASSROOM': 'child_birth_date'},
+                    'GENDER': {'SURVEY_MONKEY': "83225156", 'TRANSPARENT_CLASSROOM': 'child_gender'},
+                    'SCHOOLS': {'SURVEY_MONKEY': "83225158"},
                     'QUESTIONS': [
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'ethnicity'},
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'disposition'},
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'social_style'},
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'other_schools'},
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'specialists'},
-                        {'SURVEY_MONKEY': '', 'TRANSPARENT_CLASSROOM': 'anything_else_child'}
+                        {'SURVEY_MONKEY': "83225196", 'TRANSPARENT_CLASSROOM': 'ethnicity'},
+                        {'SURVEY_MONKEY': "83225162", 'TRANSPARENT_CLASSROOM': 'disposition'},
+                        {'SURVEY_MONKEY': "83225163", 'TRANSPARENT_CLASSROOM': 'social_style'},
+                        {'SURVEY_MONKEY': "83225168", 'TRANSPARENT_CLASSROOM': 'other_schools'},
+                        {'SURVEY_MONKEY': "83225171", 'TRANSPARENT_CLASSROOM': 'specialists'},
+                        {'SURVEY_MONKEY': "83225174", 'TRANSPARENT_CLASSROOM': 'anything_else_child'}
                     ]
                 }
             ]

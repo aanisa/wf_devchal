@@ -93,6 +93,7 @@ class SurveyMonkey(object):
             def __init__(self, id, text):
                 self.id = id
                 self.text = text
+                self.validator = validator
 
             def show_for(self, response):
                 if response.answers_for(self.id) != []:
@@ -115,8 +116,6 @@ class SurveyMonkey(object):
         @lru_cache(maxsize=None)
         def responses(cls, hub, key): # important to have the key for the caching to work properly
             return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config['HUBS'][hub.upper()]['SURVEY_MONKEY_SURVEY_ID']),  params={'sort_order': 'DESC'}).json()
-            # with open("{0}/sample-survey-monkey-responses-bulk.json".format(os.path.dirname(os.path.realpath(__file__))), 'rb') as f:
-            #     return json.load(f)
 
         def __init__(self, hub, guid=None, email=None):
             self.hub = hub
@@ -135,41 +134,6 @@ class SurveyMonkey(object):
                                     return
             raise LookupError
 
-        def email_next_steps(self):
-            for school in self.schools:
-                message = {
-                    "subject": "Next steps for your application to {0}".format(school.name),
-                    "sender": school.email,
-                    "recipients": ["{0} {1} <{2}>".format(
-                        self.answer_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['PARENTS'][0]['FIRST_NAME']['SURVEY_MONKEY']),
-                        self.answer_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['PARENTS'][0]['LAST_NAME']['SURVEY_MONKEY']),
-                        self.answer_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['PARENTS'][0]['EMAIL']['SURVEY_MONKEY'])
-                    )],
-                    "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                    "html": render_template("email_next_steps.html", school=school)
-                }
-                mail.send(Message(**message))
-
-        def email_response(self):
-            message = {
-                "subject": "Application for {0} {1}".format(self.answer_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['CHILD']['FIRST_NAME']['SURVEY_MONKEY']), self.answer_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['CHILD']['LAST_NAME']['SURVEY_MONKEY'])),
-                "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
-                "recipients": [s.email for s in self.schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("email_response.html", response=self, survey=SurveyMonkey.Survey(self.hub.upper()))
-            }
-            mail.send(Message(**message))
-
-        def submit_to_transparent_classroom(self):
-            for school in self.schools:
-                TransparentClassroom(school).submit_application(self)
-
-        def raw_answers_for(self, question_id):
-            for page in self.data["pages"]:
-                for question in page["questions"]:
-                    if question["id"] == question_id:
-                        return question["answers"]
-            return []
-
         def value_for(self, question_id, answer):
             if "text" in answer:
                 return answer["text"]
@@ -177,44 +141,74 @@ class SurveyMonkey(object):
                 return re.sub('<[^<]+?>', '', SurveyMonkey.Survey(self.hub).value_for(question_id, answer["choice_id"]))
             return None
 
-        def answer_for(self, question_id):
-            # http://stackoverflow.com/questions/363944/python-idiom-to-return-first-item-or-none
-            return next(iter(self.answers_for(question_id) or []), None)
+        def values_for(self, question_id):
+            values = []
+            for page in self.data["pages"]:
+                for question in page["questions"]:
+                    if question["id"] == question_id:
+                        for raw_answer in question["answers"]:
+                            values.append(self.value_for(question_id, raw_answer))
+            return values
 
-        def answers_for(self, question_id):
-            raw_answers = self.raw_answers_for(question_id)
-            answers = []
-            for raw_answer in raw_answers:
-                answers.append(self.value_for(question_id, raw_answer))
-            return answers
+        class Answer(object):
+            def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
+                self.value = value
+                self.survey_monkey_question_id = survey_monkey_question_id
+                self.transparent_classroom_key = transparent_classroom_key
+                self.validator = validator
+
+            def __str__(self):
+                return self.value
+
+        class Answers(object)
+            def __init__(self, response, item):
+                self.response = response
+                self.answers_factory(item)
+
+            def answers_factory(item):
+                if type(item) == dict:
+                    if "TRANSPARENT_CLASSROOM" in item:
+                        return Answer(self.response.values_for(item['SURVEY_MONKEY']), item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item['VALIDATOR'])
+                    else:
+                        for key in item:
+                            if type(item[key]) == dict:
+                                self.answers_factory(item[key]) IF ONE, IF ARRAY
+                                setattr(self, key.lower(), AND HERE)
+                            elsif type(item[key]) == list:
+                                # create class with correct capitalization of name
+                                # add instance of that class to this
+                elsif type(item) == list:
+                    HERE
+
+
+
+
+
+
+# if creating class, downcase
+
+
+
+            else:
+                for key in item:
+                    self.set_attributes(item[key])
+        elif type(item) == list:
+            for i in item:
+                self.set_attributes(i)
+        return all
+
+
+
+
 
         @property
-        def schools(self):
-            schools = []
-            for answer in self.answers_for(app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['SCHOOLS']['SURVEY_MONKEY']):
-                for school in School.query.filter_by(hub=self.hub).all():
-                    if answer.lower().find(school.match.lower()) >= 0:
-                        schools.append(school)
-            return schools
+        def answers(self):
+            return SurveyMonkey.Response.Answers(app.config['HUBS'][response.hub.upper()]['ANSWER_KEY'])
 
-        def model_factory(self, class_name, d):
-            class ModelFromFactory(): pass
-            ModelFromFactory.__name__ = class_name
-            m = ModelFromFactory()
-            for k in d:
-                setattr(m, k.lower(), self.answer_for(d[k]['SURVEY_MONKEY']))
-            return m
 
-        @property
-        def parents(self):
-            return [
-                self.model_factory("Parent", app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['PARENTS'][0]),
-                self.model_factory("Parent", app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['PARENTS'][1])
-            ]
 
-        @property
-        def child(self):
-            return self.model_factory("Child", app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['CHILD'])
+
+
 
 class TransparentClassroom(object):
     def __init__(self, school):
@@ -229,17 +223,6 @@ class TransparentClassroom(object):
         })
         self.school = school
 
-    def params_key(self, item, all):
-        if type(item) == dict:
-            if "TRANSPARENT_CLASSROOM" in item:
-                all.append(item)
-            else:
-                for key in item:
-                    all = self.params_key(item[key], all)
-        elif type(item) == list:
-            for i in item:
-                all = self.params_key(i, all)
-        return all
 
     def submit_application(self, response):
         fields = {
