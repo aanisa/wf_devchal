@@ -51,7 +51,7 @@ class SurveyMonkey(object):
             })
 
         def get(self, url, params=None, **kwargs):
-            response = super(type(self), self).get(url, params=None, **kwargs)
+            response = super(type(self), self).get(url, params=params, **kwargs)
             if "X-Ratelimit-App-Global-Day-Remaining" in response.headers:
                 app.logger.info("SurveyMonkey: X-Ratelimit-App-Global-Day-Remaining: {0}".format(response.headers["X-Ratelimit-App-Global-Day-Remaining"]))
             return response
