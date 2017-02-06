@@ -177,8 +177,8 @@ class SurveyMonkey(object):
                 wnl = WordNetLemmatizer()
                 singular_words = [wnl.lemmatize(word) for word in str.split(key)]
                 titleize_singular_words = [word.title() for word in singular_words]
-                ModelFromFactory.__name__ = ''.join(titleize_singular_words)
-                return SurveyMonkey.Response.ModelFromFactory()
+                SurveyMonkey.Response.Answers.ModelFromFactory.__name__ = ''.join(titleize_singular_words)
+                return SurveyMonkey.Response.Answers.ModelFromFactory()
 
             def answers_factory(self, item):
                 if "TRANSPARENT_CLASSROOM" in item:

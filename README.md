@@ -12,3 +12,4 @@ TODO:
   blueprint_name in tests feels leaky
   requirements.txt in the blueprints, composited to root
   webpack config in the blueprints, composited to root
+  post_compile in the blueprints, composited to root
