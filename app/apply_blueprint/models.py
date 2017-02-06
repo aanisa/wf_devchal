@@ -12,6 +12,7 @@ from flask_mail import Message
 from flask import render_template
 import json
 import re
+from nltk.stem import WordNetLemmatizer
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -160,55 +161,45 @@ class SurveyMonkey(object):
             def __str__(self):
                 return self.value
 
-        class Answers(object)
+        class Answers(object):
             def __init__(self, response, item):
                 self.response = response
                 self.answers_factory(item)
 
-            def answers_factory(item):
-                if type(item) == dict:
-                    if "TRANSPARENT_CLASSROOM" in item:
-                        return Answer(self.response.values_for(item['SURVEY_MONKEY']), item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item['VALIDATOR'])
-                    else:
-                        for key in item:
-                            if type(item[key]) == dict:
-                                self.answers_factory(item[key]) IF ONE, IF ARRAY
-                                setattr(self, key.lower(), AND HERE)
-                            elsif type(item[key]) == list:
-                                # create class with correct capitalization of name
-                                # add instance of that class to this
-                elsif type(item) == list:
-                    HERE
+            class ModelFromFactory():
+                def add_attribute(self, key, value):
+                    setattr(self, key.lower(), value)
 
+            def camel_case_name(self, name):
+                return re.sub('(?!^)([A-Z]+)', r'_\1', name).lower()
 
+            def model_factory(self, key):
+                wnl = WordNetLemmatizer()
+                singular_words = [wnl.lemmatize(word) for word in str.split(key)]
+                titleize_singular_words = [word.title() for word in singular_words]
+                ModelFromFactory.__name__ = ''.join(titleize_singular_words)
+                return SurveyMonkey.Response.ModelFromFactory()
 
-
-
-
-# if creating class, downcase
-
-
-
-            else:
-                for key in item:
-                    self.set_attributes(item[key])
-        elif type(item) == list:
-            for i in item:
-                self.set_attributes(i)
-        return all
-
-
-
-
+            def answers_factory(self, item):
+                if "TRANSPARENT_CLASSROOM" in item:
+                    value = self.response.values_for(item['SURVEY_MONKEY'])
+                    if len(value) == 0:
+                        value = None
+                    elif len(value) == 1:
+                        value = value[0]
+                    return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
+                else:
+                    for key in item:
+                        if type(item[key]) == dict:
+                            model = self.model_factory(key)
+                            model.add_attribute(key, self.answers_factory(item[key]))
+                            setattr(self, self.camel_case_name(model.__class__.__name__), model)
+                        elif type(item[key]) == list:
+                            setattr(self, self.camel_case_name(key), [self.answers_factory(i) for i in item[key]])
 
         @property
         def answers(self):
-            return SurveyMonkey.Response.Answers(app.config['HUBS'][response.hub.upper()]['ANSWER_KEY'])
-
-
-
-
-
+            return SurveyMonkey.Response.Answers(self, app.config['HUBS'][self.hub.upper()]['ANSWER_KEY'])
 
 class TransparentClassroom(object):
     def __init__(self, school):

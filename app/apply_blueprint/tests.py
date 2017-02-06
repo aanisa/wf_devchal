@@ -30,19 +30,8 @@ class TestCase(unittest.TestCase):
     def test_response(self):
         response = models.SurveyMonkey.Response("cambridge", guid=self.guid)
         self.assertIsInstance(response.data, dict)
-        children = response.children
-        self.assertGreater(len(response.children), 0)
-        child = children[0]
-        self.assertEqual(type(child.child_gender), unicode) # test one of the dictionary set attributes
-        schools = child.schools
-        self.assertGreater(len(schools), 0)
-        school = schools[0]
-        self.assertIsInstance(school, models.School)
-        parents = response.parents
-        self.assertGreater(len(parents), 0)
-        parent = parents[0]
-        self.assertEqual(type(parent.phXXXone), unicode) # test one of the dictionary set attributes
 
+        print response.answers
 
         # with app.app_context():
         #     with mail.record_messages() as outbox:
