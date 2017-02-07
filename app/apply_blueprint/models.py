@@ -138,7 +138,7 @@ class SurveyMonkey(object):
         def value_for(self, question_id, answer):
             if "text" in answer:
                 return answer["text"]
-            else:
+            else: # select from choice
                 return re.sub('<[^<]+?>', '', SurveyMonkey.Survey(self.hub).value_for(question_id, answer["choice_id"]))
             return None
 
