@@ -12,7 +12,7 @@ HUBS = {
         'TRANSPARENT_CLASSROOM_API_TOKEN': os.environ['TRANSPARENT_CLASSROOM_API_TOKEN_CAMBRIDGE'],
         'SURVEY_MONKEY_SURVEY_ID': '113377045',
         'SURVEY_MONKEY_COLLECTOR_ID': '7CRLTCY',
-        'ANSWER_KEY': {
+        'MAPPING': {
             'PARENTS': [
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': "83225144", 'TRANSPARENT_CLASSROOM': 'first_parent_name.first'},
@@ -29,7 +29,7 @@ HUBS = {
                     'ADDRESS': {'SURVEY_MONKEY': "83225152", 'TRANSPARENT_CLASSROOM': 'second_parent_address'}
                 }
             ],
-            'QUESTIONS': [
+            'ANSWERS': [
                 # Parent/Guardian page questions
                 {'SURVEY_MONKEY': "83225159", 'TRANSPARENT_CLASSROOM': 'how_hear'},
                 {'SURVEY_MONKEY': "83225160", 'TRANSPARENT_CLASSROOM': 'caregivers'},
@@ -61,8 +61,8 @@ HUBS = {
                     'LAST_NAME': {'SURVEY_MONKEY': "83225157", 'TRANSPARENT_CLASSROOM': 'child_name.last'},
                     'DOB': {'SURVEY_MONKEY': "83225155", 'TRANSPARENT_CLASSROOM': 'child_birth_date'},
                     'GENDER': {'SURVEY_MONKEY': "83225156", 'TRANSPARENT_CLASSROOM': 'child_gender'},
-                    'SCHOOLS': {'SURVEY_MONKEY': "83225158"},
-                    'QUESTIONS': [
+                    'SCHOOLS': {'SURVEY_MONKEY': "83225158", 'TRANSPARENT_CLASSROOM': 'schools'},
+                    'ANSWERS': [
                         {'SURVEY_MONKEY': "83225196", 'TRANSPARENT_CLASSROOM': 'ethnicity'},
                         {'SURVEY_MONKEY': "83225162", 'TRANSPARENT_CLASSROOM': 'disposition'},
                         {'SURVEY_MONKEY': "83225163", 'TRANSPARENT_CLASSROOM': 'social_style'},

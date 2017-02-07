@@ -31,7 +31,7 @@ class TestCase(unittest.TestCase):
         response = models.SurveyMonkey.Response("cambridge", guid=self.guid)
         self.assertIsInstance(response.data, dict)
 
-        print response.answers
+        print response.answers.__dict__
 
         # with app.app_context():
         #     with mail.record_messages() as outbox:
@@ -55,7 +55,7 @@ class TestCase(unittest.TestCase):
 
     def test_non_text_answer(self):
         r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-        assert r.answer_for(app.config['HUBS']['CAMBRIDGE']['ANSWER_KEY']['CHILD']['GENDER']['SURVEY_MONKEY'])
+        assert r.answer_for(app.config['HUBS']['CAMBRIDGE']['MAPPING']['CHILD']['GENDER']['SURVEY_MONKEY'])
 
     def test_transparent_classroom_submit_application(self):
         r = models.SurveyMonkey.Response("cambridge", guid=self.guid)

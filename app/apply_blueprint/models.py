@@ -129,7 +129,7 @@ class SurveyMonkey(object):
                 elif email:
                     for page in d["pages"]:
                         for question in page["questions"]:
-                            if question["id"] in [app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['parents'][0]['email']['survey_monkey'], app.config['HUBS'][self.hub.upper()]['ANSWER_KEY']['parents'][1]['email']['survey_monkey']]:
+                            if question["id"] in [app.config['HUBS'][self.hub.upper()]['MAPPING']['parents'][0]['email']['survey_monkey'], app.config['HUBS'][self.hub.upper()]['MAPPING']['parents'][1]['email']['survey_monkey']]:
                                 if question["answers"][0]["text"].lower() == email.lower():
                                     self.data = d
                                     return
@@ -159,6 +159,8 @@ class SurveyMonkey(object):
                 self.validator = validator
 
             def __str__(self):
+                if type(self.value) == list:
+                    return ', '.join(self.value)
                 return self.value
 
         class Answers(object):
@@ -166,40 +168,51 @@ class SurveyMonkey(object):
                 self.response = response
                 self.answers_factory(item)
 
-            class ModelFromFactory():
-                def add_attribute(self, key, value):
-                    setattr(self, key.lower(), value)
+            class ModelFromFactory(): pass
 
-            def camel_case_name(self, name):
-                return re.sub('(?!^)([A-Z]+)', r'_\1', name).lower()
+            def snake_case_name(self, name):
+                s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+                return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
             def model_factory(self, key):
                 wnl = WordNetLemmatizer()
-                singular_words = [wnl.lemmatize(word) for word in str.split(key)]
-                titleize_singular_words = [word.title() for word in singular_words]
-                SurveyMonkey.Response.Answers.ModelFromFactory.__name__ = ''.join(titleize_singular_words)
+                lowercase_words = [word.lower() for word in str.split(key)]
+                singular_lowercase_words = [wnl.lemmatize(word) for word in lowercase_words ]
+                titleize_singular_words = [word.title() for word in singular_lowercase_words]
+                SurveyMonkey.Response.Answers.ModelFromFactory.__name__ = ''.join(titleize_singular_words).encode('ascii', 'ignore')
                 return SurveyMonkey.Response.Answers.ModelFromFactory()
 
             def answers_factory(self, item):
-                if "TRANSPARENT_CLASSROOM" in item:
-                    value = self.response.values_for(item['SURVEY_MONKEY'])
-                    if len(value) == 0:
-                        value = None
-                    elif len(value) == 1:
-                        value = value[0]
-                    return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
+                if type(item) == dict:
+                    print "DICT"
+                    if "TRANSPARENT_CLASSROOM" in item:
+                        print "TRANSPARENT_CLASSROOM {0}".format(item)
+                        value = self.response.values_for(item['SURVEY_MONKEY'])
+                        if len(value) == 0:
+                            value = None
+                        elif len(value) == 1: # use value, not list, is there's only one
+                            value = value[0]
+                        return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
+                    else:
+                        print "ELSE {0}".format(item)
+                        for dictionary_item in item:
+                            print "DICT_ITEM {0}".format(dictionary_item)
+                            print "OKAY {0}.".format(self.answers_factory(item[dictionary_item])) # DONT TAKE OUT ANSWER FACT PART
+                elif type(item) == list:
+                    print "LIST {0}".format(item)
+                    lst = []
+                    for list_item in item:
+                        print "LIST_ITEM {0}".format(list_item)
+                        lst.append(self.answers_factory(list_item))
+                    print lst
+                    return lst
                 else:
-                    for key in item:
-                        if type(item[key]) == dict:
-                            model = self.model_factory(key)
-                            model.add_attribute(key, self.answers_factory(item[key]))
-                            setattr(self, self.camel_case_name(model.__class__.__name__), model)
-                        elif type(item[key]) == list:
-                            setattr(self, self.camel_case_name(key), [self.answers_factory(i) for i in item[key]])
+                    raise LookupError
+
 
         @property
         def answers(self):
-            return SurveyMonkey.Response.Answers(self, app.config['HUBS'][self.hub.upper()]['ANSWER_KEY'])
+            return SurveyMonkey.Response.Answers(self, app.config['HUBS'][self.hub.upper()]['MAPPING'])
 
 class TransparentClassroom(object):
     def __init__(self, school):
@@ -220,8 +233,7 @@ class TransparentClassroom(object):
             "session_id": self.school.tc_session_id,
             "program": "Default"
         }
-        for item in self.params_key(app.config['HUBS'][self.hub]['ANSWER_KEY'], []):
-            print item
+        for item in self.params_key(app.config['HUBS'][self.hub]['MAPPING'], []):
             answer = response.answer_for(item['SURVEY_MONKEY'])
             if answer:
                 if 'VALIDATOR' in item:
@@ -231,7 +243,6 @@ class TransparentClassroom(object):
                     fields[item['TRANSPARENT_CLASSROOM']] = answer
         url = "{0}/online_applications.json".format(self.base_url)
         data = json.dumps({"fields": fields})
-        print data
         response = self.request_session.post(url, data=data)
         if response.status_code != 201:
             app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
