@@ -156,7 +156,6 @@ class SurveyMonkey(object):
                 from pprint import pformat
                 return pformat(vars(self), indent=4, width=1)
 
-
         class Answer(Base):
             def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
                 self.value = value
@@ -169,13 +168,10 @@ class SurveyMonkey(object):
                     return "\n".join(self.value)
                 return self.value
 
-
         class Answers(Base):
             def __init__(self, response, item):
                 self.response = response
-                mapping = self.answers_factory(item, "MAPPING")
-                for key in mapping.__dict__:
-                    setattr(self, key, getattr(mapping, key))
+                self.add(item, None)
 
             def snake_case_name(self, name):
                 name = name.lower()
@@ -191,7 +187,7 @@ class SurveyMonkey(object):
                 ModelFromFactory.__name__ = ''.join(titleize_singular_words).encode('ascii', 'ignore')
                 return ModelFromFactory()
 
-            def answers_factory(self, item, name):
+            def add(self, item, name):
                 if type(item) == dict:
                     if "TRANSPARENT_CLASSROOM" in item:
                         value = self.response.values_for(item['SURVEY_MONKEY'])
@@ -201,22 +197,21 @@ class SurveyMonkey(object):
                             value = value[0]
                         return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
                     else:
-                        # dct = {}
-                        model = self.model_factory(name)
+                        if name:
+                            model = self.model_factory(name)
+                        else:
+                            model = self
                         for key in item:
-                            value = self.answers_factory(item[key], key)
+                            value = self.add(item[key], key)
                             setattr(model, self.snake_case_name(key), value)
-                            # dct[key] = value
-                        # return dct
                         return model
                 elif type(item) == list:
                     lst = []
                     for list_item in item:
-                        lst.append(self.answers_factory(list_item, name))
+                        lst.append(self.add(list_item, name))
                     return lst
                 else:
                     raise LookupError
-
 
         @property
         def answers(self):
