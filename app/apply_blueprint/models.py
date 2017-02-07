@@ -151,7 +151,13 @@ class SurveyMonkey(object):
                             values.append(self.value_for(question_id, raw_answer))
             return values
 
-        class Answer(object):
+        class Base(object):
+            def __repr__(self):
+                from pprint import pformat
+                return pformat(vars(self), indent=4, width=1)
+
+
+        class Answer(Base):
             def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
                 self.value = value
                 self.survey_monkey_question_id = survey_monkey_question_id
@@ -160,17 +166,19 @@ class SurveyMonkey(object):
 
             def __str__(self):
                 if type(self.value) == list:
-                    return ', '.join(self.value)
+                    return "\n".join(self.value)
                 return self.value
 
-        class Answers(object):
+
+        class Answers(Base):
             def __init__(self, response, item):
                 self.response = response
-                self.answers_factory(item)
-
-            class ModelFromFactory(): pass
+                mapping = self.answers_factory(item, "MAPPING")
+                for key in mapping.__dict__:
+                    setattr(self, key, getattr(mapping, key))
 
             def snake_case_name(self, name):
+                name = name.lower()
                 s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
                 return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
@@ -179,14 +187,13 @@ class SurveyMonkey(object):
                 lowercase_words = [word.lower() for word in str.split(key)]
                 singular_lowercase_words = [wnl.lemmatize(word) for word in lowercase_words ]
                 titleize_singular_words = [word.title() for word in singular_lowercase_words]
-                SurveyMonkey.Response.Answers.ModelFromFactory.__name__ = ''.join(titleize_singular_words).encode('ascii', 'ignore')
-                return SurveyMonkey.Response.Answers.ModelFromFactory()
+                class ModelFromFactory(SurveyMonkey.Response.Base): pass
+                ModelFromFactory.__name__ = ''.join(titleize_singular_words).encode('ascii', 'ignore')
+                return ModelFromFactory()
 
-            def answers_factory(self, item):
+            def answers_factory(self, item, name):
                 if type(item) == dict:
-                    print "DICT"
                     if "TRANSPARENT_CLASSROOM" in item:
-                        print "TRANSPARENT_CLASSROOM {0}".format(item)
                         value = self.response.values_for(item['SURVEY_MONKEY'])
                         if len(value) == 0:
                             value = None
@@ -194,17 +201,18 @@ class SurveyMonkey(object):
                             value = value[0]
                         return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
                     else:
-                        print "ELSE {0}".format(item)
-                        for dictionary_item in item:
-                            print "DICT_ITEM {0}".format(dictionary_item)
-                            print "OKAY {0}.".format(self.answers_factory(item[dictionary_item])) # DONT TAKE OUT ANSWER FACT PART
+                        # dct = {}
+                        model = self.model_factory(name)
+                        for key in item:
+                            value = self.answers_factory(item[key], key)
+                            setattr(model, self.snake_case_name(key), value)
+                            # dct[key] = value
+                        # return dct
+                        return model
                 elif type(item) == list:
-                    print "LIST {0}".format(item)
                     lst = []
                     for list_item in item:
-                        print "LIST_ITEM {0}".format(list_item)
-                        lst.append(self.answers_factory(list_item))
-                    print lst
+                        lst.append(self.answers_factory(list_item, name))
                     return lst
                 else:
                     raise LookupError

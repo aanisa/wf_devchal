@@ -31,7 +31,9 @@ class TestCase(unittest.TestCase):
         response = models.SurveyMonkey.Response("cambridge", guid=self.guid)
         self.assertIsInstance(response.data, dict)
 
-        print response.answers.__dict__
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(response.answers)
 
         # with app.app_context():
         #     with mail.record_messages() as outbox:
