@@ -154,7 +154,7 @@ class SurveyMonkey(object):
         class Base(object):
             def __repr__(self):
                 from pprint import pformat
-                return pformat(vars(self), indent=4, width=1)
+                return pformat(vars(self))
 
         class Answer(Base):
             def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
