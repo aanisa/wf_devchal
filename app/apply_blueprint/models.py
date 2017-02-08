@@ -135,6 +135,9 @@ class SurveyMonkey(object):
                                     return
             raise LookupError
 
+        def submit_to_transparent_classroom(self):
+            TransparentClassroom(self).submit_applications()
+
         def value_for(self, question_id, answer):
             if "text" in answer:
                 return answer["text"]
@@ -152,9 +155,10 @@ class SurveyMonkey(object):
             return values
 
         class Base(object):
-            def __repr__(self):
-                from pprint import pformat
-                return pformat(vars(self))
+            pass
+            # def __repr__(self):
+            #     from pprint import pformat
+            #     return pformat(vars(self))
 
         class Answer(Base):
             def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
@@ -218,35 +222,56 @@ class SurveyMonkey(object):
             return SurveyMonkey.Response.Answers(self, app.config['HUBS'][self.hub.upper()]['MAPPING'])
 
 class TransparentClassroom(object):
-    def __init__(self, school):
-        self.hub = school.hub.upper()
-        self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
-        self.request_session = requests.session()
-        self.request_session.headers.update({
-          "X-TransparentClassroomToken": app.config['HUBS'][self.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development
-        })
-        self.school = school
+    def __init__(self, response):
+        self.response = response
+
+    def recursively_find_fields(self, fields, obj):
+        if type(obj) == SurveyMonkey.Response.Answer:
+            fields[obj.transparent_classroom_key] = obj.__str__()
+        elif type(obj) == list:
+            for one in obj:
+                fields = self.recursively_find_fields(fields, one)
+        elif obj.__class__.__bases__ and obj.__class__.__bases__[0] == SurveyMonkey.Response.Base:
+            for attribute in obj.__dict__:
+                fields = self.recursively_find_fields(fields, getattr(obj, attribute))
+        return fields
+
+    def fields_for(self, school):
+        return self.recursively_find_fields(
+            { "session_id": school.tc_session_id, "program": "Default" },
+            self.response.answers
+        )
+
+    def submit_applications(self):
+        for child in self.response.answers.children:
+            for child_school in child.schools.value:
+                for school in School.query.filter_by(hub=self.response.hub).all():
+                    if child_school.lower().find(school.match.lower()) >= 0:
+                        fields = self.fields_for(school)
+                        import pprint
+                        pp = pprint.PrettyPrinter(indent=4)
+                        pp.pprint(fields)
 
 
-    def submit_application(self, response):
-        fields = {
-            "session_id": self.school.tc_session_id,
-            "program": "Default"
-        }
-        for item in self.params_key(app.config['HUBS'][self.hub]['MAPPING'], []):
-            answer = response.answer_for(item['SURVEY_MONKEY'])
-            if answer:
-                if 'VALIDATOR' in item:
-                    if item['VALIDATOR'](answer):
-                        fields[item['TRANSPARENT_CLASSROOM']] = answer
-                else:
-                    fields[item['TRANSPARENT_CLASSROOM']] = answer
-        url = "{0}/online_applications.json".format(self.base_url)
-        data = json.dumps({"fields": fields})
-        response = self.request_session.post(url, data=data)
-        if response.status_code != 201:
-            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
-            raise LookupError, response
+
+
+
+        # self.hub = school.hub.upper()
+        # self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
+        # self.request_session = requests.session()
+        # self.request_session.headers.update({
+        #   "X-TransparentClassroomToken": app.config['HUBS'][self.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
+        #   "Accept": "application/json",
+        #   "Content-Type": "application/json",
+        #   "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development
+        # })
+        # self.school = school
+        #
+        #
+        #
+        # url = "{0}/online_applications.json".format(self.base_url)
+        # data = json.dumps({"fields": fields})
+        # response = self.request_session.post(url, data=data)
+        # if response.status_code != 201:
+        #     app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
+        #     raise LookupError, response

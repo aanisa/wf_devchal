@@ -36,7 +36,6 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(answers.questions, list)
         self.assertIsInstance(answers.children[0].questions, list)
 
-
         # with app.app_context():
         #     with mail.record_messages() as outbox:
         #         response.email_response()
@@ -61,13 +60,17 @@ class TestCase(unittest.TestCase):
         r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
         assert r.answer_for(app.config['HUBS']['CAMBRIDGE']['MAPPING']['CHILD']['GENDER']['SURVEY_MONKEY'])
 
-    def test_transparent_classroom_submit_application(self):
+    def test_response_submit_to_transparent_classroom(self):
         r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-        models.TransparentClassroom(r.schools[0]).submit_application(r)
+        r.submit_to_transparent_classroom()
 
-    def test_transparent_classroom_submit_application_that_breaks_validations(self):
-        r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-        def answer_x(self, i):
-            return "x"
-        r.answer_for = types.MethodType(answer_x, r)
-        models.TransparentClassroom(r.schools[0]).submit_application(r)
+    # def test_transparent_classroom_submit_applications(self):
+    #     r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
+    #     models.TransparentClassroom(r.schools[0]).submit_application(r)
+    #
+    # def test_transparent_classroom_submit_application_that_breaks_validations(self):
+    #     r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
+    #     def answer_x(self, i):
+    #         return "x"
+    #     r.answer_for = types.MethodType(answer_x, r)
+    #     models.TransparentClassroom(r.schools[0]).submit_application(r)
