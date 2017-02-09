@@ -39,14 +39,14 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(application.answers, list)
         self.assertIsInstance(application.children[0].answers, list)
         application.submit_to_transparent_classroom()
-
-        # with app.app_context():
-        #     with mail.record_messages() as outbox:
-        #         response.email_response()
-        #         i = len(outbox)
-        #         self.assertGreater(i, 0)
-        #         response.email_next_steps()
-        #         self.assertGreater(len(outbox), i)
+        with app.app_context():
+            with mail.record_messages() as outbox:
+                # response.email_response()
+                # i = len(outbox)
+                # self.assertGreater(i, 0)
+                i = 0
+                application.email_next_steps()
+                self.assertGreater(len(outbox), i)
 
     def test_redirect_to_survey_monkey_with_guid(self):
         with app.test_request_context():

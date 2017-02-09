@@ -224,6 +224,23 @@ class Application:
     def submit_to_transparent_classroom(self):
         TransparentClassroom(self).submit_applications()
 
+    def email_next_steps(self):
+        schools = []
+        for child in self.children:
+            for child_school in child.schools.value:
+                for prospective_school in School.query.filter_by(hub=self.response.hub).all():
+                    if child_school.lower().find(prospective_school.match.lower()) >= 0:
+                        schools.append(prospective_school)
+        for school in schools:
+            message = {
+                "subject": "Next steps for your application to {0}".format(school.name),
+                "sender": school.email,
+                "recipients": ["{0} {1} <{2}>".format(self.parents[0].first_name, self.parents[0].last_name, self.parents[0].email)],
+                "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                "html": render_template("email_next_steps.html", school=school)
+            }
+            mail.send(Message(**message))
+
 class TransparentClassroom(object):
     def __init__(self, application):
         self.application = application
