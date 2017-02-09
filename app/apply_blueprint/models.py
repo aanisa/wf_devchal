@@ -230,7 +230,8 @@ class TransparentClassroom(object):
 
     def recursively_find_fields(self, fields, child, obj):
         if isinstance(obj, Application.Answer):
-            fields[obj.transparent_classroom_key] = obj.__str__()
+            if obj.__str__():
+                fields[obj.transparent_classroom_key] = obj.__str__()
         elif isinstance(obj, list):
             for one in obj:
                 fields = self.recursively_find_fields(fields, child, one)
@@ -253,9 +254,14 @@ class TransparentClassroom(object):
                 for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
+                        print
+                        import pprint
+                        pp = pprint.PrettyPrinter(indent=4)
+                        pp.pprint(fields)
+                        print
                         request_session = requests.session()
                         request_session.headers.update({
-                          "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
+                          "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub.upper()]['TRANSPARENT_CLASSROOM_API_TOKEN'],
                           "Accept": "application/json",
                           "Content-Type": "application/json",
                           "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id)
@@ -264,6 +270,6 @@ class TransparentClassroom(object):
                             "{0}/api/v1/online_applications.json".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL']),
                             data=json.dumps({"fields": fields})
                         )
-                        if response.status_code != 201:
-                            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
-                            raise LookupError, response
+                        if http_response.status_code != 201:
+                            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, http_response.status_code, http_response.headers, http_response.content))
+                            raise LookupError, http_response
