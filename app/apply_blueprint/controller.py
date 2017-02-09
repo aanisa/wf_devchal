@@ -31,9 +31,6 @@ def after_survey_monkey():
     response = models.SurveyMonkey.Response(request.args.get("hub"), guid=request.args.get("response_guid"))
     application = models.Application(response)
     application.submit_to_transparent_classroom()
-
-    response.email_response()
-
-    application.email_next_steps()
-
+    application.email_schools()
+    application.email_parent()
     return render_template('after_survey_monkey.html', schools=response.schools, child=response.child)

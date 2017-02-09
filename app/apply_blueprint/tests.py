@@ -41,11 +41,11 @@ class TestCase(unittest.TestCase):
         application.submit_to_transparent_classroom()
         with app.app_context():
             with mail.record_messages() as outbox:
-                # response.email_response()
-                # i = len(outbox)
-                # self.assertGreater(i, 0)
+                application.email_schools()
+                i = len(outbox)
+                self.assertGreater(i, 0)
                 i = 0
-                application.email_next_steps()
+                application.email_parent()
                 self.assertGreater(len(outbox), i)
 
     def test_redirect_to_survey_monkey_with_guid(self):

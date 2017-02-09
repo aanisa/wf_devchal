@@ -224,7 +224,7 @@ class Application:
     def submit_to_transparent_classroom(self):
         TransparentClassroom(self).submit_applications()
 
-    def email_next_steps(self):
+    def email_parent(self):
         schools = []
         for child in self.children:
             for child_school in child.schools.value:
