@@ -5,20 +5,15 @@
 <h1>Congratulations!</h1>
 
 <div>
-  You have completed {{ child.first_name }}'s
-    {% if schools|length > 1 %}
-      applications
-    {% else %}
-      application
-    {% endif %}
-  for:
+  You have completed you application for:
+
+  {% for child in application.children %}
+    <div>{{ child.first_name }} {{ child.last_name }}</div>
+
+    TODO HERE EACH SCHOOL
+  {% endfor %}
 </div>
 
-<ul>
-  {% for school in schools %}
-    <li>{{ school.name }}</li>
-  {% endfor %}
-</ul>
 
 <div>
   You should receive an email in your inbox with next steps for each school you applied to - if you don't, please email <a href="mailto:admissions@wildflowerschools.org">admissions@wildflowerschools.org</a>.</div>

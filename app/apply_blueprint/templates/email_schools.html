@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h3>Child</h3>
+<div>
+  {{ child.first_name}} {{ child.first_name}} - DOB: {{ child.dob }} - Gender: {{ child.gender }}
+</div>
+
+<h3>Parents</h3>
+{% for parent in application.parents %}
+  {% if parent.first_name.value %}
+    <div>
+      {{ parent.first_name}} {{ parent.last_name }}<br>
+      {{ parent.address }}<br>
+      {{ parent.phone }}<br>
+      <a href="mailto:{{ parent.email }}">{{ parent.email }}</a><br>
+    </div>
+  {% endif %}
+{% endfor %}
+
+<h3>Questions</h3>
+{% for page in survey.pages %}
+  {% if page.show_for(application.answers) or page.show_for(child.answers) %}
+    {% for question in page.questions %}
+      {% if question.show_for(application.answers) or question.show_for(child.answers) %}
+        <h4>{{ question.text }}</h4>
+          {% for answer in application.answers %}
+            {% if question.id == answer.survey_monkey_question_id %}
+              <div>{{ answer }}</div>
+            {% endif %}
+          {% endfor %}
+          {% for answer in child.answers %}
+            {% if question.id == answer.survey_monkey_question_id %}
+              <div>{{ answer }}</div>
+            {% endif %}
+          {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+<h3>This application is also available in Transparent Classroom.</h3>
+
+{% endblock %}

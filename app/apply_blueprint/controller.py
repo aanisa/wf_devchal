@@ -33,4 +33,4 @@ def after_survey_monkey():
     application.submit_to_transparent_classroom()
     application.email_schools()
     application.email_parent()
-    return render_template('after_survey_monkey.html', schools=response.schools, child=response.child)
+    return render_template('after_survey_monkey.html', application=application)

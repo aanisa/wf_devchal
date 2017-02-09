@@ -85,22 +85,23 @@ class SurveyMonkey(object):
                 self.title = title
                 self.questions = []
 
-            def show_for(self, response):
+            def show_for(self, answers):
                 for question in self.questions:
-                    if response.answers_for(question.id) != []:
-                        return True
+                    for answer in answers:
+                        if answer.survey_monkey_question_id == question.id:
+                            return True
                 return False
 
         class Question(object):
             def __init__(self, id, text):
                 self.id = id
                 self.text = text
-                self.validator = validator
 
-            def show_for(self, response):
-                if response.answers_for(self.id) != []:
+            def show_for(self, answers):
+              for answer in answers:
+                  if answer.survey_monkey_question_id == self.id and answer.value: # don't show Nones
                     return True
-                return False
+              return False
 
         @property
         def pages(self):
@@ -224,6 +225,21 @@ class Application:
     def submit_to_transparent_classroom(self):
         TransparentClassroom(self).submit_applications()
 
+    def email_schools(self):
+        for child in self.children:
+            schools = []
+            for child_school in child.schools.value:
+                for prospective_school in School.query.filter_by(hub=self.response.hub).all():
+                    if child_school.lower().find(prospective_school.match.lower()) >= 0:
+                        schools.append(prospective_school)
+                message = {
+                    "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
+                    "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
+                    "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                    "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
+                }
+                mail.send(Message(**message))
+
     def email_parent(self):
         schools = []
         for child in self.children:
@@ -247,8 +263,9 @@ class TransparentClassroom(object):
 
     def recursively_find_fields(self, fields, child, obj):
         if isinstance(obj, Application.Answer):
-            if obj.__str__():
-                fields[obj.transparent_classroom_key] = obj.__str__()
+            if obj.__str__(): # has value
+                if (not obj.validator) or obj.validator(obj): # is not invalid
+                    fields[obj.transparent_classroom_key] = obj.__str__()
         elif isinstance(obj, list):
             for one in obj:
                 fields = self.recursively_find_fields(fields, child, one)
