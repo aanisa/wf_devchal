@@ -62,7 +62,7 @@ HUBS = {
                     'DOB': {'SURVEY_MONKEY': "83225155", 'TRANSPARENT_CLASSROOM': 'child_birth_date'},
                     'GENDER': {'SURVEY_MONKEY': "83225156", 'TRANSPARENT_CLASSROOM': 'child_gender'},
                     'SCHOOLS': {'SURVEY_MONKEY': "83225158", 'TRANSPARENT_CLASSROOM': 'schools'},
-                    'SCHOOLS_RANKING': {'SURVEY_MONKEY': "83225175", 'TRANSPARENT_CLASSROOM': 'schools_ranking'}
+                    'SCHOOLS_RANKING': {'SURVEY_MONKEY': "83225175", 'TRANSPARENT_CLASSROOM': 'schools_ranking'},
                     'ANSWERS': [
                         {'SURVEY_MONKEY': "83225196", 'TRANSPARENT_CLASSROOM': 'ethnicity'},
                         {'SURVEY_MONKEY': "83225162", 'TRANSPARENT_CLASSROOM': 'disposition'},
