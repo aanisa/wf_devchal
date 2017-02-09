@@ -254,11 +254,6 @@ class TransparentClassroom(object):
                 for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
-                        print
-                        import pprint
-                        pp = pprint.PrettyPrinter(indent=4)
-                        pp.pprint(fields)
-                        print
                         request_session = requests.session()
                         request_session.headers.update({
                           "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub.upper()]['TRANSPARENT_CLASSROOM_API_TOKEN'],
