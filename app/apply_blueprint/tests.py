@@ -36,8 +36,8 @@ class TestCase(unittest.TestCase):
         application = models.Application(response)
         self.assertIsInstance(application.children, list)
         self.assertIsInstance(application.parents, list)
-        self.assertIsInstance(application.questions, list)
-        self.assertIsInstance(application.children[0].questions, list)
+        self.assertIsInstance(application.answers, list)
+        self.assertIsInstance(application.children[0].answers, list)
         application.submit_to_transparent_classroom()
 
         # with app.app_context():
