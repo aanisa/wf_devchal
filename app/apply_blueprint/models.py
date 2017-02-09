@@ -231,7 +231,7 @@ class TransparentClassroom(object):
         elif isinstance(obj, list):
             for one in obj:
                 fields = self.recursively_find_fields(fields, child, one)
-        elif obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model:
+        elif isinstance(obj, Application) or (obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model):
             # THIS NOT WORKING - CHILD IS NOT == ... WHY?
             if (not isinstance(obj, Application.Child)) or obj == child:
                 for attribute in obj.__dict__:
@@ -242,13 +242,13 @@ class TransparentClassroom(object):
         return self.recursively_find_fields(
             { "session_id": school.tc_session_id, "program": "Default" },
             child,
-            self.application.answers
+            self.application
         )
 
     def submit_applications(self):
-        for child in self.response.answers.children:
+        for child in self.application.children:
             for child_school in child.schools.value:
-                for school in School.query.filter_by(hub=self.response.hub).all():
+                for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
                         import pprint
@@ -256,7 +256,7 @@ class TransparentClassroom(object):
                         pp.pprint(fields)
                         request_session = requests.session()
                         request_session.headers.update({
-                          "X-TransparentClassroomToken": app.config['HUBS'][self.response.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
+                          "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
                           "Accept": "application/json",
                           "Content-Type": "application/json",
                           "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id)

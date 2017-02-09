@@ -38,6 +38,7 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(application.parents, list)
         self.assertIsInstance(application.questions, list)
         self.assertIsInstance(application.children[0].questions, list)
+        application.submit_to_transparent_classroom()
 
         # with app.app_context():
         #     with mail.record_messages() as outbox:
