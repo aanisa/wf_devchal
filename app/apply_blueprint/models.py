@@ -13,6 +13,7 @@ from flask import render_template
 import json
 import re
 from nltk.stem import WordNetLemmatizer
+import sys
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -135,111 +136,113 @@ class SurveyMonkey(object):
                                     return
             raise LookupError
 
-        def submit_to_transparent_classroom(self):
-            TransparentClassroom(self).submit_applications()
-
-        def value_for(self, question_id, answer):
+        def answer_for(self, question_id, answer):
             if "text" in answer:
                 return answer["text"]
             else: # select from choice
                 return re.sub('<[^<]+?>', '', SurveyMonkey.Survey(self.hub).value_for(question_id, answer["choice_id"]))
             return None
 
-        def values_for(self, question_id):
+        def answers_for(self, question_id):
             values = []
             for page in self.data["pages"]:
                 for question in page["questions"]:
                     if question["id"] == question_id:
                         for raw_answer in question["answers"]:
-                            values.append(self.value_for(question_id, raw_answer))
+                            values.append(self.answer_for(question_id, raw_answer))
             return values
 
-        class Base(object):
-            pass
-            # def __repr__(self):
-            #     from pprint import pformat
-            #     return pformat(vars(self))
-
-        class Answer(Base):
-            def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
-                self.value = value
-                self.survey_monkey_question_id = survey_monkey_question_id
-                self.transparent_classroom_key = transparent_classroom_key
-                self.validator = validator
-
-            def __str__(self):
-                if type(self.value) == list:
-                    return "\n".join(self.value)
-                return self.value
-
-        class Answers(Base):
-            def __init__(self, response, item):
-                self.response = response
-                self.add(item, None)
-
-            def snake_case_name(self, name):
-                name = name.lower()
-                s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-                return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-            def model_factory(self, key):
-                wnl = WordNetLemmatizer()
-                lowercase_words = [word.lower() for word in str.split(key)]
-                singular_lowercase_words = [wnl.lemmatize(word) for word in lowercase_words ]
-                titleize_singular_words = [word.title() for word in singular_lowercase_words]
-                class ModelFromFactory(SurveyMonkey.Response.Base): pass
-                ModelFromFactory.__name__ = ''.join(titleize_singular_words).encode('ascii', 'ignore')
-                return ModelFromFactory()
-
-            def add(self, item, name):
-                if type(item) == dict:
-                    if "TRANSPARENT_CLASSROOM" in item:
-                        value = self.response.values_for(item['SURVEY_MONKEY'])
-                        if len(value) == 0:
-                            value = None
-                        elif len(value) == 1: # use value, not list, is there's only one
-                            value = value[0]
-                        return SurveyMonkey.Response.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
-                    else:
-                        if name:
-                            model = self.model_factory(name)
-                        else:
-                            model = self
-                        for key in item:
-                            value = self.add(item[key], key)
-                            setattr(model, self.snake_case_name(key), value)
-                        return model
-                elif type(item) == list:
-                    lst = []
-                    for list_item in item:
-                        lst.append(self.add(list_item, name))
-                    return lst
-                else:
-                    raise LookupError
-
-        @property
-        def answers(self):
-            return SurveyMonkey.Response.Answers(self, app.config['HUBS'][self.hub.upper()]['MAPPING'])
-
-class TransparentClassroom(object):
+class Application:
     def __init__(self, response):
         self.response = response
+        self.add(app.config['HUBS'][self.response.hub.upper()]['MAPPING'], None)
 
-    def recursively_find_fields(self, fields, obj):
-        if type(obj) == SurveyMonkey.Response.Answer:
+    class Model(object):
+        def __repr__(self):
+            from pprint import pformat
+            return pformat(vars(self))
+
+    class Answer(Model):
+        def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
+            self.value = value
+            self.survey_monkey_question_id = survey_monkey_question_id
+            self.transparent_classroom_key = transparent_classroom_key
+            self.validator = validator
+
+        def __str__(self):
+            if type(self.value) == list:
+                return "\n".join(self.value)
+            return self.value
+
+    def snake_case_name(self, name):
+        name = name.lower()
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    def model_factory(self, key):
+        wnl = WordNetLemmatizer()
+        lowercase_words = [word.lower() for word in str.split(key)]
+        singular_lowercase_words = [wnl.lemmatize(word) for word in lowercase_words ]
+        titleize_singular_words = [word.title() for word in singular_lowercase_words]
+        class ModelFromFactory(Application.Model): pass
+        class_name = ''.join(titleize_singular_words).encode('ascii', 'ignore')
+        ModelFromFactory.__name__ = class_name
+        mff = ModelFromFactory()
+        setattr(Application, class_name, mff.__class__)
+        return mff
+
+    def add(self, item, name):
+        if isinstance(item, dict):
+            if "TRANSPARENT_CLASSROOM" in item:
+                value = self.response.answers_for(item['SURVEY_MONKEY'])
+                if len(value) == 0:
+                    value = None
+                elif len(value) == 1: # use value, not list, is there's only one
+                    value = value[0]
+                return Application.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
+            else:
+                if name:
+                    model = self.model_factory(name)
+                else:
+                    model = self
+                for key in item:
+                    value = self.add(item[key], key)
+                    if value:
+                        setattr(model, self.snake_case_name(key), value)
+                return model
+        elif isinstance(item, list):
+            lst = []
+            for list_item in item:
+                lst.append(self.add(list_item, name))
+            return lst
+        else:
+            raise LookupError
+
+    def submit_to_transparent_classroom(self):
+        TransparentClassroom(self).submit_applications()
+
+class TransparentClassroom(object):
+    def __init__(self, application):
+        self.application = application
+
+    def recursively_find_fields(self, fields, child, obj):
+        if isinstance(obj, Application.Answer):
             fields[obj.transparent_classroom_key] = obj.__str__()
-        elif type(obj) == list:
+        elif isinstance(obj, list):
             for one in obj:
-                fields = self.recursively_find_fields(fields, one)
-        elif obj.__class__.__bases__ and obj.__class__.__bases__[0] == SurveyMonkey.Response.Base:
-            for attribute in obj.__dict__:
-                fields = self.recursively_find_fields(fields, getattr(obj, attribute))
+                fields = self.recursively_find_fields(fields, child, one)
+        elif obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model:
+            # THIS NOT WORKING - CHILD IS NOT == ... WHY?
+            if (not isinstance(obj, Application.Child)) or obj == child:
+                for attribute in obj.__dict__:
+                    fields = self.recursively_find_fields(fields, child, getattr(obj, attribute))
         return fields
 
-    def fields_for(self, school):
+    def fields_for(self, school, child):
         return self.recursively_find_fields(
             { "session_id": school.tc_session_id, "program": "Default" },
-            self.response.answers
+            child,
+            self.application.answers
         )
 
     def submit_applications(self):
@@ -247,31 +250,21 @@ class TransparentClassroom(object):
             for child_school in child.schools.value:
                 for school in School.query.filter_by(hub=self.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
-                        fields = self.fields_for(school)
+                        fields = self.fields_for(school, child)
                         import pprint
                         pp = pprint.PrettyPrinter(indent=4)
                         pp.pprint(fields)
-
-
-
-
-
-        # self.hub = school.hub.upper()
-        # self.base_url = "{0}/api/v1".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL'])
-        # self.request_session = requests.session()
-        # self.request_session.headers.update({
-        #   "X-TransparentClassroomToken": app.config['HUBS'][self.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
-        #   "Accept": "application/json",
-        #   "Content-Type": "application/json",
-        #   "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id) # for testing and development
-        # })
-        # self.school = school
-        #
-        #
-        #
-        # url = "{0}/online_applications.json".format(self.base_url)
-        # data = json.dumps({"fields": fields})
-        # response = self.request_session.post(url, data=data)
-        # if response.status_code != 201:
-        #     app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
-        #     raise LookupError, response
+                        request_session = requests.session()
+                        request_session.headers.update({
+                          "X-TransparentClassroomToken": app.config['HUBS'][self.response.hub]['TRANSPARENT_CLASSROOM_API_TOKEN'],
+                          "Accept": "application/json",
+                          "Content-Type": "application/json",
+                          "X-TransparentClassroomSchoolId": "{0}".format(school.tc_school_id)
+                        })
+                        http_response = request_session.post(
+                            "{0}/api/v1/online_applications.json".format(app.config['TRANSPARENT_CLASSROOM_BASE_URL']),
+                            data=json.dumps({"fields": fields})
+                        )
+                        if response.status_code != 201:
+                            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, response.status_code, response.headers, response.content))
+                            raise LookupError, response
