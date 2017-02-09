@@ -162,6 +162,9 @@ class Application:
             from pprint import pformat
             return pformat(vars(self))
 
+        def __eq__(self, other):
+            return self.__dict__ == other.__dict__
+
     class Answer(Model):
         def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
             self.value = value
@@ -232,7 +235,6 @@ class TransparentClassroom(object):
             for one in obj:
                 fields = self.recursively_find_fields(fields, child, one)
         elif isinstance(obj, Application) or (obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model):
-            # THIS NOT WORKING - CHILD IS NOT == ... WHY?
             if (not isinstance(obj, Application.Child)) or obj == child:
                 for attribute in obj.__dict__:
                     fields = self.recursively_find_fields(fields, child, getattr(obj, attribute))
