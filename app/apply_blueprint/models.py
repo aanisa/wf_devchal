@@ -6,6 +6,7 @@ import requests
 from combomethod import combomethod
 import inspect
 import dateutil.parser
+import dateutil.relativedelta
 import os
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
@@ -157,6 +158,8 @@ class Application:
     def __init__(self, response):
         self.response = response
         self.add(app.config['HUBS'][self.response.hub.upper()]['MAPPING'], None)
+        for child in self.children:
+            child.age_on = lambda self, d: dateutil.relativedelta(dateutil.parser.parse(self.dob), dateutil.parser.parse(d)).years
 
     class Model(object):
         def __repr__(self):
@@ -260,7 +263,7 @@ class Application:
                 "sender": school.email,
                 "recipients": ["{0} {1} <{2}>".format(self.parents[0].first_name, self.parents[0].last_name, self.parents[0].email)],
                 "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("{0}.html".format(school.email_parent_template or "email_parent"), school=school)
+                "html": render_template("{0}.html".format(school.email_parent_template or "email_parent"), school=school, children=self.children)
             }
             mail.send(Message(**message))
 
