@@ -15,12 +15,12 @@ app.config.from_object("config.{0}".format(os.environ['APP_CONFIG_MODE']))
 
 mail = Mail(app)
 
-class MailWithLogging(Mail):
-    def send(self, message):
-        app.logger.critical(message)
-        super(Mail, self).send(message)
-
-mail = MailWithLogging(app)
+# class MailWithLogging(Mail):
+#     def send(self, message):
+#         app.logger.critical(message)
+#         super(Mail, self).send(message)
+#
+# mail = MailWithLogging(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
