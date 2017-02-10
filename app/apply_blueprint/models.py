@@ -14,6 +14,7 @@ import json
 import re
 from nltk.stem import WordNetLemmatizer
 import sys
+import itertools
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -228,7 +229,10 @@ class Application:
     def email_schools(self):
         for child in self.children:
             schools = []
-            for child_school in child.schools.value:
+            value = child.schools.value
+            if not isinstance(value, list):
+                value = [value]
+            for child_school in value:
                 for prospective_school in School.query.filter_by(hub=self.response.hub).all():
                     if child_school.lower().find(prospective_school.match.lower()) >= 0:
                         schools.append(prospective_school)
@@ -243,7 +247,10 @@ class Application:
     def email_parent(self):
         schools = []
         for child in self.children:
-            for child_school in child.schools.value:
+            value = child.schools.value
+            if not isinstance(value, list):
+                value = [value]
+            for child_school in value:
                 for prospective_school in School.query.filter_by(hub=self.response.hub).all():
                     if child_school.lower().find(prospective_school.match.lower()) >= 0:
                         if prospective_school not in schools: # only send one email per school, even if parent has 2+ kids applying to same school
@@ -285,7 +292,10 @@ class TransparentClassroom(object):
 
     def submit_applications(self):
         for child in self.application.children:
-            for child_school in child.schools.value:
+            value = child.schools.value
+            if not isinstance(value, list):
+                value = [value]
+            for child_school in value:
                 for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
