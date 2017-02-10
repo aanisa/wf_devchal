@@ -246,7 +246,8 @@ class Application:
             for child_school in child.schools.value:
                 for prospective_school in School.query.filter_by(hub=self.response.hub).all():
                     if child_school.lower().find(prospective_school.match.lower()) >= 0:
-                        schools.append(prospective_school)
+                        if prospective_school not in schools: # only send one email per school, even if parent has 2+ kids applying to same school
+                            schools.append(prospective_school)
         for school in schools:
             message = {
                 "subject": "Next steps for your application to {0}".format(school.name),
@@ -264,7 +265,7 @@ class TransparentClassroom(object):
     def recursively_find_fields(self, fields, child, obj):
         if isinstance(obj, Application.Answer):
             if obj.__str__(): # has value
-                if (not obj.validator) or obj.validator(obj): # is not invalid
+                if (not obj.validator) or obj.validator(obj.__str__()): # is not invalid
                     fields[obj.transparent_classroom_key] = obj.__str__()
         elif isinstance(obj, list):
             for one in obj:

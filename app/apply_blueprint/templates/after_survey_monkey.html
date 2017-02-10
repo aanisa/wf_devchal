@@ -8,14 +8,20 @@
   You have completed you application for:
 
   {% for child in application.children %}
-    <div>{{ child.first_name }} {{ child.last_name }}</div>
-
-    TODO HERE EACH SCHOOL
+    <div style="margin-top: 1em; margin-left: 1em; margin-bottom: 0">{{ child.first_name }} {{ child.last_name }}</div>
+    <div style="margin-left: 2em">
+      {% if child.schools.value is string  %}
+        {{ child.schools.value }}
+      {% else %}
+        {% for school in child.schools.value %}
+          {{ school }}<br>
+          {% endfor %}
+      {% endif %}
+    </div>
   {% endfor %}
 </div>
 
-
-<div>
+<div style="margin-top: 2em">
   You should receive an email in your inbox with next steps for each school you applied to - if you don't, please email <a href="mailto:admissions@wildflowerschools.org">admissions@wildflowerschools.org</a>.</div>
 
 <div>Thank you for your interest in Wildflower! We look forward to getting to know your family.</div>
