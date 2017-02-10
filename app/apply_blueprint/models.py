@@ -34,8 +34,7 @@ class School(Base):
     parent_teacher_conversation_optional = db.Column(db.Boolean())
     schedule_parent_observation_url = db.Column(db.String(120))
     parent_observation_optional = db.Column(db.Boolean())
-    schedule_child_visit_url = db.Column(db.String(120))
-    child_visit_optional = db.Column(db.Boolean())
+    email_parent_template = db.Column(db.String(120))
     email = db.Column(db.String(120))
     hub = db.Column(db.String(120))
 
@@ -261,7 +260,7 @@ class Application:
                 "sender": school.email,
                 "recipients": ["{0} {1} <{2}>".format(self.parents[0].first_name, self.parents[0].last_name, self.parents[0].email)],
                 "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("email_next_steps.html", school=school)
+                "html": render_template("{0}.html".format(school.email_parent_template or "email_parent"), school=school)
             }
             mail.send(Message(**message))
 
