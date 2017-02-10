@@ -60,21 +60,8 @@ class TestCase(unittest.TestCase):
             response = app.test_client().get(url)
             self.assertEqual(response.status_code, 200)
 
-    def test_non_text_answer(self):
-        r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-        assert r.answer_for(app.config['HUBS']['CAMBRIDGE']['MAPPING']['CHILD']['GENDER']['SURVEY_MONKEY'])
-
-    def test_response_submit_to_transparent_classroom(self):
-        r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-        r.submit_to_transparent_classroom()
-
-    # def test_transparent_classroom_submit_applications(self):
-    #     r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-    #     models.TransparentClassroom(r.schools[0]).submit_application(r)
-    #
-    # def test_transparent_classroom_submit_application_that_breaks_validations(self):
-    #     r = models.SurveyMonkey.Response("cambridge", guid=self.guid)
-    #     def answer_x(self, i):
-    #         return "x"
-    #     r.answer_for = types.MethodType(answer_x, r)
-    #     models.TransparentClassroom(r.schools[0]).submit_application(r)
+    def test_application_breaks_transparent_classroom_validations(self):
+        response = models.SurveyMonkey.Response("cambridge", guid=self.guid)
+        application = models.Application(response)
+        application.parents[0].phone.value = "XYZ"
+        application.submit_to_transparent_classroom()

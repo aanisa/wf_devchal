@@ -5,8 +5,6 @@ TRANSPARENT_CLASSROOM_BASE_URL = "https://www.transparentclassroom.com"
 
 SURVEY_MONKEY_OAUTH_TOKEN=os.environ['SURVEY_MONKEY_OAUTH_TOKEN']
 
-phone_valid = lambda p: not p or re.match('^\D*(\d\D*){6,}$', p) != None
-
 HUBS = {
     'CAMBRIDGE': {
         'TRANSPARENT_CLASSROOM_API_TOKEN': os.environ['TRANSPARENT_CLASSROOM_API_TOKEN_CAMBRIDGE'],
@@ -17,15 +15,15 @@ HUBS = {
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': "83225144", 'TRANSPARENT_CLASSROOM': 'first_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': "83225148", 'TRANSPARENT_CLASSROOM': 'first_parent_name.last'} ,
-                    'EMAIL': {'SURVEY_MONKEY': "83225145", 'TRANSPARENT_CLASSROOM': 'first_parent_email'}, # Validated at SurveyMonkey
-                    'PHONE': {'SURVEY_MONKEY': "83225147", 'TRANSPARENT_CLASSROOM': 'first_parent_mobile_number', 'VALIDATOR': phone_valid},
+                    'EMAIL': {'SURVEY_MONKEY': "83225145", 'TRANSPARENT_CLASSROOM': 'first_parent_email'},
+                    'PHONE': {'SURVEY_MONKEY': "83225147", 'TRANSPARENT_CLASSROOM': 'first_parent_mobile_number'},
                     'ADDRESS': {'SURVEY_MONKEY': "83225146", 'TRANSPARENT_CLASSROOM': 'first_parent_address'}
                 },
                 {
                     'FIRST_NAME': {'SURVEY_MONKEY': "83225149", 'TRANSPARENT_CLASSROOM': 'second_parent_name.first'},
                     'LAST_NAME': {'SURVEY_MONKEY': "83225153", 'TRANSPARENT_CLASSROOM': 'second_parent_name.last'},
-                    'EMAIL': {'SURVEY_MONKEY': "83225150", 'TRANSPARENT_CLASSROOM': 'second_parent_email'}, # Validated at SurveyMonkey
-                    'PHONE': {'SURVEY_MONKEY': "83225151", 'TRANSPARENT_CLASSROOM': 'second_parent_mobile_number', 'VALIDATOR': phone_valid},
+                    'EMAIL': {'SURVEY_MONKEY': "83225150", 'TRANSPARENT_CLASSROOM': 'second_parent_email'},
+                    'PHONE': {'SURVEY_MONKEY': "83225151", 'TRANSPARENT_CLASSROOM': 'second_parent_mobile_number'},
                     'ADDRESS': {'SURVEY_MONKEY': "83225152", 'TRANSPARENT_CLASSROOM': 'second_parent_address'}
                 }
             ],

@@ -159,7 +159,9 @@ class Application:
         self.response = response
         self.add(app.config['HUBS'][self.response.hub.upper()]['MAPPING'], None)
         for child in self.children:
-            child.age_on = lambda self, d: dateutil.relativedelta(dateutil.parser.parse(self.dob), dateutil.parser.parse(d)).years
+            child.age_on = lambda d, child=child: dateutil.relativedelta(dateutil.parser.parse(child.dob), dateutil.parser.parse(d)).years
+        for parent in self.parents:
+            parent.phone.validator = lambda parent=parent: not parent.phone.value or re.match('^\D*(\d\D*){6,}$', parent.phone.value) != None
 
     class Model(object):
         def __repr__(self):
@@ -170,11 +172,10 @@ class Application:
             return self.__dict__ == other.__dict__
 
     class Answer(Model):
-        def __init__(self, value, survey_monkey_question_id, transparent_classroom_key, validator):
+        def __init__(self, value, survey_monkey_question_id, transparent_classroom_key):
             self.value = value
             self.survey_monkey_question_id = survey_monkey_question_id
             self.transparent_classroom_key = transparent_classroom_key
-            self.validator = validator
 
         def __str__(self):
             if type(self.value) == list:
@@ -206,7 +207,7 @@ class Application:
                     value = None
                 elif len(value) == 1: # use value, not list, is there's only one
                     value = value[0]
-                return Application.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'], item.get('VALIDATOR'))
+                return Application.Answer(value, item['SURVEY_MONKEY'], item['TRANSPARENT_CLASSROOM'])
             else:
                 if name:
                     model = self.model_factory(name)
@@ -274,7 +275,7 @@ class TransparentClassroom(object):
     def recursively_find_fields(self, fields, child, obj):
         if isinstance(obj, Application.Answer):
             if obj.__str__(): # has value
-                if (not obj.validator) or obj.validator(obj.__str__()): # is not invalid
+                if  "validator" not in obj.__dict__ or obj.validator():
                     fields[obj.transparent_classroom_key] = obj.__str__()
         elif isinstance(obj, list):
             for one in obj:
@@ -301,6 +302,9 @@ class TransparentClassroom(object):
                 for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
+                        import pprint
+                        pp = pprint.PrettyPrinter(indent=4)
+                        pp.pprint(fields)
                         request_session = requests.session()
                         request_session.headers.update({
                           "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub.upper()]['TRANSPARENT_CLASSROOM_API_TOKEN'],
