@@ -154,12 +154,12 @@ class SurveyMonkey(object):
                             values.append(self.answer_for(question_id, raw_answer))
             return values
 
-class Application:
+class Application(object):
     def __init__(self, response):
         self.response = response
         self.add(app.config['HUBS'][self.response.hub.upper()]['MAPPING'], None)
         for child in self.children:
-            child.age_on = lambda d, child=child: dateutil.relativedelta(dateutil.parser.parse(child.dob), dateutil.parser.parse(d)).years
+            child.age_on = lambda d, child=child: dateutil.relativedelta.relativedelta(dateutil.parser.parse(d), dateutil.parser.parse(child.dob.value)).years
         for parent in self.parents:
             parent.phone.validator = lambda parent=parent: not parent.phone.value or re.match('^\D*(\d\D*){6,}$', parent.phone.value) != None
 
@@ -168,7 +168,7 @@ class Application:
             from pprint import pformat
             return pformat(vars(self))
 
-        def __eq__(self, other):
+        def __cmp__(self, other):
             return self.__dict__ == other.__dict__
 
     class Answer(Model):
@@ -192,12 +192,32 @@ class Application:
         lowercase_words = [word.lower() for word in str.split(key)]
         singular_lowercase_words = [wnl.lemmatize(word) for word in lowercase_words ]
         titleize_singular_words = [word.title() for word in singular_lowercase_words]
-        class ModelFromFactory(Application.Model): pass
         class_name = ''.join(titleize_singular_words).encode('ascii', 'ignore')
-        ModelFromFactory.__name__ = class_name
-        mff = ModelFromFactory()
-        setattr(Application, class_name, mff.__class__)
+        if class_name in Application.__dict__:
+            mff = eval("Application.{0}()".format(class_name))
+        else:
+            class ModelFromFactory(Application.Model): pass
+            ModelFromFactory.__name__ = class_name
+            mff = ModelFromFactory()
+            setattr(Application, class_name, mff.__class__)
         return mff
+
+    def is_empty(self, obj):
+        if isinstance(obj, list):
+            for item in list:
+                if not self.is_empty(item):
+                    return False
+        elif isinstance(obj, Application.Answer):
+            if obj.value:
+                return False
+            return True
+        elif obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model:
+            for attribute in obj.__dict__:
+                if not self.is_empty(getattr(obj, attribute)):
+                    return False
+        else:
+            raise LookupError, obj
+        return True
 
     def add(self, item, name):
         if isinstance(item, dict):
@@ -215,16 +235,20 @@ class Application:
                     model = self
                 for key in item:
                     value = self.add(item[key], key)
+                    # should this be if not self.is_empty(value) ?
                     if value:
                         setattr(model, self.snake_case_name(key), value)
                 return model
         elif isinstance(item, list):
             lst = []
             for list_item in item:
-                lst.append(self.add(list_item, name))
+                obj = self.add(list_item, name)
+                if not self.is_empty(obj):
+                    lst.append(obj)
             return lst
         else:
             raise LookupError
+
 
     def submit_to_transparent_classroom(self):
         TransparentClassroom(self).submit_applications()
@@ -242,7 +266,7 @@ class Application:
                 message = {
                     "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
                     "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
-                    "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                    "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org'], #, 'cam.leonard@wildflowerschools.org'],
                     "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
                 }
                 mail.send(Message(**message))
@@ -281,9 +305,14 @@ class TransparentClassroom(object):
             for one in obj:
                 fields = self.recursively_find_fields(fields, child, one)
         elif isinstance(obj, Application) or (obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model):
-            if (not isinstance(obj, Application.Child)) or obj == child:
+            if not isinstance(obj, Application.Child) or obj == child:
                 for attribute in obj.__dict__:
                     fields = self.recursively_find_fields(fields, child, getattr(obj, attribute))
+            elif isinstance(obj, Application.Child):
+                pass
+            else:
+                raise LookupError
+
         return fields
 
     def fields_for(self, school, child):
@@ -302,9 +331,6 @@ class TransparentClassroom(object):
                 for school in School.query.filter_by(hub=self.application.response.hub).all():
                     if child_school.lower().find(school.match.lower()) >= 0:
                         fields = self.fields_for(school, child)
-                        import pprint
-                        pp = pprint.PrettyPrinter(indent=4)
-                        pp.pprint(fields)
                         request_session = requests.session()
                         request_session.headers.update({
                           "X-TransparentClassroomToken": app.config['HUBS'][self.application.response.hub.upper()]['TRANSPARENT_CLASSROOM_API_TOKEN'],

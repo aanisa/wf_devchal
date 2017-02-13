@@ -3,19 +3,17 @@
 
 <h3>Child</h3>
 <div>
-  {{ child.first_name}} {{ child.first_name}} - DOB: {{ child.dob }} - Gender: {{ child.gender }}
+  {{ child.first_name}} {{ child.last_name}} - DOB: {{ child.dob }} - Gender: {{ child.gender }}
 </div>
 
 <h3>Parents</h3>
 {% for parent in application.parents %}
-  {% if parent.first_name.value %}
-    <div>
-      {{ parent.first_name}} {{ parent.last_name }}<br>
-      {{ parent.address }}<br>
-      {{ parent.phone }}<br>
-      <a href="mailto:{{ parent.email }}">{{ parent.email }}</a><br>
-    </div>
-  {% endif %}
+  <div>
+    {{ parent.first_name}} {{ parent.last_name }}<br>
+    {{ parent.address }}<br>
+    {{ parent.phone }}<br>
+    <a href="mailto:{{ parent.email }}">{{ parent.email }}</a><br>
+  </div>
 {% endfor %}
 
 <h3>Questions</h3>

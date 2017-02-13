@@ -7,6 +7,8 @@ from flask_cors import cross_origin
 from flask_mail import Message
 import traceback
 
+app.jinja_env.add_extension('jinja2.ext.do')
+
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
 
 @blueprint.errorhandler(500)
