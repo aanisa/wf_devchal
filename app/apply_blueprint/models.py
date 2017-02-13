@@ -306,7 +306,6 @@ class TransparentClassroom(object):
                 fields = self.recursively_find_fields(fields, child, one)
         elif isinstance(obj, Application) or (obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model):
             if not isinstance(obj, Application.Child) or obj == child:
-                print "GAH {0}".format(obj == child)
                 for attribute in obj.__dict__:
                     fields = self.recursively_find_fields(fields, child, getattr(obj, attribute))
             elif isinstance(obj, Application.Child):
