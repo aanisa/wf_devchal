@@ -324,19 +324,6 @@ class TransparentClassroom(object):
         )
 
     def submit_applications(self):
-        # import pprint
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(self.application.children[1])
-        # print "======="
-        # child = self.application.children[1]
-        # child_school = child.schools.value
-        # for school in School.query.filter_by(hub=self.application.response.hub).all():
-        #     if child_school.lower().find(school.match.lower()) >= 0:
-        #         import pprint
-        #         pp = pprint.PrettyPrinter(indent=4)
-        #         pp.pprint(self.fields_for(school, child))
-        # raise "OK"
-
         for child in self.application.children:
             value = child.schools.value
             if not isinstance(value, list):
