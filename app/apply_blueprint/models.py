@@ -168,7 +168,7 @@ class Application(object):
             from pprint import pformat
             return pformat(vars(self))
 
-        def __cmp__(self, other):
+        def __eq__(self, other):
             return self.__dict__ == other.__dict__
 
     class Answer(Model):
@@ -306,6 +306,7 @@ class TransparentClassroom(object):
                 fields = self.recursively_find_fields(fields, child, one)
         elif isinstance(obj, Application) or (obj.__class__.__bases__ and obj.__class__.__bases__[0] == Application.Model):
             if not isinstance(obj, Application.Child) or obj == child:
+                print "GAH {0}".format(obj == child)
                 for attribute in obj.__dict__:
                     fields = self.recursively_find_fields(fields, child, getattr(obj, attribute))
             elif isinstance(obj, Application.Child):
@@ -323,6 +324,19 @@ class TransparentClassroom(object):
         )
 
     def submit_applications(self):
+        # import pprint
+        # pp = pprint.PrettyPrinter(indent=4)
+        # pp.pprint(self.application.children[1])
+        # print "======="
+        # child = self.application.children[1]
+        # child_school = child.schools.value
+        # for school in School.query.filter_by(hub=self.application.response.hub).all():
+        #     if child_school.lower().find(school.match.lower()) >= 0:
+        #         import pprint
+        #         pp = pprint.PrettyPrinter(indent=4)
+        #         pp.pprint(self.fields_for(school, child))
+        # raise "OK"
+
         for child in self.application.children:
             value = child.schools.value
             if not isinstance(value, list):
