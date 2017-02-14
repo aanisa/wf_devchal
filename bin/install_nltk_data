@@ -2,15 +2,14 @@
 
 source $BIN_DIR/utils
 
-
 echo "-----> Starting nltk data installation"
 
 # Assumes NLTK_DATA environment variable is already set
 # $ heroku config:set NLTK_DATA='/app/nltk_data'
 
-python -m nltk.downloader -d /app/nltk_data wordnet
+python -m nltk.downloader wordnet
 
-cd /app/nltk_data
+cd ${NLTK_DATA}
 
 find . -name "*.zip" -type f -delete
 
