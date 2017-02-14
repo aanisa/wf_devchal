@@ -10,6 +10,9 @@ echo "-----> Starting nltk data installation"
 python -m nltk.downloader -d ${NLTK_DATA} wordnet
 
 # Open the NLTK_DATA directory
+
+ls ${NLTK_DATA}
+
 cd ${NLTK_DATA}
 
 # Delete all of the zip files
