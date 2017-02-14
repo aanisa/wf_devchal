@@ -2,6 +2,8 @@
 
 source $BIN_DIR/utils
 
+cat $BIN_DIR/utils
+
 echo "-----> Starting nltk data installation"
 
 # Assumes NLTK_DATA environment variable is already set
