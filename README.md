@@ -13,3 +13,4 @@ TODO:
   requirements.txt in the blueprints, composited to root
   webpack config in the blueprints, composited to root
   post_compile in the blueprints, composited to root
+  nltk_data dir in root is leaky
