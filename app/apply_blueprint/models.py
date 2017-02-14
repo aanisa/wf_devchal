@@ -203,6 +203,7 @@ class Application(object):
         return mff
 
     def is_empty(self, obj):
+        print obj
         if isinstance(obj, list):
             for item in list:
                 if not self.is_empty(item):
@@ -343,5 +344,5 @@ class TransparentClassroom(object):
                             data=json.dumps({"fields": fields})
                         )
                         if http_response.status_code != 201:
-                            app.logger.error("Posting: {0} To: {1} Response: Status code: {2} Headers: {3} Content: {4}".format(data, url, http_response.status_code, http_response.headers, http_response.content))
+                            app.logger.error("Posting: {0} Response: Status code: {1} Headers: {2} Content: {3}".format(fields, http_response.status_code, http_response.headers, http_response.content))
                             raise LookupError, http_response
