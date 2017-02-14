@@ -12,7 +12,7 @@ else
   export APP_CONFIG_MODE=$m
 fi
 
-if [ $m = "development" ]; then
+if [ "$m" = "development" ]; then
   export FLASK_DEBUG=1
 fi
 
