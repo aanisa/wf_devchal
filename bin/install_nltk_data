@@ -1,4 +1,3 @@
-# bin/install_nltk_data
 #!/usr/bin/env bash
 
 source $BIN_DIR/utils
