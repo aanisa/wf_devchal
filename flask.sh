@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ ${APP_CONFIG_MODE} ]; then
   echo "APP_CONFIG_MODE set from enviroment variable to ${APP_CONFIG_MODE}"
