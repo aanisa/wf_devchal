@@ -11,9 +11,11 @@ python -m nltk.downloader -d ${NLTK_DATA} wordnet
 
 # Open the NLTK_DATA directory
 
-ls ${NLTK_DATA}
+ls -l ${NLTK_DATA}
 
 cd ${NLTK_DATA}
+
+pwd
 
 # Delete all of the zip files
 find . -name "*.zip" -type f -delete
