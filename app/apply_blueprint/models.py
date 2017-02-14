@@ -203,7 +203,6 @@ class Application(object):
         return mff
 
     def is_empty(self, obj):
-        # print type(obj)
         if isinstance(obj, list):
             for item in list:
                 if not self.is_empty(item):
