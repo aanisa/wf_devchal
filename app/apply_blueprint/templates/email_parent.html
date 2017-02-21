@@ -34,14 +34,7 @@
           (Optional)
       {% endif %}
       Please <a href="{{ school.schedule_parent_teacher_conversation_url }}">click here</a> to schedule your follow-up conversation.
-    </li>
-  {% endif %}
-  {% if school.schedule_child_visit_url %}
-    <li>
-      {% if school.child_visit_optional %}
-          (Optional)
-      {% endif %}
-      Please <a href="{{ school.schedule_child_visit_url }}">click here</a> to schedule your child's visit.
+      If you’ve already had your follow-up conversation, you don’t need to complete this step.
     </li>
   {% endif %}
 </ol>
