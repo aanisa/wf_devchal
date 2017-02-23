@@ -1,55 +1,63 @@
 {% extends "layout.html" %}
 {% block body %}
 
-
-{% set age_on_date = "9/1" %}
-
 <div>
-  Thank you for applying to {{ school.name }}! We look forward to getting to know you and your family better.
+  Thank you for your interest in Wild Rose, we're looking forward to meeting you.
 </div>
 
 <div>
-  {% set children_to_visit = [] %}
-  {% for child in children %}
-    {% if child.age_on(age_on_date) >= 5 %}
-      {% do children_to_visit.append(child) %}
-    {% endif %}
-  {% endfor %}
+  The admissions process includes a parent visit and
 
-  {% if children_to_visit|length == 0 %}
-    We'd like to schedule a time for you to observe the school and sit down with our school leaders for a conversation.
-  {% elif children_to_visit|length == 1 %}
-    We'd like to schedule a time for you to observe the school and sit down with our school leaders for a conversation, and a time for your child to visit.
-  {% elif children_to_visit|length > 1 %}
-    We'd like to schedule a time for you to observe the school and sit down with our school leaders for a conversation, and a time for your children to visit.
+  {% if children|length == 1 %}
+    a child visit.
+  {% else %}
+    a visit for each of your children.
   {% endif %}
 
-  We know choosing a learning environment for your child is a big decision. Through this process, you’ll have the opportunity to better understand Wildflower’s principles and practices, meet our teachers and ask any questions you may have.
+  The parent visit is a time for you to observe the classroom and to sit down and have a conversation with our school leaders.
+  The student visit is a time for your child to visit the classroom.
 </div>
+
+<div>
+  We know choosing a learning environment for your child is a big decision.
+  Through this process, you’ll have the opportunity to better understand our principles and practices, meet our teachers and ask questions.
+  Some parents choose to wait to schedule the student visit after they have observed and determined that Wild Rose is a good match for their family.
+</div>
+
+{% set age_on_date = "9/1" %}
 
 <div>Your actions:</div>
 <ol>
     <li>
-      Please <a href="{{ school.schedule_parent_observation_url }}">click here</a> to schedule your parent observation.
+      Please <a href="{{ school.schedule_parent_observation_url }}">click here</a> to schedule your observation (parents only).
       If you’ve already observed, you don’t need to complete this step.
     </li>
 
-    {% for child in children_to_visit %}
-      {% if child.age_on(age_on_date) >= 5 %}
-        <li>
-          {% if child.age_on(age_on_date) < 7 %}
-            {% set visit_url = "https://calendly.com/wild-rose-appointments/child-visit-half-day" %}
-          {% else %}
-            {% set visit_url = "https://calendly.com/wild-rose-appointments/child-visit-full-day" %}
-          {% endif %}
-          Please <a href="{{ visit_url }}">click here</a> to schedule a visit for {{ child.first_name}} {{ child.last_name }}.
-          Please schedule the date of the visit to be after the date of your observation.
-          If {{ child.first_name}} has already visited, you don’t need to complete this step.
-        </li>
-      {% endif %}
+    {% for child in children %}
+      <li>
+        {% if child.age_on(age_on_date) >= 7 %}
+          Please <a href="https://calendly.com/wild-rose-appointments/child-visit-full-day">click here</a>
+          to schedule a full-day class visit for {{ child.first_name}}.  This is a great way to experience a typical day at Wild Rose.
+        {% elif child.age_on(age_on_date) >= 5 %}
+          Please <a href="https://calendly.com/wild-rose-appointments/child-visit-half-day">click here</a>
+          to schedule a half-day class visit for {{ child.first_name}}.  This is a great way to experience a typical day at Wild Rose.
+        {% else %}
+          Please <a href="https://calendly.com/wild-rose-appointments/child-visit-after-school">click here</a>
+          to schedule a half-hour visit for {{ child.first_name}} to meet our teachers when school is not in session.
+        {% endif %}
+        If {{ child.first_name}} has already visited, you don’t need to complete this step.
+      </li>
     {% endfor %}
 
+
 </ol>
+
+{% if children|length > 1 %}
+  <div>
+    Your children are welcome to visit on the same day.
+  </div>
+{% endif %}
+
 
 <div>Best,</div>
 
