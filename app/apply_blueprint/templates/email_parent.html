@@ -21,18 +21,12 @@
 <ol>
   {% if school.schedule_parent_observation_url %}
     <li>
-      {% if school.parent_observation_optional %}
-          (Optional)
-      {% endif %}
       Please <a href="{{ school.schedule_parent_observation_url }}">click here</a> to schedule your parent observation.
       If you’ve already observed, you don’t need to complete this step.
     </li>
   {% endif %}
   {% if school.schedule_parent_teacher_conversation_url %}
     <li>
-      {% if parent_teacher_conversation_optional %}
-          (Optional)
-      {% endif %}
       Please <a href="{{ school.schedule_parent_teacher_conversation_url }}">click here</a> to schedule your follow-up conversation.
       Please schedule this appointment to follow your parent observation appointment.
       If you’ve already had your follow-up conversation, you don’t need to complete this step.
