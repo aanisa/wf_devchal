@@ -1,4 +1,4 @@
-from app import app, db, ma, mail
+from app import app, db, mail
 import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime

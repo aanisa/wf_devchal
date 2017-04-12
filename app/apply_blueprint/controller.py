@@ -2,8 +2,6 @@ from flask import Blueprint, render_template, request
 import models
 from app import app, db, mail
 import os
-from flask_restful import Resource, Api
-from flask_cors import cross_origin
 from flask_mail import Message
 import traceback
 
