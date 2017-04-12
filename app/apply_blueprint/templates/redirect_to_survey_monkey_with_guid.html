@@ -3,6 +3,22 @@
   <script>
     // Jacascript GUID https://gist.github.com/jed/982883
     function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)}
-    document.location = "https://www.surveymonkey.com/r/{{ SURVEY_MONKEY_COLLECTOR_ID }}?hub={{ hub }}&response_guid=" + b()
+
+    function getCookie(cookiename) {
+      var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
+      return unescape(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+    }
+
+    var response_guid = getCookie("response_guid")
+    if (! response_guid) {
+      response_guid = b();
+      var now = new Date();
+      var time = now.getTime();
+      time += 3600 * 24 * 365 * 1000;
+      now.setTime(time);
+      document.cookie = "response_guid=" + response_guid +";path=/;expires=" + now.toUTCString();
+    }
+
+    document.location = "https://www.surveymonkey.com/r/{{ SURVEY_MONKEY_COLLECTOR_ID }}?hub={{ hub }}&response_guid=" + response_guid
   </script>
 {% endblock %}
