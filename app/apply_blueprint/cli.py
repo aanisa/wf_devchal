@@ -4,6 +4,8 @@ import csv
 import models
 import ast
 import click
+import time
+import requests
 
 path = os.path.dirname(os.path.realpath(__file__))
 name = path.split("/")[-1]
@@ -13,9 +15,9 @@ def cli():
     """Namespace for blueprint"""
     pass
 
-@app.cli.command("seed")
-def seed():
-    """Seed"""
+@app.cli.command("seed_from_csvs")
+def seed_from_csvs():
+    """Seed from CSV"""
     seeds = []
     for f in [f for f in os.listdir("{0}/seeds/".format(path))]:
         parts = f.split(".")
@@ -27,7 +29,7 @@ def seed():
                     seeds.append(populate(eval("models.{0}()".format(model_name)), d))
     db.session.add_all(seeds)
     db.session.commit()
-cli.add_command(seed)
+cli.add_command(seed_from_csvs)
 
 def populate(seed, dict):
     for k in dict.keys():
