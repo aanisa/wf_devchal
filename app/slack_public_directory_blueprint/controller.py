@@ -6,4 +6,4 @@ blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 @blueprint.route('/')
 def index():
-    return ProfileSchema(many=True).jsonify(Profile.query.all)
+    return models.DirectorySchema(many=True).jsonify(models.Directory.query.all())
