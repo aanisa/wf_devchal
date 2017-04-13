@@ -11,8 +11,9 @@ def index():
 
 @blueprint.route('/slack_event')
 def slack_event():
-    print request.get_data() 
-    post = request.get_json()
-    if post['token'] == app.config['SLACK_TOKEN']:
-        # for verification - see https://api.slack.com/events/url_verification
-        return post['challenge']
+    print request.get_data()
+    return request.get_data()
+    # post = request.get_json()
+    # if post['token'] == app.config['SLACK_TOKEN']:
+    #     # for verification - see https://api.slack.com/events/url_verification
+    #     return post['challenge']
