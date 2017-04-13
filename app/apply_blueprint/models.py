@@ -8,7 +8,6 @@ import inspect
 import dateutil.parser
 import dateutil.relativedelta
 import os
-from sqlalchemy.ext.hybrid import hybrid_property
 from flask_mail import Message
 from flask import render_template
 import json
