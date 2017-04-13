@@ -5,8 +5,6 @@ from app import app, db, mail
 import os
 import cli
 from click.testing import CliRunner
-import json
-import flask_restful
 import types
 
 blueprint_name = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
