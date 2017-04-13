@@ -9,11 +9,9 @@ blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 def index():
     return models.PublicProfileSchema(many=True).jsonify(models.PublicProfile.query.all())
 
-@blueprint.route('/slack_event')
+@blueprint.route('/slack_event', methods=['POST'])
 def slack_event():
-    print request.get_data()
-    return request.get_data()
-    # post = request.get_json()
-    # if post['token'] == app.config['SLACK_TOKEN']:
-    #     # for verification - see https://api.slack.com/events/url_verification
-    #     return post['challenge']
+    post = request.get_json()
+    if post['token'] == app.config['SLACK_TOKEN']:
+        # for verification - see https://api.slack.com/events/url_verification
+        return post['challenge']
