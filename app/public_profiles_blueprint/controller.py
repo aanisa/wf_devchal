@@ -13,6 +13,6 @@ def index():
 def slack_event():
     post = request.get_json()
     print post
-    if post['token'] == app.config['SLACK_TOKEN']:
+    if post['token'] == app.config['SLACK_VERIFICATION_TOKEN']:
         # for verification - see https://api.slack.com/events/url_verification
         return post['challenge']

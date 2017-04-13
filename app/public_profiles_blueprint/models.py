@@ -14,7 +14,7 @@ class Base(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
 def slack_api(method, arguments = {}):
-    url = "https://slack.com/api/{0}?token={1}&{2}".format(method, app.config['SLACK_TOKEN'], urllib.urlencode(arguments))
+    url = "https://slack.com/api/{0}?token={1}&{2}".format(method, app.config['SLACK_API_TOKEN'], urllib.urlencode(arguments))
     while True:
         response = requests.get(url)
         if response.status_code == 429:
