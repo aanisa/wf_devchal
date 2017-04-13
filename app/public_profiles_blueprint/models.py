@@ -37,7 +37,6 @@ class PublicProfile(Base):
     def create_for(cls, slack_id):
         slack_profile = slack_api("users.profile.get", {"user": slack_id})["profile"]
         if slack_profile.get("fields") and slack_profile.get("fields").get("Xf4XRDP22E",{}).get("value") == "Yes":
-            print slack_profile
             return PublicProfile(
                 slack_id  = slack_id,
                 name      = slack_profile.get("real_name"),
