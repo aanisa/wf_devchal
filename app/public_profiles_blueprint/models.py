@@ -51,9 +51,10 @@ class PublicProfile(Base):
     def seed_from_slack(cls):
         user_list = slack_api("users.list")["members"]
         for user in user_list:
-            profile = PublicProfile.create_for(user['id'])
-            if profile:
-                db.session.add(profile)
+            if not user['deleted']:
+                profile = PublicProfile.create_for(user['id'])
+                if profile:
+                    db.session.add(profile)
         db.session.commit()
 
     # update isn't exactly correct; can also include delete and create; handles case where was public now private
