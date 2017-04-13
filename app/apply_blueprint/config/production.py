@@ -1,5 +1,6 @@
 import os
 import re
+import copy
 
 TRANSPARENT_CLASSROOM_BASE_URL = "https://www.transparentclassroom.com"
 
@@ -203,5 +204,5 @@ HUBS = {
     }
 }
 
-HUBS['SANDBOX'] = HUBS['CAMBRIDGE']
+HUBS['SANDBOX'] = copy.deepcopy(HUBS['CAMBRIDGE'])
 HUBS['SANDBOX']['TRANSPARENT_CLASSROOM_API_TOKEN'] = os.environ['TRANSPARENT_CLASSROOM_API_TOKEN_SANDBOX']
