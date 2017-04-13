@@ -11,8 +11,8 @@ def index():
 
 @blueprint.route('/slack_event', methods=['POST'])
 def slack_event():
-    print request.get_data()
     post = request.get_json()
     if post['token'] == app.config['SLACK_VERIFICATION_TOKEN']:
-        # for verification - see https://api.slack.com/events/url_verification - return post['challenge']
-        return "Ok"
+        # for verification - see https://api.slack.com/events/url_verification -> return post['challenge']
+        models.PublicProfile.update_profile_from_slack_event(post['event']['user'])
+    return "Ok"
