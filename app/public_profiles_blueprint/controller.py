@@ -7,7 +7,7 @@ blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 @blueprint.route('/')
 def index():
-    return models.PublicProfileSchema(many=True).jsonify(models.PublicProfile.query.all())
+    return models.PublicProfileSchema(many=True).jsonify(models.PublicProfile.query.order_by(models.PublicProfile.name).all())
 
 @blueprint.route('/slack_event', methods=['POST'])
 def slack_event():
