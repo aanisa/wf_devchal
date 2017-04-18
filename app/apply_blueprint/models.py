@@ -201,7 +201,7 @@ class Application(object):
 
     def is_empty(self, obj):
         if isinstance(obj, list):
-            for item in list:
+            for item in obj:
                 if not self.is_empty(item):
                     return False
         elif isinstance(obj, Application.Answer):
