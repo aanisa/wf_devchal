@@ -29,21 +29,19 @@ class PublicProfile(Base):
     slack_id      = db.Column(db.String(120))
     name          = db.Column(db.String(120))
     role          = db.Column(db.String(120))
-    img_url       = db.Column(db.String(120))
-    link_url      = db.Column(db.String(120))
-    link_text     = db.Column(db.String(120))
+    img_url       = db.Column(db.String(256))
+    bio           = db.Column(db.String(256))
 
     @classmethod
     def create_for(cls, slack_id):
         slack_profile = slack_api("users.profile.get", {"user": slack_id})["profile"]
-        if slack_profile.get("fields") and slack_profile.get("fields").get("Xf4XRDP22E",{}).get("value") == "Yes":
+        if slack_profile.get("fields") and len(slack_profile.get("fields").get("Xf4ZLD1W8Z",{}).get("value", "")) > 0:
             return PublicProfile(
                 slack_id  = slack_id,
                 name      = slack_profile.get("real_name"),
                 role      = slack_profile.get("title"),
                 img_url   = slack_profile.get("image_512"),
-                link_url  = slack_profile.get("fields").get("Xf4XSVFQ1K", {}).get("value"),
-                link_text = slack_profile.get("fields").get("Xf4XSVFQ1K", {}).get("alt")
+                bio       = slack_profile.get("fields").get("Xf4ZLD1W8Z").get("value")
             )
         return None
 
