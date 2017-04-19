@@ -2,8 +2,10 @@ from flask import Blueprint, Response, request
 from app import app
 import models
 import os
+from flask_cors import CORS, cross_origin
 
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
+CORS(blueprint)
 
 @blueprint.route('/')
 def index():

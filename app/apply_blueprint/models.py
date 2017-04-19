@@ -1,4 +1,4 @@
-from app import app, db, mail
+from app import app, db
 import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
@@ -15,7 +15,16 @@ import re
 from nltk.stem import WordNetLemmatizer
 import sys
 import itertools
+from flask_mail import Mail, Message
 
+class MailWithLogging(Mail):
+    def send(self, message):
+        app.logger.critical(message)
+        super(Mail, self).send(message)
+
+mail = MailWithLogging(app)
+
+# mail = Mail(app)
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 class Base(db.Model):

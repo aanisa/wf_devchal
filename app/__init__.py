@@ -2,29 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
-from flask_mail import Mail, Message
-from flask_marshmallow import Marshmallow
-from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-
-CORS(app)
 
 app.config.from_object('config.default')
 app.config.from_object("config.{0}".format(os.environ['APP_CONFIG_MODE']))
 
-mail = Mail(app)
-
-# class MailWithLogging(Mail):
-#     def send(self, message):
-#         app.logger.critical(message)
-#         super(Mail, self).send(message)
-#
-# mail = MailWithLogging(app)
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-ma = Marshmallow(app)
 
 for f in [f for f in os.listdir(os.path.dirname(os.path.realpath(__file__)))]:
     if f.find("_blueprint") >= 0:

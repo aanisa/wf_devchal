@@ -6,12 +6,14 @@ Global Heroku config/env vars:
 
 
 TODO:
-  Automatically prefix table names in blueprints (flask_sqlalchemy is causing problems)
-  Config is still a global namspace; isolate each blueprint's config
   Add flask cli command to create scaffolding blueprint w. empty req'd files
-  blueprint_name in tests feels leaky
-  requirements.txt in the blueprints, composited to root
-  webpack config in the blueprints, composited to root
   post_compile in the blueprints, composited to root
+  requirements.txt in the blueprints, composited to root
+
+
+  Automatically prefix table names in blueprints (flask_sqlalchemy is causing problems)
+  blueprint_name in tests feels leaky
+  webpack config in the blueprints, composited to root
   nltk_data dir in root is leaky
-  make 500 global and apply everywhere
+  Config is still a global namspace; isolate each blueprint's config
+  make 500 global and apply everywhere -  maybe copy template when create, update email

@@ -1,11 +1,13 @@
-from app import app, db, ma
+from app import app, db
 import os
 import sqlalchemy.orm
 import urllib
 import requests
 import time
+from flask_marshmallow import Marshmallow
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
+ma = Marshmallow(app)
 
 class Base(db.Model):
     __abstract__  = True
