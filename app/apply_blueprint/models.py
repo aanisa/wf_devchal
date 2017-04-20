@@ -264,13 +264,13 @@ class Application(object):
                 for prospective_school in School.query.filter_by(hub=self.response.hub).all():
                     if child_school.lower().find(prospective_school.match.lower()) >= 0:
                         schools.append(prospective_school)
-                message = {
-                    "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
-                    "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
-                    "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                    "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
-                }
-                mail.send(Message(**message))
+            message = {
+                "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
+                "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
+                "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
+                "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
+            }
+            mail.send(Message(**message))
 
     def email_parent(self):
         schools = []
