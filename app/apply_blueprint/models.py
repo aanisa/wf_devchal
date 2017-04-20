@@ -1,10 +1,7 @@
 from app import app, db
-import sqlalchemy.orm
 from functools32 import lru_cache
 import datetime
 import requests
-from combomethod import combomethod
-import inspect
 import dateutil.parser
 import dateutil.relativedelta
 import os
@@ -13,18 +10,16 @@ from flask import render_template
 import json
 import re
 from nltk.stem import WordNetLemmatizer
-import sys
-import itertools
 from flask_mail import Mail, Message
 
-class MailWithLogging(Mail):
-    def send(self, message):
-        app.logger.critical(message)
-        super(Mail, self).send(message)
+# class MailWithLogging(Mail):
+#     def send(self, message):
+#         app.logger.critical(message)
+#         super(Mail, self).send(message)
+#
+# mail = MailWithLogging(app)
 
-mail = MailWithLogging(app)
-
-# mail = Mail(app)
+mail = Mail(app)
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 class Base(db.Model):
@@ -48,7 +43,7 @@ class School(Base):
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
     # the http library uses stdout for logging, not the logger, so you can't
-    # reasonably filter it's output; having *all* the headers is too much
+    # reasonably filter its output; having *all* the headers is too much
     # consequently, I'm subclassing the request library and having the get
     # method (the only one I'm currently using) do the logging
     class Session(requests.Session):
