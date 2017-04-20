@@ -12,10 +12,10 @@ name = path.split("/")[-1]
 
 @app.cli.group(name = name)
 def cli():
-    """Namespace for blueprint"""
+    """commands for blueprint"""
     pass
 
-@app.cli.command("seed_from_csvs")
+@cli.command("seed_from_csvs")
 def seed_from_csvs():
     """Seed from CSV"""
     seeds = []
