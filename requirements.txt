@@ -15,3 +15,4 @@ Flask-Mail
 # marshmallow-sqlalchemy
 flask-cors
 nltk
+boto3

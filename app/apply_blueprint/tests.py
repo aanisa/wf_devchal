@@ -1,7 +1,7 @@
 import unittest
 import models
 import flask
-from app import app, db, mail
+from app import app, db
 import os
 import cli
 from click.testing import CliRunner
@@ -14,7 +14,7 @@ class TestCase(unittest.TestCase):
         db.session.commit() # fixes hang - see http://stackoverflow.com/questions/24289808/drop-all-freezes-in-flask-with-sqlalchemy
         db.drop_all()
         db.create_all()
-        r = CliRunner().invoke(cli.seed)
+        r = CliRunner().invoke(cli.seed_from_csvs)
         if r.exception: raise r.exception
         self.guid = models.SurveyMonkey.Response.responses("sandbox", "foo")["data"][0]["custom_variables"]["response_guid"]
 
@@ -38,7 +38,7 @@ class TestCase(unittest.TestCase):
         self.assertIsInstance(application.children[0].answers, list)
         application.submit_to_transparent_classroom()
         with app.app_context():
-            with mail.record_messages() as outbox:
+            with models.mail.record_messages() as outbox:
                 application.email_schools()
                 i = len(outbox)
                 self.assertGreater(i, 0)

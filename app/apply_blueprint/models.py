@@ -6,11 +6,12 @@ import dateutil.parser
 import dateutil.relativedelta
 import os
 from flask_mail import Message
-from flask import render_template
+from flask import render_template_string
 import json
 import re
 from nltk.stem import WordNetLemmatizer
 from flask_mail import Mail, Message
+import boto3
 
 # class MailWithLogging(Mail):
 #     def send(self, message):
@@ -36,7 +37,6 @@ class School(Base):
     match = db.Column(db.String(120))
     schedule_parent_teacher_conversation_url = db.Column(db.String(120))
     schedule_parent_observation_url = db.Column(db.String(120))
-    email_parent_template = db.Column(db.String(120))
     email = db.Column(db.String(120))
     hub = db.Column(db.String(120))
 
@@ -183,9 +183,8 @@ class Application(object):
                 return "\n".join(self.value)
             return self.value
 
-    def snake_case_name(self, name):
-        name = name.lower()
-        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    def snake_case(self, s):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
     def model_factory(self, key):
@@ -238,7 +237,7 @@ class Application(object):
                     value = self.add(item[key], key)
                     # should this be if not self.is_empty(value) ?
                     if value:
-                        setattr(model, self.snake_case_name(key), value)
+                        setattr(model, self.snake_case(key), value)
                 return model
         elif isinstance(item, list):
             lst = []
@@ -268,7 +267,7 @@ class Application(object):
                 "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
                 "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
                 "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
+                "html": render_template_string("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
             }
             mail.send(Message(**message))
 
@@ -283,13 +282,25 @@ class Application(object):
                     if child_school.lower().find(prospective_school.match.lower()) >= 0:
                         if prospective_school not in schools: # only send one email per school, even if parent has 2+ kids applying to same school
                             schools.append(prospective_school)
+
+        s3 = boto3.client('s3')
+
+        template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/default.html")['Body'].read().decode('utf-8')
+
         for school in schools:
+            try:
+                s3_template_path = "email-templates/{0}/{1}.html".format(school.hub, school.name)
+                print s3_template_path
+                template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/{0}/{1}.html".format(school.hub, school.name))['Body'].read().decode('utf-8')
+            except Exception as e:
+                pass
             message = {
                 "subject": "Next steps for your application to {0}".format(school.name),
                 "sender": school.email,
                 "recipients": ["{0} {1} <{2}>".format(self.parents[0].first_name, self.parents[0].last_name, self.parents[0].email)],
                 "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template("{0}.html".format(school.email_parent_template or "email_parent"), school=school, children=self.children)
+                "html": render_template_string(template_string, school=school, children=self.children)
+                # don't use render template, use render_string or whatever
             }
             mail.send(Message(**message))
 
