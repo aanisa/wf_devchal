@@ -16,7 +16,7 @@ class TestCase(unittest.TestCase):
         db.create_all()
         r = CliRunner().invoke(cli.seed_from_csvs)
         if r.exception: raise r.exception
-        self.guid = models.SurveyMonkey.Response.responses("sandbox", "foo")["data"][0]["custom_variables"]["response_guid"]
+        self.guid = "1a2ca5c5-133e-4fb1-9829-b8f9f208184b" #models.SurveyMonkey.Response.responses("sandbox", "foo")["data"][0]["custom_variables"]["response_guid"]
 
     def test_survey(self):
         s = models.SurveyMonkey.Survey("sandbox")

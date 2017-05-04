@@ -120,7 +120,7 @@ class SurveyMonkey(object):
         @classmethod
         @lru_cache(maxsize=None)
         def responses(cls, hub, key): # important to have the key for the caching to work properly
-            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config['HUBS'][hub.upper()]['SURVEY_MONKEY_SURVEY_ID']),  params={'sort_order': 'DESC'}).json()
+            return SurveyMonkey.request_session.get("https://api.surveymonkey.net/v3/surveys/{0}/responses/bulk".format(app.config['HUBS'][hub.upper()]['SURVEY_MONKEY_SURVEY_ID']), params={'sort_order': 'DESC'}).json()
 
         def __init__(self, hub, guid=None, email=None):
             self.hub = hub
@@ -290,7 +290,6 @@ class Application(object):
         for school in schools:
             try:
                 s3_template_path = "email-templates/{0}/{1}.html".format(school.hub, school.name)
-                print s3_template_path
                 template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/{0}/{1}.html".format(school.hub, school.name))['Body'].read().decode('utf-8')
             except Exception as e:
                 pass
