@@ -3,12 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 import importlib
-import cli
 
 app = Flask(__name__)
 
 app.config.from_object('config.default')
 app.config.from_object("config.{0}".format(os.environ['APP_CONFIG_MODE']))
+
+import cli # import after app defined
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
