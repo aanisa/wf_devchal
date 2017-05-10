@@ -15,7 +15,18 @@ class UI extends React.Component {
     var that = this;
     fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
-        return response.text()
+        if (response.status == 404) {
+          fetch(thisUrl + "/../../email_template?tc_api_token=" + tc.env.userApiToken)
+            .then(function(response) {
+              return response.text();
+            }).then(function(text) {
+              that.setState({value: text});
+            }).catch(function(ex) {
+              alert('failed:' + ex);
+            })
+        } else {
+          return response.text();
+        }
       }).then(function(text) {
         that.setState({value: text});
       }).catch(function(ex) {
@@ -30,7 +41,7 @@ class UI extends React.Component {
     var that = this;
     fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
-        return response.json()
+        return response.json();
       }).then(function(json) {
         var f  = new FormData();
         for (var k in json.fields) {
@@ -53,11 +64,18 @@ class UI extends React.Component {
         alert('failed:' + ex);
       })
   }
+  keyDown(e) {
+    if (e.metaKey && e.keyCode == 83) {
+      this.save(e);
+      e.preventDefault();
+      return false;
+    }
+  }
   render() {
     return (
       <div>
         <b>Parent Email Template</b><br/>
-        <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)}></textarea><br/>
+        <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
         <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
       </div>
     )

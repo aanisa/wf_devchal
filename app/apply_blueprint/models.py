@@ -45,6 +45,16 @@ class School(Base):
     def s3_template_path(self):
         return "email-templates/{0}/{1}.html".format(self.hub, self.name)
 
+    @classmethod
+    def default_email_template_get_url(cls):
+        s3 = boto3.client('s3')
+        return s3.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': app.config['S3_BUCKET'],
+                'Key': "email-templates/default.html"
+            }
+        )
 
     def email_template_get_url(self):
         s3 = boto3.client('s3')
