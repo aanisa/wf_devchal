@@ -12,6 +12,7 @@ import re
 from nltk.stem import WordNetLemmatizer
 from flask_mail import Mail, Message
 import boto3
+import botocore.client
 
 # class MailWithLogging(Mail):
 #     def send(self, message):
@@ -39,6 +40,25 @@ class School(Base):
     schedule_parent_observation_url = db.Column(db.String(120))
     email = db.Column(db.String(120))
     hub = db.Column(db.String(120))
+
+    @property
+    def s3_template_path(self):
+        return "email-templates/{0}/{1}.html".format(self.hub, self.name)
+
+
+    def email_template_get_url(self):
+        s3 = boto3.client('s3')
+        return s3.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': app.config['S3_BUCKET'],
+                'Key': self.s3_template_path
+            }
+        )
+
+    def email_template_post_parameters(self):
+        s3 = boto3.client('s3', config=botocore.client.Config(signature_version='s3v4'))
+        return s3.generate_presigned_post(Bucket=app.config['S3_BUCKET'], Key=self.s3_template_path)
 
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
@@ -289,8 +309,7 @@ class Application(object):
 
         for school in schools:
             try:
-                s3_template_path = "email-templates/{0}/{1}.html".format(school.hub, school.name)
-                template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/{0}/{1}.html".format(school.hub, school.name))['Body'].read().decode('utf-8')
+                template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key=school.s3_template_path)['Body'].read().decode('utf-8')
             except Exception as e:
                 pass
             message = {

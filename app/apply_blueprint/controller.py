@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, jsonify
 import models
 from app import app, db
 import os
 from flask_mail import Message
 import traceback
+from flask_cors import CORS, cross_origin
 
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
 
@@ -34,3 +35,30 @@ def after_survey_monkey():
     application.email_schools()
     application.email_parent()
     return render_template('after_survey_monkey.html', application=application)
+
+@blueprint.route('/email_template')
+@cross_origin()
+def email_template():
+    # TODO authenticate request; take token as param and use TC API
+    tc_school_id = request.args.get("tc_school_id")
+    school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
+    return redirect(school.email_template_get_url())
+
+@blueprint.route('/email_template_post_parameters')
+@cross_origin()
+def email_template_post_parameters():
+    # TODO authenticate request; take token as param and use TC API
+    tc_school_id = request.args.get("tc_school_id")
+    school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
+    return jsonify(school.email_template_post_parameters())
+
+# curl \
+# -v \
+# -F "key=email-templates/cambridge/Aster Montessori School.html" \
+# -F "policy=eyJjb25kaXRpb25zIjogW3siYnVja2V0IjogIndmLWFwcGxpY2F0aW9uLXV0aWxpdHkifSwgeyJrZXkiOiAiZW1haWwtdGVtcGxhdGVzL2NhbWJyaWRnZS9Bc3RlciBNb250ZXNzb3JpIFNjaG9vbC5odG1sIn0sIHsieC1hbXotYWxnb3JpdGhtIjogIkFXUzQtSE1BQy1TSEEyNTYifSwgeyJ4LWFtei1jcmVkZW50aWFsIjogIkFLSUFJSkVXTko2T0pQQ0ZRQ09BLzIwMTcwNTA1L3VzLWVhc3QtMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMTcwNTA1VDE5MDk1N1oifV0sICJleHBpcmF0aW9uIjogIjIwMTctMDUtMDVUMjA6MDk6NTdaIn0=" \
+# -F "x-amz-algorithm=AWS4-HMAC-SHA256" \
+# -F "x-amz-credential=AKIAIJEWNJ6OJPCFQCOA/20170505/us-east-1/s3/aws4_request" \
+# -F "x-amz-date=20170505T190957Z" \
+# -F  "x-amz-signature=4abd7ef930ac7af1c4be4f825fb4a29f0850fb77fe1b59fb1d23da081d5afa1f" \
+# -F "file=@template.html" \
+# https://wf-application-utility.s3.amazonaws.com/
