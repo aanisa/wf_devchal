@@ -11,7 +11,7 @@ var thisUrl = scripts[scripts.length-1].src;
 class UI extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: "" };
+    this.state = { value: "", label: "Save", disabled: false};
     var that = this;
     fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
@@ -26,46 +26,39 @@ class UI extends React.Component {
     this.setState({value: e.target.value});
   }
   save(e) {
+    this.setState({label: "Saving...", disabled: true})
     var that = this;
     fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
         return response.json()
       }).then(function(json) {
-
         var f  = new FormData();
         for (var k in json.fields) {
           f.append(k, json.fields[k]);
         }
-
         var b = new Blob([that.state.value], {type: "text/html"});
         f.append("file", b);
-
-        // "https://requestb.in/pcfczlpc"
-        // json.url
         fetch(json.url , {
            method: 'POST',
-          //  'Content-type', 'multipart/form-data'
-          //  headers: {'Content-Type': 'application/json'},
            body: f
          }).then(function(response) {
-
+           that.setState({label: "Saved"})
+           setTimeout(function() {
+             that.setState({label: "Save", disabled: false})
+           }, 3000)
          }).catch(function(ex) {
            alert('updating status failed:' + ex);
          })
-
       }).catch(function(ex) {
         alert('failed:' + ex);
       })
-
-    // change button to say saving, then saved, then back to save
-    // change colors of button to make it obvious
   }
   render() {
     return (
       <div>
         <b>Parent Email Template</b><br/>
         <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)}></textarea><br/>
-        <input type="button" value="Save" onClick={(e) => this.save(e)}/><br/>
+        <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
       </div>
     )
   }
