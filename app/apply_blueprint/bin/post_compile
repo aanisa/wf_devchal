@@ -9,5 +9,6 @@ if [ -f $BASEDIR/install_nltk_data ]; then
 fi
 
 echo "TEST"
+npm
 webpack
 echo "TEST"
