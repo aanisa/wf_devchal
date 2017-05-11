@@ -8,7 +8,8 @@
   "dependencies": {
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "promise-polyfill": "6.0.2"
+    "promise-polyfill": "6.0.2",
+    "babel-preset-es2015""6.24.1"
   },
   "scripts": {
     "start": "react-scripts start",
