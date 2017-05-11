@@ -9,4 +9,5 @@ if [ -f $BASEDIR/install_nltk_data ]; then
 fi
 
 cd $BASEDIR/../
+npm install
 webpack
