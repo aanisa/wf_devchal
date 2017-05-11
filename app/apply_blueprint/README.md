@@ -1,7 +1,14 @@
 Blueprint Heroku config/env vars:
 
-  heroku config:set survey_monkey_oauth_token=TBD
-  heroku config:set transparent_classroom_api_token=TBD
+  heroku config:set MAIL_USERNAME=TBD
+  heroku config:set MAIL_PASSWORD=TBD
+  heroku config:set NLTK_DATA=/app/nltk_data
+  heroku config:set SURVEY_MONKEY_OAUTH_TOKEN=TBD
+  heroku config:set TRANSPARENT_CLASSROOM_API_TOKEN_CAMBRIDGE=TBD
+  heroku config:set TRANSPARENT_CLASSROOM_API_TOKEN_SANDBOX=TBD
+  heroku config:set S3_BUCKET=wf-application-utility
+  heroku config:set AWS_ACCESS_KEY_ID=TBD
+  heroku config:set AWS_SECRET_ACCESS_KEY=TBD
 
 Update config map if changes to Survey Monkey or Transparent Classroom form
 
