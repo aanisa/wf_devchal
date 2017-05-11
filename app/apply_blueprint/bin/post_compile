@@ -8,6 +8,8 @@ if [ -f $BASEDIR/install_nltk_data ]; then
      $BASEDIR/install_nltk_data
 fi
 
+echo "-----> npm install & webpack"
+
 cd $BASEDIR/../
 npm install
 webpack
