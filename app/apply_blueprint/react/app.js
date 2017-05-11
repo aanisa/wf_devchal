@@ -83,11 +83,19 @@ class UI extends React.Component {
 }
 
 setTimeout(function(){
-  if (location.pathname.endsWith('application/parent_email')) {
-    document.title = 'Parent Email Template';
+  if (location.pathname.endsWith('application/parent_email_template')) {
+    document.title = 'Application: Parent Email Template';
     ReactDOM.render(
       <UI />,
       document.getElementById('foundation')
     );
   }
+
+  if (location.pathname.includes('/s/' + tc.env.currentSchoolId + '/schools/' + tc.env.currentSchoolId)) {
+    var div = document.createElement("div");
+    div.innerHTML = '<a href="/s/' + tc.env.currentSchoolId + '/networks/wf/application/parent_email_template">Online Application: Parent Email Template</a>'
+    var form = document.querySelector('#edit_school')
+    form.parentNode.insertBefore(div, form.nextSibling);
+  }
+
 }, 200);
