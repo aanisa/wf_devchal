@@ -13,7 +13,7 @@ class UI extends React.Component {
     super(props);
     this.state = { value: "", label: "Save", disabled: false};
     var that = this;
-    fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
+    fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId)
       .then(function(response) {
         if (response.status == 404) {
           fetch(thisUrl + "/../../email_template?tc_api_token=" + tc.env.userApiToken)

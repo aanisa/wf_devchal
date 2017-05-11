@@ -40,7 +40,6 @@ def after_survey_monkey():
 @blueprint.route('/email_template')
 @cross_origin()
 def email_template():
-    # TODO authenticate request; take token as param and use TC API
     tc_school_id = request.args.get("tc_school_id")
     if tc_school_id:
         school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
@@ -51,7 +50,9 @@ def email_template():
 @blueprint.route('/email_template_post_parameters')
 @cross_origin()
 def email_template_post_parameters():
-    # TODO authenticate request; take token as param and use TC API
-    tc_school_id = request.args.get("tc_school_id")
-    school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
-    return jsonify(school.email_template_post_parameters())
+    tc_api_token = request.args.get("tc_api_token")
+    tc_school_id = int(request.args.get("tc_school_id"))
+    if models.TransparentClassroom.authorized(tc_api_token, tc_school_id):
+        school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
+        return jsonify(school.email_template_post_parameters())
+    return 401

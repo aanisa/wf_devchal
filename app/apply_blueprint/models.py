@@ -333,6 +333,21 @@ class Application(object):
             mail.send(Message(**message))
 
 class TransparentClassroom(object):
+    @classmethod
+    def authorized(cls, tc_api_token, tc_school_id):
+        request_session = requests.session()
+        request_session.headers.update({
+            "X-TransparentClassroomToken": tc_api_token,
+            "Accept": "application/json",
+        })
+        response = request_session.get("{0}/api/v1/schools.json".format(app.config["TRANSPARENT_CLASSROOM_BASE_URL"]))
+        json = response.json()
+
+        if tc_school_id in [i["id"] for i in json]:
+            print "True!"
+            return True
+        return False
+
     def __init__(self, application):
         self.application = application
 
