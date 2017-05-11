@@ -10,5 +10,6 @@ fi
 
 echo "TEST"
 npm
+
 webpack
 echo "TEST"
