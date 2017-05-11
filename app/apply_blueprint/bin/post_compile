@@ -8,8 +8,5 @@ if [ -f $BASEDIR/install_nltk_data ]; then
      $BASEDIR/install_nltk_data
 fi
 
-echo "TEST"
-npm
-
+cd $BASEDIR/../
 webpack
-echo "TEST"
