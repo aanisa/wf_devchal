@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+BASEDIR=$(dirname "$0")
+
+if [ -f $BASEDIR/install_nltk_data ]; then
+    echo "-----> Running install_nltk_data"
+    chmod +x $BASEDIR/install_nltk_data
+     $BASEDIR/install_nltk_data
+fi

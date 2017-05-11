@@ -1,7 +1,3 @@
-TODO:
-  Menus
-
-
 Blueprint Heroku config/env vars:
 
   heroku config:set survey_monkey_oauth_token=TBD
