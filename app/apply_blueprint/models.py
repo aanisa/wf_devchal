@@ -344,7 +344,6 @@ class TransparentClassroom(object):
         json = response.json()
 
         if tc_school_id in [i["id"] for i in json]:
-            print "True!"
             return True
         return False
 
