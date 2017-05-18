@@ -91,9 +91,7 @@ setTimeout(function(){
     );
   }
 
-
-
-  if (location.pathname == '/s/' + tc.env.currentSchoolId + '/schools/' + tc.env.currentSchoolId + '?') {
+  if (location.pathname == '/s/' + tc.env.currentSchoolId + '/schools/' + tc.env.currentSchoolId) {
     var div = document.createElement("div");
     div.innerHTML = '<a href="/s/' + tc.env.currentSchoolId + '/networks/wf/application/parent_email_template">Online Application: Parent Email Template</a>'
     var form = document.querySelector('#edit_school')
