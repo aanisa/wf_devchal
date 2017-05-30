@@ -297,7 +297,7 @@ class Application(object):
                 "subject": "Application for {0} {1}".format(child.first_name, child.last_name),
                 "sender": "Wildflower Schools <noreply@wildflowerschools.org>",
                 "recipients": [s.email for s in schools] + ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
-                "html": render_template_string("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
+                "html": render_template("email_schools.html", application=self, child=child, survey=SurveyMonkey.Survey(self.response.hub.upper()))
             }
             mail.send(Message(**message))
 
