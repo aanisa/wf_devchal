@@ -6,7 +6,7 @@ import dateutil.parser
 import dateutil.relativedelta
 import os
 from flask_mail import Message
-from flask import render_template_string
+from flask import render_template, render_template_string
 import json
 import re
 from nltk.stem import WordNetLemmatizer
