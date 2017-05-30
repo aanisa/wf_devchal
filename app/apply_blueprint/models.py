@@ -315,9 +315,10 @@ class Application(object):
 
         s3 = boto3.client('s3')
 
-        template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/default.html")['Body'].read().decode('utf-8')
+        default_template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/default.html")['Body'].read().decode('utf-8')
 
         for school in schools:
+            template_string = default_template_string
             try:
                 template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key=school.s3_template_path)['Body'].read().decode('utf-8')
             except Exception as e:
@@ -328,7 +329,6 @@ class Application(object):
                 "recipients": ["{0} {1} <{2}>".format(self.parents[0].first_name, self.parents[0].last_name, self.parents[0].email)],
                 "bcc": ['dan.grigsby@wildflowerschools.org', 'cam.leonard@wildflowerschools.org'],
                 "html": render_template_string(template_string, school=school, children=self.children)
-                # don't use render template, use render_string or whatever
             }
             mail.send(Message(**message))
 
