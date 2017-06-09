@@ -1,40 +1,39 @@
 # -*- coding: utf-8 -*-
 
+from app import app, db
 import boto3
-from app import app
-from flask_oauthlib.client import OAuth
+import os
+
+tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
+
+class Base(db.Model):
+    __abstract__  = True
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+class AuthenticationTokens(Base):
+    __tablename__ = "{0}_authentication_tokens".format(tablename_prefix)
+    company_id = db.Column(db.BigInteger)
+    oauth_token = db.Column(db.String(120))
+    oauth_token_secret = db.Column(db.String(120))
+
+def store_authentication_tokens(tokens, company_id):
+    authorization_tokens = AuthenticationTokens.query.filter_by(company_id=company_id).first()
+    if authorization_tokens is None:
+        authorization_tokens = AuthenticationTokens(company_id=company_id)
+    authorization_tokens.oauth_token = tokens['oauth_token']
+    authorization_tokens.oauth_token_secret = tokens['oauth_token_secret']
+    db.session.add(authorization_tokens)
+    db.session.commit()
 
 def charts_of_accounts(path):
     bucket = boto3.resource('s3').Bucket(app.config['QBO_S3_BUCKET'])
     result = bucket.meta.client.list_objects(Bucket=bucket.name, Prefix=path, Delimiter="/")
-
     objects = {}
-
     for o in result.get("CommonPrefixes", {}):
         objects[o.get("Prefix").split('/')[-2] + "/"] = u'📁'
-
     for o in result.get("Contents", {}):
         if o.get("Key") != path:
             objects[o.get("Key").split('/')[-1]] = u'🌱'
-
     return objects
-
-oauth = OAuth()
-qbo = oauth.remote_app(
-    'qbo',
-    request_token_url = 'https://oauth.intuit.com/oauth/v1/get_request_token',
-    access_token_url  = 'https://oauth.intuit.com/oauth/v1/get_access_token',
-    authorize_url     = 'https://appcenter.intuit.com/Connect/Begin',
-    consumer_key      = app.config['QBO_CONSUMER_KEY'],
-    consumer_secret   = app.config['QBO_CONSUMER_SECRET']
-)
-
-@qbo.tokengetter
-def get_qbo_token():
-    # return resp['oauth_token'], resp['oauth_token_secret']
-    print "get_qbo_token"
-
-def store_credentials(resp, realm_id):
-    # if realm_id is already there then delete
-
-    # insert
