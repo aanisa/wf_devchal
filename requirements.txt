@@ -16,3 +16,4 @@ Flask-Mail
 flask-cors
 nltk
 boto3
+Flask-OAuthlib

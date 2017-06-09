@@ -4,9 +4,7 @@ import copy
 
 TRANSPARENT_CLASSROOM_BASE_URL = "https://www.transparentclassroom.com"
 SURVEY_MONKEY_OAUTH_TOKEN=os.environ['SURVEY_MONKEY_OAUTH_TOKEN']
-AWS_ACCESS_KEY_ID=os.environ['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY=os.environ['AWS_SECRET_ACCESS_KEY']
-S3_BUCKET=os.environ['S3_BUCKET']
+APPLY_S3_BUCKET=os.environ['APPLY_S3_BUCKET']
 
 HUBS = {
     'CAMBRIDGE': {

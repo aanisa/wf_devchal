@@ -1,0 +1,5 @@
+import os
+
+QBO_S3_BUCKET = os.environ['QBO_S3_BUCKET']
+QBO_CONSUMER_KEY = os.environ['QBO_CONSUMER_KEY']
+QBO_CONSUMER_SECRET = os.environ['QBO_CONSUMER_SECRET']
