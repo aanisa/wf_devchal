@@ -1,12 +1,29 @@
-Global Heroku config/env vars:
+# Wildflower Foundation Dev Challenge
 
-  heroku config:set APP_CONFIG_MODE=production
-  heroku config:set MAIL_USERNAME=TBD
-  heroku config:set MAIL_PASSWORD=TBD
+### Goal: Build UI for email template used by teachers 
+
+## Set-up
+* Fork Repo
+* Create Local Repo
+* `git pull origin master`
+* `npm install`
+* `brew install python` - there is issues with using local python
+* `cd ..` - go one direcoty up
+* `virtualenv [repo name]` - istall virtual env into project Repo
+* `pip install -r requirements.txt` - Install Dependencies
 
 
-TODO:
-  set tablename_prefix and blueprint_name in __init
+
+
+## Global Heroku config/env vars:
+
+  - heroku config:set APP_CONFIG_MODE=production
+  - heroku config:set MAIL_USERNAME=TBD
+  - heroku config:set MAIL_PASSWORD=TBD
+
+
+## TODO:
+  - set tablename_prefix and blueprint_name in __init
 
 
   Add flask cli command to create scaffolding blueprint w. empty req'd files
