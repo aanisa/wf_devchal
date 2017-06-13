@@ -1,15 +1,8 @@
-<html>
-  <style>
-    * {
-      font-family: monospace;
-    }
-    a {
-      text-decoration: none;
-    }
-  </style>
-  <body>
-    {% for o in objects|dictsort %}
-      <a href="{{ o[0] }}">{{o[1]}} {{ o[0] }}</a><br>
-    {% endfor %}
-  </body>
-</html>
+{% extends "qbo_layout.html" %}
+{% block body %}
+
+{% for o in objects|dictsort %}
+  <a href="{{ o[0] }}">{{o[1]}} {{ o[0] }}</a><br>
+{% endfor %}
+
+{% endblock %}

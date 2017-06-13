@@ -37,4 +37,8 @@ prefix = "charts_of_accounts/"
 @blueprint.route("/{0}".format(prefix), defaults={'path': ""})
 @blueprint.route("/{0}<path:path>".format(prefix))
 def charts_of_accounts(path):
-    return render_template('charts_of_accounts.html', objects = models.charts_of_accounts("{0}{1}".format(prefix, path)))
+    if path[-5:] == ".json":
+        models.set_chart_of_accounts(path)
+        return render_template('chart_of_accounts_set.html')
+    else:
+        return render_template('charts_of_accounts.html', objects = models.charts_of_accounts("{0}{1}".format(prefix, path)))

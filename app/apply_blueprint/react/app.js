@@ -7,7 +7,6 @@ import 'whatwg-fetch'
 var scripts = document.getElementsByTagName("script");
 var thisUrl = scripts[scripts.length-1].src;
 
-
 class UI extends React.Component {
   constructor(props) {
     super(props);

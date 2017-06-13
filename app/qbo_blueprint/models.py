@@ -37,3 +37,6 @@ def charts_of_accounts(path):
         if o.get("Key") != path:
             objects[o.get("Key").split('/')[-1]] = u'🌱'
     return objects
+
+def set_chart_of_accounts(path):
+    pass
