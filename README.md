@@ -1,6 +1,6 @@
 # Wildflower Foundation Dev Challenge
 
-### Goal: Build UI for email template used by teachers 
+### Goal: Build UI for email template used by teachers
 
 ## Set-up
 * Fork Repo
@@ -8,8 +8,7 @@
 * `git pull origin master`
 * `npm install`
 * `brew install python` - there is issues with using local python
-* `cd ..` - go one direcoty up
-* `virtualenv [repo name]` - istall virtual env into project Repo
+* `virtualenv [repo name]` - install virtual env into project Repo
 * `pip install -r requirements.txt` - Install Dependencies
 
 
