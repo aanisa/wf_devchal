@@ -10,6 +10,7 @@
 * `brew install python` - there is issues with using local python
 * `virtualenv [repo name]` - install virtual env into project Repo
 * `pip install -r requirements.txt` - Install Dependencies
+* `source venv/bin/activate` - activate virtual environment
 
 
 
