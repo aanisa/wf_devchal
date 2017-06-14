@@ -1,2 +1,3 @@
 Blueprint Heroku config/env vars:
-  heroku config:set QBO_S3_BUCKET=wf-qbo-utility
+  heroku config:set GSUITE_APIS_CLIENT_ID=TBD
+  heroku config:set GSUITE_APIS_CLIENT_SECRET=TBD
