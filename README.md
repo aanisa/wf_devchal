@@ -32,7 +32,9 @@ Export the following variables with their assigned values
 * `export SLACK_API_TOKEN`
 * `export SLACK_VERIFICATION_TOKEN`
 
-* `flask run`
+* `npm install webpack -g`
+* `flask run`or `bash flask.sh run` - to run server
+* open http://localhost:5000/apply/static/bundle.js
 
 
 ## Global Heroku config/env vars:

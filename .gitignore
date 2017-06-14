@@ -95,3 +95,5 @@ ENV/
 bundle.js
 
 node_modules
+
+notes.md

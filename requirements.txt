@@ -11,8 +11,8 @@ functools32
 combomethod
 python-dateutil
 Flask-Mail
-# flask-marshmallow
-# marshmallow-sqlalchemy
+flask-marshmallow
+marshmallow-sqlalchemy
 flask-cors
 nltk
 boto3
