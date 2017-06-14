@@ -12,9 +12,22 @@
 * `pip install -r requirements.txt` - Install Dependencies
 * `source venv/bin/activate` - activate virtual environment
 *  `export FLASK_APP=app/__init__.py`
-* `flask run` 
 
 
+Export the following variables with their assigned values
+* `export APP_CONFIG_MODE`
+* `export MAIL_USERNAME`
+* `export MAIL_PASSWORD`
+* `export SURVEY_MONKEY_OAUTH_TOKEN`
+* `export AWS_ACCESS_KEY_ID`
+* `export AWS_SECRET_ACCESS_KEY`
+* `export S3_BUCKET`
+* `export TRANSPARENT_CLASSROOM_API_TOKEN_CAMBRIDGE`
+* `export TRANSPARENT_CLASSROOM_API_TOKEN_SANDBOX`
+* `export SLACK_API_TOKEN`
+* `export SLACK_VERIFICATION_TOKEN`
+
+* `flask run`
 
 
 ## Global Heroku config/env vars:
