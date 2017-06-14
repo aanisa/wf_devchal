@@ -17,7 +17,7 @@ Install Pip - Run these commands
 * `virtualenv [name dir]` - install virtual env into project Repo
 * `pip install -r requirements.txt` - Install Dependencies
 *  `export FLASK_APP=app/__init__.py`
-
+* `export APP_CONFIG_MODE=development`
 
 Export the following variables with their assigned values
 * `export APP_CONFIG_MODE`
