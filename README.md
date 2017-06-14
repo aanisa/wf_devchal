@@ -33,6 +33,7 @@ Export the following variables with their assigned values
 * `export SLACK_VERIFICATION_TOKEN`
 
 * `npm install webpack -g`
+* `webpack react/app.js static/bundle.js` - run webpack and create bundle.js file
 * `flask run`or `bash flask.sh run` - to run server
 * open http://localhost:5000/apply/static/bundle.js
 
