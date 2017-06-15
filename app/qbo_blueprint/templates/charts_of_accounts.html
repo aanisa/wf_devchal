@@ -1,8 +1,16 @@
 {% extends "qbo_layout.html" %}
 {% block body %}
 
-{% for o in objects|dictsort %}
-  <a href="{{ o[0] }}">{{o[1]}} {{ o[0] }}</a><br>
+{% for f in files %}
+  {% if f.mimeType == "application/vnd.google-apps.folder" %}
+    <a href="{{ url_for(blueprint_name + ".charts_of_accounts", id = f.id)}}"> 📁
+  {% elif f.mimeType == "application/vnd.google-apps.spreadsheet" %}
+    <a href="{{ url_for(blueprint_name + ".set_chart_of_accounts", id = f.id) }}"> 🌱
+  {% endif %}
+  {{ f.name }}
+  </a>
+  <br>
+
 {% endfor %}
 
 {% endblock %}

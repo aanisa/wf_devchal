@@ -2,8 +2,6 @@
 
 from app import app, db
 import os
-import httplib2
-from apiclient import discovery
 
 tablename_prefix = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
@@ -27,22 +25,6 @@ def store_authentication_tokens(tokens, company_id):
     authorization_tokens.oauth_token_secret = tokens['oauth_token_secret']
     db.session.add(authorization_tokens)
     db.session.commit()
-
-def charts_of_accounts(credentials, path):
-    http_auth = credentials.authorize(httplib2.Http())
-    drive = discovery.build('drive', 'v2', http_auth)
-    files = drive.files().list().execute()
-    print files
-
-    # bucket = boto3.resource('s3').Bucket(app.config['QBO_S3_BUCKET'])
-    # result = bucket.meta.client.list_objects(Bucket=bucket.name, Prefix=path, Delimiter="/")
-    # objects = {}
-    # for o in result.get("CommonPrefixes", {}):
-    #     objects[o.get("Prefix").split('/')[-2] + "/"] = u'📁'
-    # for o in result.get("Contents", {}):
-    #     if o.get("Key") != path:
-    #         objects[o.get("Key").split('/')[-1]] = u'🌱'
-    # return objects
 
 def set_chart_of_accounts(path):
     pass
