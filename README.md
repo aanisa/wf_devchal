@@ -41,10 +41,16 @@ Stunnel
 * `brew install stunnel`
 * Create stunnel.pem file in root directory
 * Generate SSL Keys and Certificates
-     `openssl genrsa -out key.pem 2048
-      openssl req -new -x509 -key key.pem -out cert.pem -days 1095` -> fill out
+  -   `openssl genrsa -out key.pem 2048
+      openssl req -new -x509 -key key.pem -out cert.pem -days 1095`
+  - Fill out form
 * copy key.pem and cert.pem to etc/stunnel
-      `cat key.pem cert.pem  > etc/stunnel/stunnel.pem`
+    -  `cat key.pem cert.pem  > etc/stunnel/stunnel.pem`
+
+* Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf`
+* Re-Start Server: `bash flask.sh run`
+
+
 
 ## Global Heroku config/env vars:
 
