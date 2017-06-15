@@ -38,6 +38,8 @@ Export the following variables with their assigned values
 * open http://localhost:5000/apply/static/bundle.js - should see bundle.js script
 
 Stunnel
+* `brew install stunnel`
+* Create stunnel.pem file in root directory
 * Generate SSL Keys and Certificates
      `openssl genrsa -out key.pem 2048
       openssl req -new -x509 -key key.pem -out cert.pem -days 1095` -> fill out
