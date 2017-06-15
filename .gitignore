@@ -97,3 +97,7 @@ bundle.js
 node_modules
 
 notes.md
+
+# stunnel
+etc/
+stunnel.pem
