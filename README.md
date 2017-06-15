@@ -37,8 +37,12 @@ Export the following variables with their assigned values
 * `flask run`or `bash flask.sh run` - to run server
 * open http://localhost:5000/apply/static/bundle.js - should see bundle.js script
 
-stunnel
-*
+Stunnel
+* Generate SSL Keys and Certificates
+     `openssl genrsa -out key.pem 2048
+      openssl req -new -x509 -key key.pem -out cert.pem -days 1095` -> fill out
+* copy key.pem and cert.pem to etc/stunnel
+      `cat key.pem cert.pem  > etc/stunnel/stunnel.pem`
 
 ## Global Heroku config/env vars:
 
