@@ -2,44 +2,18 @@ from flask import Blueprint, render_template, url_for, request, session, redirec
 from app import app
 import os
 import models
-from flask_oauthlib.client import OAuth # qbo
 from oauth2client.client import OAuth2WebServerFlow, OAuth2Credentials # gsuite
 import httplib2
 from apiclient import discovery
-
+from flask_oauthlib.client import OAuth # qbo
 
 blueprint = Blueprint(os.path.dirname(os.path.realpath(__file__)).split("/")[-1], __name__, template_folder='templates', static_folder='static')
 
-# QBO
+@blueprint.route("/")
+def index():
+    return redirect(url_for("{0}.authorize_gsuite".format(blueprint.name)))
 
-qbo = OAuth().remote_app(
-    'qbo',
-    request_token_url = 'https://oauth.intuit.com/oauth/v1/get_request_token',
-    access_token_url  = 'https://oauth.intuit.com/oauth/v1/get_access_token',
-    authorize_url     = 'https://appcenter.intuit.com/Connect/Begin',
-    consumer_key      = app.config['QBO_CONSUMER_KEY'],
-    consumer_secret   = app.config['QBO_CONSUMER_SECRET']
-)
-
-@blueprint.route("/authorize_qbo")
-def authorize():
-    return qbo.authorize(callback=url_for("{0}.qbo_authorized".format(blueprint.name)))
-
-@blueprint.route("/qbo_authorized")
-def authorized():
-    tokens = qbo.authorized_response()
-    if tokens is None:
-        return "Denied"
-    else:
-        session['qbo_token'] = tokens
-        models.store_authentication_tokens(tokens, request.args.get('realmId'))
-    return redirect(url_for("{0}.charts_of_accounts".format(blueprint.name)))
-
-@qbo.tokengetter
-def tokengetter():
-    return session['qbo_token']['oauth_token'], session['qbo_token']['oauth_token_secret']
-
-# GSuite
+# Step-1, authorize GSuite
 
 def flow():
     return OAuth2WebServerFlow(
@@ -59,7 +33,7 @@ def gsuite_authorized():
     session['gsuite_credentials'] = credentials.to_json()
     return redirect(url_for("{0}.charts_of_accounts".format(blueprint.name)))
 
-# Chart of accounts
+# Step-2, choose a chart of accounts
 
 prefix = "charts_of_accounts/"
 @blueprint.route("/{0}".format(prefix), defaults={'id': app.config['GSUITE_CHARTS_OF_ACCOUNTS_FOLDER_ID']})
@@ -73,6 +47,40 @@ def charts_of_accounts(id):
     files = drive.files().list(q="'{0}' in parents and (mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.folder')".format(id), orderBy="name").execute()['files']
     return render_template('charts_of_accounts.html', files = files, blueprint_name = blueprint.name)
 
-@blueprint.route("/set_chart_of_accounts/<string:id>")
-def set_chart_of_accounts(id):
-    return "OK"
+@blueprint.route("/set_chart_of_accounts/<string:sheet_id>")
+def set_chart_of_accounts(sheet_id):
+    session['sheet_id'] = sheet_id
+    return redirect(url_for("{0}.authorize_qbo".format(blueprint.name)))
+
+# Step-3, authorize QBO
+
+qbo = OAuth().remote_app(
+    'qbo',
+    request_token_url = 'https://oauth.intuit.com/oauth/v1/get_request_token',
+    access_token_url  = 'https://oauth.intuit.com/oauth/v1/get_access_token',
+    authorize_url     = 'https://appcenter.intuit.com/Connect/Begin',
+    consumer_key      = app.config['QBO_CONSUMER_KEY'],
+    consumer_secret   = app.config['QBO_CONSUMER_SECRET']
+)
+
+@blueprint.route("/authorize_qbo")
+def authorize_qbo():
+    return qbo.authorize(callback=url_for("{0}.qbo_authorized".format(blueprint.name)))
+
+@blueprint.route("/qbo_authorized")
+def qbo_authorized():
+    qbo_tokens = qbo.authorized_response()
+    session['qbo_tokens'] = qbo_tokens;
+    models.store_qbo_authentication_tokens(qbo_tokens, request.args.get('realmId'))
+    return redirect(url_for("{0}.update_chart_of_accounts".format(blueprint.name)))
+
+@qbo.tokengetter
+def tokengetter():
+    return session['qbo_tokens']['oauth_token'], session['qbo_tokens']['oauth_token_secret']
+
+# Step-4, update chart of accounts
+
+@blueprint.route("/update_chart_of_accounts")
+def update_chart_of_accounts():
+    models.update_chart_of_accounts(session['qbo_tokens'], OAuth2Credentials.from_json(session['gsuite_credentials']), session['sheet_id'])
+    return render_template('update_chart_of_accounts.html')

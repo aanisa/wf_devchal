@@ -17,7 +17,7 @@ class AuthenticationTokens(Base):
     oauth_token = db.Column(db.String(120))
     oauth_token_secret = db.Column(db.String(120))
 
-def store_authentication_tokens(tokens, company_id):
+def store_qbo_authentication_tokens(tokens, company_id):
     authorization_tokens = AuthenticationTokens.query.filter_by(company_id=company_id).first()
     if authorization_tokens is None:
         authorization_tokens = AuthenticationTokens(company_id=company_id)
@@ -26,5 +26,5 @@ def store_authentication_tokens(tokens, company_id):
     db.session.add(authorization_tokens)
     db.session.commit()
 
-def set_chart_of_accounts(path):
+def update_chart_of_accounts(qbo_tokens, gsuite_credentials, sheet_id):
     pass
