@@ -41,11 +41,11 @@ def after_survey_monkey():
 @cross_origin()
 def email_template():
     tc_school_id = request.args.get("tc_school_id")
-    if tc_school_id:
-        school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
-        return redirect(school.email_template_get_url())
-    else:
-        return redirect(models.School.default_email_template_get_url())
+    # if tc_school_id:
+    #     school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
+    #     return redirect(school.email_template_get_url())
+    # else:
+    return redirect(models.School.default_email_template_get_url())
 
 @blueprint.route('/email_template_post_parameters')
 @cross_origin()
