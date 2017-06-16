@@ -31,6 +31,14 @@ Export the following variables with their assigned values
 * `export TRANSPARENT_CLASSROOM_API_TOKEN_SANDBOX`
 * `export SLACK_API_TOKEN`
 * `export SLACK_VERIFICATION_TOKEN`
+* `export GSUITE_CLIENT_SECRET`
+* `export GSUITE_CLIENT_ID`
+* `export GSUITE_CHARTS_OF_ACCOUNTS_FOLDER_ID`
+* `export FLASK_SECRET_KEY`
+* `export QBO_S3_BUCKET`
+* `export APPLY_S3_BUCKET`
+* `export QBO_CONSUMER_SECRET`
+* `export QBO_CONSUMER_KEY`
 
 * `npm install webpack -g`
 * `webpack react/app.js static/bundle.js` - run webpack and create bundle.js file
@@ -49,7 +57,6 @@ Stunnel
 
 * Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf`
 * Re-Start Server: `bash flask.sh run`
-
 
 
 ## Global Heroku config/env vars:
