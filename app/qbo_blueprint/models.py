@@ -63,7 +63,7 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
             accounts[i]['Name'] = name
             parent_account = next(a for a in accounts if a["FullyQualifiedName"] == parent_fully_qualified_name)
             accounts[i]['ParentRef'] = {"value": parent_account["Id"]}
-        else
+        else:
             accounts[i]['Name'] = fqn
 
         response = qbo.post("https://quickbooks.api.intuit.com/v3/company/{0}/account".format(qbo_company_id), format='json', headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'wfbot'}, data=account)
