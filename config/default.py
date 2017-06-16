@@ -2,6 +2,7 @@ import os
 
 DEBUG=False
 SQLALCHEMY_TRACK_MODIFICATIONS=False
+SECRET_KEY=os.environ["FLASK_SECRET_KEY"]
 
 MAIL_SERVER='email-smtp.us-east-1.amazonaws.com'
 MAIL_PORT=587

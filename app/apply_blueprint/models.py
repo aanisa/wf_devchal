@@ -51,7 +51,7 @@ class School(Base):
         return s3.generate_presigned_url(
             ClientMethod='get_object',
             Params={
-                'Bucket': app.config['S3_BUCKET'],
+                'Bucket': app.config['APPLY_S3_BUCKET'],
                 'Key': "email-templates/default.html"
             }
         )
@@ -61,14 +61,14 @@ class School(Base):
         return s3.generate_presigned_url(
             ClientMethod='get_object',
             Params={
-                'Bucket': app.config['S3_BUCKET'],
+                'Bucket': app.config['APPLY_S3_BUCKET'],
                 'Key': self.s3_template_path
             }
         )
 
     def email_template_post_parameters(self):
         s3 = boto3.client('s3', config=botocore.client.Config(signature_version='s3v4'))
-        return s3.generate_presigned_post(Bucket=app.config['S3_BUCKET'], Key=self.s3_template_path)
+        return s3.generate_presigned_post(Bucket=app.config['APPLY_S3_BUCKET'], Key=self.s3_template_path)
 
 class SurveyMonkey(object):
     # log SurveyMonkey's X-Ratelimit-App-Global-Day-Remaining header
@@ -315,12 +315,12 @@ class Application(object):
 
         s3 = boto3.client('s3')
 
-        default_template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key="email-templates/default.html")['Body'].read().decode('utf-8')
+        default_template_string = s3.get_object(Bucket=app.config['APPLY_S3_BUCKET'], Key="email-templates/default.html")['Body'].read().decode('utf-8')
 
         for school in schools:
             template_string = default_template_string
             try:
-                template_string = s3.get_object(Bucket=app.config['S3_BUCKET'], Key=school.s3_template_path)['Body'].read().decode('utf-8')
+                template_string = s3.get_object(Bucket=app.config['APPLY_S3_BUCKET'], Key=school.s3_template_path)['Body'].read().decode('utf-8')
             except Exception as e:
                 pass
             message = {
