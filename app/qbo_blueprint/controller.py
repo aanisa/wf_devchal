@@ -71,7 +71,9 @@ def authorize_qbo():
 def qbo_authorized():
     qbo_tokens = qbo.authorized_response()
     session['qbo_tokens'] = qbo_tokens;
-    models.store_qbo_authentication_tokens(qbo_tokens, request.args.get('realmId'))
+    qbo_company_id = request.args.get('realmId');
+    session['qbo_company_id'] = qbo_company_id;
+    models.store_qbo_authentication_tokens(qbo_tokens, qbo_company_id)
     return redirect(url_for("{0}.update_chart_of_accounts".format(blueprint.name)))
 
 @qbo.tokengetter
@@ -82,5 +84,5 @@ def tokengetter():
 
 @blueprint.route("/update_chart_of_accounts")
 def update_chart_of_accounts():
-    models.update_chart_of_accounts(session['qbo_tokens'], OAuth2Credentials.from_json(session['gsuite_credentials']), session['sheet_id'])
+    models.update_chart_of_accounts(qbo, session['qbo_company_id'], OAuth2Credentials.from_json(session['gsuite_credentials']), session['sheet_id'])
     return render_template('update_chart_of_accounts.html')
