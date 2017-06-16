@@ -34,7 +34,6 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
     skip_list = [u'Retained Earnings', u'Sales of Product Income', u'Services', u'Uncategorized Asset', u'Uncategorized Expense', u'Uncategorized Income', u'Undeposited Funds', u'Opening Balance Equity']
 
     # delete existing accounts, except un-delete-ables
-    app.logger.info("Deleting existing QBO accounts")
     for account in qbo.get("https://quickbooks.api.intuit.com/v3/company/{0}/query?query=select%20%2A%20from%20account&minorversion=4".format(qbo_company_id), headers={'Accept': 'application/json'}).data['QueryResponse']['Account']:
         if account['FullyQualifiedName'] not in skip_list:
             account['Active'] = False
@@ -43,7 +42,6 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
                 raise LookupError, "update {0} {1} {2}".format(response.status, response.data, account)
 
     # get chart of accounts from google sheet
-    app.logger.info("Getting chart of accounts from Google")
     http_auth = gsuite_credentials.authorize(httplib2.Http())
     sheets = discovery.build('sheets', 'v4', http_auth)
     result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range='A:Z').execute()
@@ -59,7 +57,6 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
     # important! create accounts closer to the root of the tree first, further away later, so the latter can reference the former
     accounts = sorted(accounts, key=lambda a: a['FullyQualifiedName'].count(':'))
 
-    app.logger.info("Creating QBO accounts")
     for i, account in enumerate(accounts):
         if account['FullyQualifiedName'] not in skip_list:
             fqn = account['FullyQualifiedName']
@@ -71,7 +68,6 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
             else:
                 accounts[i]['Name'] = fqn
 
-            print accounts[i]
             response = qbo.post("https://quickbooks.api.intuit.com/v3/company/{0}/account".format(qbo_company_id), format='json', headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'wfbot'}, data=accounts[i])
             if response.status != 200:
                 raise LookupError, "create {0} {1} {2}".format(response.status, response.data, account)
