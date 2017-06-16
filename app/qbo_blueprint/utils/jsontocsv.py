@@ -10,11 +10,14 @@ input = sys.stdin.read()
 
 writer = csv.writer(sys.stdout)
 
+skip_list = [u'Retained Earnings', u'Sales of Product Income', u'Services', u'Uncategorized Asset', u'Uncategorized Expense', u'Uncategorized Income', u'Undeposited Funds', u'Opening Balance Equity']
+
 for account in json.loads(input)["QueryResponse"]["Account"]:
-    writer.writerow([
-        account.get("FullyQualifiedName", ""),
-        account.get("Classification", ""),
-        account.get("AccountType", ""),
-        account.get("AccountSubType", ""),
-        account.get("Description", "")
-    ])
+    if account['FullyQualifiedName'] not in skip_list:
+        writer.writerow([
+            account.get("FullyQualifiedName", ""),
+            account.get("Classification", ""),
+            account.get("AccountType", ""),
+            account.get("AccountSubType", ""),
+            account.get("Description", "")
+        ])
