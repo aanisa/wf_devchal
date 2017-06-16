@@ -58,6 +58,12 @@ Stunnel
 * Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf`
 * Re-Start Server: `bash flask.sh run`
 
+Database
+* Start postgres - `brew services start postgresql`
+* Create Postico Database - new favorite called 'wf'
+* Create Table - copy queries.sql
+
+
 
 ## Global Heroku config/env vars:
 
