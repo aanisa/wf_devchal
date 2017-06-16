@@ -61,7 +61,7 @@ def update_chart_of_accounts(qbo, qbo_company_id, gsuite_credentials, sheet_id):
         if fqn.count(':') > 0:
             parent_fully_qualified_name, name = fqn.rsplit(":", 1)
             accounts[i]['Name'] = name
-            parent_account = next(a for a in accounts if a["FullyQualifiedName"] == parent_fully_qualified_name)\
+            parent_account = next(a for a in accounts if a["FullyQualifiedName"] == parent_fully_qualified_name)
             accounts[i]['ParentRef'] = {"value": parent_account["Id"]}
         else
             accounts[i]['Name'] = fqn
