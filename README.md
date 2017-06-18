@@ -1,6 +1,7 @@
 # Wildflower Foundation Dev Challenge
 
-### Goal: Build UI for email template used by teachers
+### Goal:
+Build UI for email template used by teachers
 
 ## Set-up
 * Fork Repo
@@ -8,7 +9,7 @@
 * `git pull origin master`
 * `npm install`
 
-Install Pip - Run these commands
+#### Install Pip - Run these commands
 * `curl -O http://python-distribute.org/distribute_setup.py`
 * `python distribute_setup.py`
 * `curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py`
@@ -19,7 +20,7 @@ Install Pip - Run these commands
 *  `export FLASK_APP=app/__init__.py`
 * `export APP_CONFIG_MODE=development`
 
-Export the following variables with their assigned values
+#### Export the following variables with their assigned values
 * `export APP_CONFIG_MODE`
 * `export MAIL_USERNAME`
 * `export MAIL_PASSWORD`
@@ -45,7 +46,7 @@ Export the following variables with their assigned values
 * `flask run`or `bash flask.sh run` - to run server
 * open http://localhost:5000/apply/static/bundle.js - should see bundle.js script
 
-Stunnel
+#### Stunnel
 * `brew install stunnel`
 * Create stunnel.pem file in root directory
 * Generate SSL Keys and Certificates
@@ -58,11 +59,11 @@ Stunnel
 * Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf`
 * Re-Start Server: `bash flask.sh run`
 
-Database
+#### Database
 * Start postgres - `brew services start postgresql`
 * Create Postico Database - new favorite called 'wf'
 * Create Table - copy queries.sql
-
+* Re-Start Server: `bash flask.sh run`
 
 
 ## Global Heroku config/env vars:
