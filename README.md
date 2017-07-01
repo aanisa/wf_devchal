@@ -17,7 +17,7 @@ Build UI for email template used by teachers
 * `pip install virtualenv`
 * `virtualenv [name dir]` - install virtual env into project Repo
 * `pip install -r requirements.txt` - Install Dependencies
-*  `export FLASK_APP=app/__init__.py`
+* `export FLASK_APP=app/__init__.py`
 * `export APP_CONFIG_MODE=development`
 
 #### Export the following variables with their assigned values
