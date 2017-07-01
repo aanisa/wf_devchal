@@ -5,36 +5,32 @@ import ReactDOM from 'react-dom';
 import 'whatwg-fetch'
 
 var scripts = document.getElementsByTagName("script");
-var thisUrl = scripts[scripts.length - 1].src;
+var thisUrl = scripts[scripts.length-1].src;
 
 class UI extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      value: "",
-      label: "Save",
-      disabled: false
-    };
+    this.state = { value: "", label: "Save", disabled: false};
     var that = this;
-    fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId).then(function(response) {
-      if (response.status == 404) {
-        fetch(thisUrl + "/../../email_template?tc_api_token=" + tc.env.userApiToken).then(function(response) {
+    fetch(thisUrl + "/../../email_template?tc_school_id=" + tc.env.currentSchoolId)
+      .then(function(response) {
+        if (response.status == 404) {
+          fetch(thisUrl + "/../../email_template?tc_api_token=" + tc.env.userApiToken)
+            .then(function(response) {
+              return response.text();
+            }).then(function(text) {
+              that.setState({value: text});
+            }).catch(function(ex) {
+              alert('failed:' + ex);
+            })
+        } else {
           return response.text();
-        }).then(function(text) {
-          that.setState({value: text});
-        }).catch(function(ex) {
-          alert('failed:' + ex);
-        })
-      } else {
-        console.log('THE response', response);
-        return response.text();
-      }
-    }).then(function(text) {
-      console.log('Text', text);
-      that.setState({value: text});
-    }).catch(function(ex) {
-      alert('failed:' + ex);
-    })
+        }
+      }).then(function(text) {
+        that.setState({value: text});
+      }).catch(function(ex) {
+        alert('failed:' + ex);
+      })
   }
   changed(e) {
     this.setState({value: e.target.value});
@@ -42,29 +38,30 @@ class UI extends React.Component {
   save(e) {
     this.setState({label: "Saving...", disabled: true})
     var that = this;
-    fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken).then(function(response) {
-      return response.json();
-    }).then(function(json) {
-      var f = new FormData();
-      for (var k in json.fields) {
-        f.append(k, json.fields[k]);
-      }
-      var b = new Blob([that.state.value], {type: "text/html"});
-      f.append("file", b);
-      fetch(json.url, {
-        method: 'POST',
-        body: f
-      }).then(function(response) {
-        that.setState({label: "Saved"})
-        setTimeout(function() {
-          that.setState({label: "Save", disabled: false})
-        }, 3000)
+    fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
+      .then(function(response) {
+        return response.json();
+      }).then(function(json) {
+        var f  = new FormData();
+        for (var k in json.fields) {
+          f.append(k, json.fields[k]);
+        }
+        var b = new Blob([that.state.value], {type: "text/html"});
+        f.append("file", b);
+        fetch(json.url , {
+           method: 'POST',
+           body: f
+         }).then(function(response) {
+           that.setState({label: "Saved"})
+           setTimeout(function() {
+             that.setState({label: "Save", disabled: false})
+           }, 3000)
+         }).catch(function(ex) {
+           alert('updating status failed:' + ex);
+         })
       }).catch(function(ex) {
-        alert('updating status failed:' + ex);
+        alert('failed:' + ex);
       })
-    }).catch(function(ex) {
-      alert('failed:' + ex);
-    })
   }
   keyDown(e) {
     if (e.metaKey && e.keyCode == 83) {
@@ -76,18 +73,22 @@ class UI extends React.Component {
   render() {
     return (
       <div>
-           <b>Parent Email Template</b><br/>
-           <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
-           <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
+        <b>Parent Email Template</b><br/>
+        <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
+        <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
       </div>
-)
-    }
+    )
+  }
 }
 
-setTimeout(function() {
-    if (location.pathname.endsWith('application/parent_email_template ')) {
- document.title = 'Application: Parent Email Template';
-    ReactDOM.render(< UI / >, document.getElementById('foundation'));}
+setTimeout(function(){
+  if (location.pathname.endsWith('application/parent_email_template')) {
+    document.title = 'Application: Parent Email Template';
+    ReactDOM.render(
+      <UI />,
+      document.getElementById('foundation')
+    );
+  }
 
   if (location.pathname == '/s/' + tc.env.currentSchoolId + '/schools/' + tc.env.currentSchoolId) {
     var div = document.createElement("div");
@@ -96,5 +97,4 @@ setTimeout(function() {
     form.parentNode.insertBefore(div, form.nextSibling);
   }
 
-},
-200);
+}, 200);
