@@ -38,8 +38,11 @@ class UI extends React.Component {
   save(e) {
     this.setState({label: "Saving...", disabled: true})
     var that = this;
+    // console.warn('XHR ISSUE',xhr.responseText);
     fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
+        console.log('Response', response.json());
+        // In Response.json() --> [[PromiseValue]] :SyntaxError: Unexpected token < in JSON at position ]
         return response.json();
       }).then(function(json) {
         var f  = new FormData();
@@ -74,6 +77,7 @@ class UI extends React.Component {
     return (
       <div>
         <b>Parent Email Template</b><br/>
+        <p> This is a Test Tag </p>
         <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
         <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
       </div>
