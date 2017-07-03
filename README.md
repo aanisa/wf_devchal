@@ -14,8 +14,6 @@ Build UI for email template used by teachers
 * `python distribute_setup.py`
 * `curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py`
 * `python get-pip.py`
-* `pip install virtualenv`
-* `virtualenv [name dir]` - install virtual env into project Repo
 * `pip install -r requirements.txt` - Install Dependencies
 * `export FLASK_APP=app/__init__.py`
 * `export APP_CONFIG_MODE=development`
