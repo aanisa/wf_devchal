@@ -57,7 +57,7 @@ Build UI for email template used by teachers
 * copy key.pem and cert.pem to etc/stunnel
     -  `cat key.pem cert.pem  > etc/stunnel/stunnel.pem`
 
-* Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf`
+* Start stunnel:  `sudo stunnel etc/stunnel/stunnel.conf` - `sudo stunnel stunnel.conf`
 * Re-Start Server: `bash flask.sh run`
 
 #### Database
