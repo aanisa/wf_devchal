@@ -43,6 +43,7 @@ class UI extends React.Component {
       .then(function(response) {
         console.log('Response', response.json());
         // In Response.json() --> [[PromiseValue]] :SyntaxError: Unexpected token < in JSON at position ]
+        //unable to save
         return response.json();
       }).then(function(json) {
         var f  = new FormData();
@@ -73,13 +74,23 @@ class UI extends React.Component {
       return false;
     }
   }
+  textEdit() {
+    console.log('Add some Text');
+  }
+
   render() {
     return (
       <div>
         <b>Parent Email Template</b><br/>
-        <p> This is a Test Tag </p>
-        <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
-        <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
+        <div>
+          <div name="textEditor">
+            <button onClick={this.textEdit}>Add Text</button>
+          </div>
+          <div >
+            <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
+            <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
+          </div>
+        </div>
       </div>
     )
   }

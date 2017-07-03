@@ -52,6 +52,7 @@ def email_template():
 def email_template_post_parameters():
     tc_api_token = request.args.get("tc_api_token")
     tc_school_id = int(request.args.get("tc_school_id"))
+
     if models.TransparentClassroom.authorized(tc_api_token, tc_school_id):
         school = models.School.query.filter_by(tc_school_id=tc_school_id).first()
         return jsonify(school.email_template_post_parameters())
