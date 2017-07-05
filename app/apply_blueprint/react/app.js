@@ -76,6 +76,7 @@ class UI extends React.Component {
   }
   textEdit() {
     console.log('Add some Text');
+    
   }
 
   render() {

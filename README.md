@@ -42,7 +42,7 @@ Build UI for email template used by teachers
 * `npm install webpack -g`
 * Open new terminal windown and navigate to `app/apply_blueprint`
 * `webpack react/app.js static/bundle.js` - run webpack and create bundle.js file
-* `flask run`or `bash flask.sh run` - to run server
+* `bash flask.sh run` - to run server
 * open http://localhost:5000/apply/static/bundle.js - should see bundle.js script
 
 #### Stunnel
