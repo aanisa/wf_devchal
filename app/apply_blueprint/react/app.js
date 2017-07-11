@@ -41,7 +41,6 @@ class UI extends React.Component {
     // console.warn('XHR ISSUE',xhr.responseText);
     fetch(thisUrl + "/../../email_template_post_parameters?tc_school_id=" + tc.env.currentSchoolId + "&tc_api_token=" + tc.env.userApiToken)
       .then(function(response) {
-        console.log('Response', response.json());
         // In Response.json() --> [[PromiseValue]] :SyntaxError: Unexpected token < in JSON at position ]
         //unable to save
         return response.json();
@@ -74,24 +73,13 @@ class UI extends React.Component {
       return false;
     }
   }
-  textEdit() {
-    console.log('Add some Text');
-    
-  }
 
   render() {
     return (
       <div>
         <b>Parent Email Template</b><br/>
-        <div>
-          <div name="textEditor">
-            <button onClick={this.textEdit}>Add Text</button>
-          </div>
-          <div >
-            <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
-            <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
-          </div>
-        </div>
+        <textarea name="template" id="template" cols="120" rows="20" value={this.state.value} onChange={(e) => this.changed(e)} onKeyDown={(e) => this.keyDown(e)}></textarea><br/>
+        <input type="button" value={this.state.label} onClick={(e) => this.save(e)} disabled={this.state.disabled}/><br/>
       </div>
     )
   }
